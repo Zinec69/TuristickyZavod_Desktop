@@ -1,4 +1,5 @@
-﻿using PCSC;
+﻿using MiFare.Classic;
+using PCSC;
 using PCSC.Monitoring;
 using System.Text;
 using turisticky_zavod.Data;
@@ -12,13 +13,16 @@ namespace turisticky_zavod.Domain
 
         public NFCReaderPCSC()
         {
+            var readers = GetReaderNames();
+            if (readers.Length < 1)
+                throw new Exception("Čtečka nenalezena");
+
             Monitor = MonitorFactory.Instance.Create(SCardScope.System);
 
             //Monitor.StatusChanged += (sender, args) => MessageBox.Show($"Reader monitor status changed\nLast: {args.LastState}\nNew: {args.NewState}");
             Monitor.MonitorException += (sender, args) => MessageBox.Show($"Reader monitor exception: {args.Message}");
             //Monitor.Initialized += (sender, args) => MessageBox.Show($"\"{args.ReaderName}\" successfully initialized, state: {args.State}");
 
-            var readers = GetReaderNames();
             ReaderName = readers.FirstOrDefault(s => s.Contains("PICC"), readers[0]);
             Monitor.Start(ReaderName);
         }
@@ -27,6 +31,7 @@ namespace turisticky_zavod.Domain
         {
             string all_str = "";
             int i = 1, count = -1;
+            int starting_block = 0, num_of_blocks = 0;
             using (var context = ContextFactory.Instance.Establish(SCardScope.System))
             {
                 using (var reader = context.ConnectReader(ReaderName, SCardShareMode.Shared, SCardProtocol.Any))
@@ -35,7 +40,8 @@ namespace turisticky_zavod.Domain
 
                     while (i < 64)
                     {
-                        if ((i + 1) % 4 == 0)
+                        int blocks_in_sector = GetBlocksInSector(GetBlockSector(i));
+                        if ((i + 1) % blocks_in_sector == 0)
                         {
                             i++;
                             continue;
@@ -52,6 +58,8 @@ namespace turisticky_zavod.Domain
                             if (count < 0)
                             {
                                 count = int.Parse(block);
+                                starting_block = i;
+                                num_of_blocks = count;
                             }
                             else
                             {
@@ -63,9 +71,12 @@ namespace turisticky_zavod.Domain
                         }
                         else
                         {
-                            i += i == 1 ? 3 : 4;
+                            i += i == 1 ? blocks_in_sector - 1 : blocks_in_sector;
                         }
                     }
+
+                    if (!EraseTag(reader, starting_block, num_of_blocks))
+                        throw new Exception("Nepodařilo se vymazat čip");
                 }
             }
 
@@ -73,10 +84,12 @@ namespace turisticky_zavod.Domain
                 throw new Exception("Nepodařilo se z čipu přečíst všechny informace");
 
             var runner_split = all_str.Split(";");
+            var name = runner_split[1].Split(' ');
             return new Runner()
             {
                 ID = int.Parse(runner_split[0]),
-                Name = runner_split[1],
+                FirstName = name[0],
+                LastName = name[1],
                 Team = runner_split[2],
                 StartTime = long.Parse(runner_split[3]),
                 FinishTime = runner_split[4] == "0" ? null : long.Parse(runner_split[4]),
@@ -84,6 +97,30 @@ namespace turisticky_zavod.Domain
                 PenaltySeconds = int.Parse(runner_split[6]),
                 Disqualified = runner_split[7] == "1"
             };
+        }
+
+        private static bool EraseTag(ICardReader reader, int starting_block, int num_of_blocks)
+        {
+            var data = new byte[16];
+            int i = starting_block, count = num_of_blocks;
+            while (i < 64 && count >= 0)
+            {
+                int blocks_in_sector = GetBlocksInSector(GetBlockSector(i));
+                if ((i + 1) % blocks_in_sector == 0)
+                {
+                    i++;
+                    continue;
+                }
+                if (AuthenticateBlock(reader, i))
+                {
+                    if (UpdateBlock(reader, i++, data))
+                        count--;
+                }
+                else
+                    i += i == 1 ? blocks_in_sector - 1 : blocks_in_sector;
+            }
+
+            return true;
         }
 
         private static bool LoadAuthenticationKey(ICardReader reader)
@@ -116,6 +153,25 @@ namespace turisticky_zavod.Domain
 
             return true;
         }
+
+        private static bool UpdateBlock(ICardReader reader, int block, byte[] data)
+        {
+            if (data.Length != 16)
+                return false;
+
+            var buffer = new byte[2];
+            var cmd = new byte[21];
+
+            new byte[] { 0xFF, 0xD6, 0x00, (byte)block, 0x10 }.CopyTo(cmd, 0);
+            data.CopyTo(cmd, 5);
+
+            reader.Transmit(cmd, buffer);
+
+            return buffer[0] == 0x90 && buffer[1] == 0x00;
+        }
+
+        private static int GetBlocksInSector(int sector) => sector < 32 ? 4 : 16;
+        private static int GetBlockSector(int block) => block < 32 * 4 ? block / 4 : 32 + (block - 32 * 4) / 16;
 
         public void AddOnCardInserted(CardInsertedEvent event_handler) => Monitor.CardInserted += event_handler;
         public void AddOnCardRemoved(CardRemovedEvent event_handler) => Monitor.CardRemoved += event_handler;

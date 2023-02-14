@@ -78,10 +78,12 @@ namespace turisticky_zavod.Domain
             }
 
             var runner_split = all_str.Split(";");
+            var name = runner_split[1].Split(' ');
             var runner = new Runner()
             {
                 ID = int.Parse(runner_split[0]),
-                Name = runner_split[1],
+                FirstName = name[0],
+                LastName = name[1],
                 Team = runner_split[2],
                 StartTime = long.Parse(runner_split[3]),
                 FinishTime = runner_split[4] == "0" ? null : long.Parse(runner_split[4]),

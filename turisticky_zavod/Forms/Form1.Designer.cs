@@ -38,7 +38,7 @@
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(318, 10);
+            this.button2.Location = new System.Drawing.Point(456, 10);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(108, 38);
             this.button2.TabIndex = 1;
@@ -50,9 +50,9 @@
             // 
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripStatusLabel1});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 295);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 500);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(759, 22);
+            this.statusStrip1.Size = new System.Drawing.Size(1031, 22);
             this.statusStrip1.TabIndex = 2;
             this.statusStrip1.Text = "statusStrip1";
             // 
@@ -79,14 +79,14 @@
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.RowTemplate.Height = 25;
             this.dataGridView1.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dataGridView1.Size = new System.Drawing.Size(735, 238);
+            this.dataGridView1.Size = new System.Drawing.Size(1007, 443);
             this.dataGridView1.TabIndex = 3;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(759, 317);
+            this.ClientSize = new System.Drawing.Size(1031, 522);
             this.Controls.Add(this.dataGridView1);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.button2);
