@@ -1,0 +1,221 @@
+﻿namespace Forms
+{
+    partial class JsonPicker
+    {
+        /// <summary>
+        /// Required designer variable.
+        /// </summary>
+        private System.ComponentModel.IContainer components = null;
+
+        /// <summary>
+        /// Clean up any resources being used.
+        /// </summary>
+        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing && (components != null))
+            {
+                components.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+
+        #region Windows Form Designer generated code
+
+        /// <summary>
+        /// Required method for Designer support - do not modify
+        /// the contents of this method with the code editor.
+        /// </summary>
+        private void InitializeComponent()
+        {
+            components = new System.ComponentModel.Container();
+            dataGridView1 = new DataGridView();
+            RunnerID = new DataGridViewTextBoxColumn();
+            FirstName = new DataGridViewTextBoxColumn();
+            LastName = new DataGridViewTextBoxColumn();
+            teamDataGridViewTextBoxColumn = new DataGridViewTextBoxColumn();
+            StartTimeFormatted = new DataGridViewTextBoxColumn();
+            FinishTimeFormatted = new DataGridViewTextBoxColumn();
+            disqualifiedDataGridViewCheckBoxColumn = new DataGridViewCheckBoxColumn();
+            runnerBindingSource = new BindingSource(components);
+            button_cancel = new Button();
+            button_save = new Button();
+            groupBox1 = new GroupBox();
+            label_title = new Label();
+            label_hint = new Label();
+            ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)runnerBindingSource).BeginInit();
+            groupBox1.SuspendLayout();
+            SuspendLayout();
+            // 
+            // dataGridView1
+            // 
+            dataGridView1.AllowUserToAddRows = false;
+            dataGridView1.AllowUserToDeleteRows = false;
+            dataGridView1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            dataGridView1.AutoGenerateColumns = false;
+            dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            dataGridView1.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.DisplayedCells;
+            dataGridView1.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dataGridView1.Columns.AddRange(new DataGridViewColumn[] { RunnerID, FirstName, LastName, teamDataGridViewTextBoxColumn, StartTimeFormatted, FinishTimeFormatted, disqualifiedDataGridViewCheckBoxColumn });
+            dataGridView1.DataSource = runnerBindingSource;
+            dataGridView1.EditMode = DataGridViewEditMode.EditProgrammatically;
+            dataGridView1.Location = new Point(8, 22);
+            dataGridView1.Margin = new Padding(5, 2, 5, 5);
+            dataGridView1.Name = "dataGridView1";
+            dataGridView1.ReadOnly = true;
+            dataGridView1.RowTemplate.Height = 25;
+            dataGridView1.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dataGridView1.Size = new Size(777, 309);
+            dataGridView1.TabIndex = 0;
+            dataGridView1.ColumnHeaderMouseClick += dataGridView1_ColumnHeaderMouseClick;
+            // 
+            // RunnerID
+            // 
+            RunnerID.DataPropertyName = "RunnerID";
+            RunnerID.HeaderText = "Startovní číslo";
+            RunnerID.Name = "RunnerID";
+            RunnerID.ReadOnly = true;
+            // 
+            // FirstName
+            // 
+            FirstName.DataPropertyName = "FirstName";
+            FirstName.HeaderText = "Jméno";
+            FirstName.Name = "FirstName";
+            FirstName.ReadOnly = true;
+            // 
+            // LastName
+            // 
+            LastName.DataPropertyName = "LastName";
+            LastName.HeaderText = "Příjmení";
+            LastName.Name = "LastName";
+            LastName.ReadOnly = true;
+            // 
+            // teamDataGridViewTextBoxColumn
+            // 
+            teamDataGridViewTextBoxColumn.DataPropertyName = "Team";
+            teamDataGridViewTextBoxColumn.HeaderText = "Oddíl";
+            teamDataGridViewTextBoxColumn.Name = "teamDataGridViewTextBoxColumn";
+            teamDataGridViewTextBoxColumn.ReadOnly = true;
+            // 
+            // StartTimeFormatted
+            // 
+            StartTimeFormatted.DataPropertyName = "StartTimeFormatted";
+            StartTimeFormatted.HeaderText = "Čas startu";
+            StartTimeFormatted.Name = "StartTimeFormatted";
+            StartTimeFormatted.ReadOnly = true;
+            // 
+            // FinishTimeFormatted
+            // 
+            FinishTimeFormatted.DataPropertyName = "FinishTimeFormatted";
+            FinishTimeFormatted.HeaderText = "Čas konce";
+            FinishTimeFormatted.Name = "FinishTimeFormatted";
+            FinishTimeFormatted.ReadOnly = true;
+            // 
+            // disqualifiedDataGridViewCheckBoxColumn
+            // 
+            disqualifiedDataGridViewCheckBoxColumn.DataPropertyName = "Disqualified";
+            disqualifiedDataGridViewCheckBoxColumn.HeaderText = "Diskvalifikován/a";
+            disqualifiedDataGridViewCheckBoxColumn.Name = "disqualifiedDataGridViewCheckBoxColumn";
+            disqualifiedDataGridViewCheckBoxColumn.ReadOnly = true;
+            // 
+            // runnerBindingSource
+            // 
+            runnerBindingSource.DataSource = typeof(Data.Runner);
+            // 
+            // button_cancel
+            // 
+            button_cancel.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            button_cancel.Location = new Point(706, 417);
+            button_cancel.Name = "button_cancel";
+            button_cancel.Size = new Size(88, 30);
+            button_cancel.TabIndex = 2;
+            button_cancel.Text = "Zrušit";
+            button_cancel.UseVisualStyleBackColor = true;
+            // 
+            // button_save
+            // 
+            button_save.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            button_save.Location = new Point(612, 417);
+            button_save.Name = "button_save";
+            button_save.Size = new Size(88, 30);
+            button_save.TabIndex = 1;
+            button_save.Text = "Uložit";
+            button_save.UseVisualStyleBackColor = true;
+            button_save.Click += button_save_Click;
+            // 
+            // groupBox1
+            // 
+            groupBox1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            groupBox1.Controls.Add(dataGridView1);
+            groupBox1.Location = new Point(9, 68);
+            groupBox1.Margin = new Padding(0);
+            groupBox1.Name = "groupBox1";
+            groupBox1.Size = new Size(793, 339);
+            groupBox1.TabIndex = 3;
+            groupBox1.TabStop = false;
+            groupBox1.Text = "Seznam běžců";
+            // 
+            // label_title
+            // 
+            label_title.AutoSize = true;
+            label_title.Font = new Font("Segoe UI", 14F, FontStyle.Regular, GraphicsUnit.Point);
+            label_title.Location = new Point(12, 9);
+            label_title.Name = "label_title";
+            label_title.Size = new Size(284, 25);
+            label_title.TabIndex = 4;
+            label_title.Text = "Zvolte běžce, které chcete přidat";
+            // 
+            // label_hint
+            // 
+            label_hint.AutoSize = true;
+            label_hint.Font = new Font("Segoe UI", 9F, FontStyle.Italic, GraphicsUnit.Point);
+            label_hint.Location = new Point(15, 37);
+            label_hint.Name = "label_hint";
+            label_hint.Size = new Size(225, 15);
+            label_hint.TabIndex = 5;
+            label_hint.Text = "(Přidržením klávesy ctrl zvolíte více řádků)";
+            // 
+            // JsonPicker
+            // 
+            AcceptButton = button_save;
+            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleMode = AutoScaleMode.Font;
+            CancelButton = button_cancel;
+            ClientSize = new Size(811, 459);
+            Controls.Add(label_hint);
+            Controls.Add(label_title);
+            Controls.Add(groupBox1);
+            Controls.Add(button_save);
+            Controls.Add(button_cancel);
+            DoubleBuffered = true;
+            MinimumSize = new Size(827, 237);
+            Name = "JsonPicker";
+            StartPosition = FormStartPosition.CenterScreen;
+            Text = "Načíst z Jsonu";
+            ((System.ComponentModel.ISupportInitialize)dataGridView1).EndInit();
+            ((System.ComponentModel.ISupportInitialize)runnerBindingSource).EndInit();
+            groupBox1.ResumeLayout(false);
+            ResumeLayout(false);
+            PerformLayout();
+        }
+
+        #endregion
+
+        private DataGridView dataGridView1;
+        private Button button_cancel;
+        private Button button_save;
+        private GroupBox groupBox1;
+        private BindingSource runnerBindingSource;
+        private DataGridViewTextBoxColumn runnerIDDataGridViewTextBoxColumn;
+        private Label label_title;
+        private Label label_hint;
+        private DataGridViewTextBoxColumn RunnerID;
+        private DataGridViewTextBoxColumn FirstName;
+        private DataGridViewTextBoxColumn LastName;
+        private DataGridViewTextBoxColumn teamDataGridViewTextBoxColumn;
+        private DataGridViewTextBoxColumn StartTimeFormatted;
+        private DataGridViewTextBoxColumn FinishTimeFormatted;
+        private DataGridViewCheckBoxColumn disqualifiedDataGridViewCheckBoxColumn;
+    }
+}
