@@ -1,36 +1,36 @@
 ﻿using PCSC;
 using PCSC.Monitoring;
 using System.Text;
-using Data;
+using turisticky_zavod.Data;
+using Usb.Events;
 
-namespace Logic
+namespace turisticky_zavod.Logic
 {
     public class NFCReaderPCSC
     {
-        private ISCardMonitor Monitor;
-        private string ReaderName;
+        private readonly IUsbEventWatcher UsbEventWatcher = new UsbEventWatcher();
+        public ISCardMonitor Monitor = MonitorFactory.Instance.Create(SCardScope.System);
 
-        public SCRState State;
-        private IntPtr controlCode = new(0x310000 + (3500 * 4));
+        private string ReaderName = string.Empty;
+        public SCRState ReaderState;
 
-        public NFCReaderPCSC()
-        {
-            Monitor = MonitorFactory.Instance.Create(SCardScope.System);
+        private readonly IntPtr controlCode = new(0x310000 + (3500 * 4));
 
-            Monitor.StatusChanged += (_, args) => State = args.NewState;
-            Monitor.MonitorException += (_, args) =>
-            {
-                if (args.SCardError == SCardError.ServiceStopped || args.SCardError == SCardError.NoService)
-                    Monitor.Cancel();
-                //else
-                    // TODO
-                    //MessageBox.Show($"Reader monitor exception: {args.SCardError}");
-            };
-            Monitor.Initialized += (_, args) => State = args.State;
-        }
+        public NFCReaderPCSC() { }
 
         public bool Connect()
         {
+            Monitor.Initialized += (_, args) => ReaderState = args.State;
+            Monitor.StatusChanged += (_, args) => ReaderState = args.NewState;
+            //Monitor.MonitorException += (_, args) =>
+            //{
+            //    if (args.SCardError == SCardError.ServiceStopped || args.SCardError == SCardError.NoService)
+            //        Monitor.Cancel();
+            //    //else
+            //        // TODO
+            //        //MessageBox.Show($"Reader monitor exception: {args.SCardError}");
+            //};
+
             var readers = GetReaderNames();
             if (readers.Length > 0)
             {
@@ -58,6 +58,9 @@ namespace Logic
 
         public Runner ReadRunnerFromTag(bool eraseAfterwards = false)
         {
+            if (ReaderState != SCRState.Present)
+                throw new NFCException("Čtečka není připojena");
+
             string all_str = "";
             int i = 1, count = -1;
             int starting_block = 0, num_of_blocks = 0;
@@ -113,7 +116,6 @@ namespace Logic
                 throw new NFCException("Nepodařilo se z čipu přečíst všechna data");
 
             var runner_split = all_str.Split(";");
-            var name = runner_split[1].Split(' ');
 
             if (runner_split.Length < 6)
                 throw new NFCException("Data na čipu jsou nekompletní nebo ve špatném formátu");
@@ -125,12 +127,12 @@ namespace Logic
                 {
                     checkpointInfos.Add(new CheckpointRunnerInfo()
                     {
-                        Checkpoint = Database.Instance.Checkpoints.First(ch => ch.CheckpointID == int.Parse(runner_split[j])),
+                        Checkpoint = Database.Instance.Checkpoint.First(ch => ch.CheckpointID == int.Parse(runner_split[j])),
                         Referee = new() { Name = runner_split[j + 1] },
-                        TimeArrived = long.Parse(runner_split[j + 2]) * 1000,
-                        TimeDeparted = runner_split[j + 3] == "0" ? null : long.Parse(runner_split[j + 3]) * 1000,
-                        TimeWaitedSeconds = int.Parse(runner_split[j + 4]),
-                        PenaltySeconds = int.Parse(runner_split[j + 5])
+                        TimeArrived = DateTimeOffset.FromUnixTimeSeconds(long.Parse(runner_split[j + 2])).DateTime.ToLocalTime(),
+                        TimeDeparted = runner_split[j + 3] == "0" ? null : DateTimeOffset.FromUnixTimeSeconds(long.Parse(runner_split[j + 3])).DateTime.ToLocalTime(),
+                        TimeWaitedSeconds = new TimeSpan(0, 0, int.Parse(runner_split[j + 4])),
+                        PenaltySeconds = new TimeSpan(0, 0, int.Parse(runner_split[j + 5]))
                     });
                 }
             }
@@ -138,11 +140,10 @@ namespace Logic
             return new Runner()
             {
                 RunnerID = int.Parse(runner_split[0]),
-                FirstName = name[0],
-                LastName = name[1],
+                Name = runner_split[1],
                 Team = runner_split[2],
-                StartTime = long.Parse(runner_split[3]) * 1000,
-                FinishTime = runner_split[4] == "0" ? null : long.Parse(runner_split[4]) * 1000,
+                StartTime = DateTimeOffset.FromUnixTimeSeconds(long.Parse(runner_split[3])).DateTime.ToLocalTime(),
+                FinishTime = runner_split[4] == "0" ? null : DateTimeOffset.FromUnixTimeSeconds(long.Parse(runner_split[4])).DateTime.ToLocalTime(),
                 Disqualified = runner_split[5] == "1",
                 CheckpointInfo = checkpointInfos
             };
@@ -237,7 +238,7 @@ namespace Logic
                 Monitor.CardRemoved += event_handler;
         }
 
-        public bool CheckTagCompatibility(byte[] atr) => !(atr.Length < 15 || atr[13] != 0x00 || !(atr[14] == 0x01 || atr[14] == 0x02));
+        public static bool CheckTagCompatibility(byte[] atr) => !(atr.Length < 15 || atr[13] != 0x00 || !(atr[14] == 0x01 || atr[14] == 0x02));
         public bool IsConnected() => Monitor != null && Monitor.Monitoring;
 
         private static string[] GetReaderNames()

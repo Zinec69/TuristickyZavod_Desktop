@@ -1,33 +1,46 @@
-﻿using System.Text.Json.Serialization;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
-namespace Data
+namespace turisticky_zavod.Data
 {
+    public class BaseRunner : Person
+    {
+        [Key]
+        public int ID { get; set; }
+        public int? BirthYear { get; set; }
+    }
+
+    public class Partner : BaseRunner { }
+
     [JsonSerializable(typeof(Runner), TypeInfoPropertyName = "Runners")]
-    public class Runner : Person
+    public class Runner : BaseRunner
     {
         public int? RunnerID { get; set; }
-        public int BirthYear { get; set; }
         public string Team { get; set; }
-        public long StartTime { get; set; }
-        public long? FinishTime { get; set; }
+        public DateTime? StartTime { get; set; }
+        public DateTime? FinishTime { get; set; }
         public bool Disqualified { get; set; }
 
-        public virtual List<CheckpointRunnerInfo> CheckpointInfo { get; set; } = new();
-        public Runner? Partner { get; set; }
-        public AgeCategory? AgeCategory { get => AgeCategory.GetByBirthYear(BirthYear); }
+        public int? PartnerID { get; set; }
 
-        public string StartTimeFormatted
-        {
-            get => StartTime != default
-                ? DateTimeOffset.FromUnixTimeMilliseconds(StartTime).TimeOfDay.ToString("hh':'mm':'ss")
-                : "-";
-        }
-        public string FinishTimeFormatted
-        {
-            get => FinishTime.HasValue && FinishTime != default
-                ? DateTimeOffset.FromUnixTimeMilliseconds(FinishTime.Value).TimeOfDay.ToString("hh':'mm':'ss")
-                : "-";
-        }
-        public string AgeCategoryFormatted { get => AgeCategory != null ? AgeCategory.Name : "-"; }
+        [ForeignKey(nameof(PartnerID))]
+        [DeleteBehavior(DeleteBehavior.SetNull)]
+        public virtual Partner? Partner { get; set; }
+
+        public List<CheckpointRunnerInfo> CheckpointInfo { get; set; } = new();
+
+        public AgeCategory? AgeCategory { get { return BirthYear.HasValue ? AgeCategory.GetByBirthYear(BirthYear.Value) : null; } }
+
+
+        [NotMapped]
+        public string PartnerFirstName { get { return Partner != null ? Partner.FirstName : "-"; }  }
+
+        [NotMapped]
+        public string PartnerLastName { get { return Partner != null ? Partner.LastName : "-"; } }
+
+        [NotMapped]
+        public int? PartnerBirthYear { get { return (Partner != null && Partner.BirthYear.HasValue) ? Partner.BirthYear.Value : null; } }
     }
 }

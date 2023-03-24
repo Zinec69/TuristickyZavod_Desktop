@@ -1,6 +1,6 @@
-﻿using Data;
+﻿using turisticky_zavod.Data;
 
-namespace Forms
+namespace turisticky_zavod.Forms
 {
     public partial class JsonPicker : Form
     {

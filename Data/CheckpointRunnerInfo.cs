@@ -4,16 +4,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Data
+namespace turisticky_zavod.Data
 {
     public class CheckpointRunnerInfo
     {
         public int ID { get; set; }
         public Checkpoint Checkpoint { get; set; }
         public Person Referee { get; set; }
-        public long TimeArrived { get; set; }
-        public long? TimeDeparted { get; set; }
-        public int TimeWaitedSeconds { get; set; }
-        public int PenaltySeconds { get; set; }
+        public DateTime TimeArrived { get; set; }
+        public DateTime? TimeDeparted { get; set; }
+        public TimeSpan TimeWaitedSeconds { get; set; }
+        public TimeSpan PenaltySeconds { get; set; }
     }
 }

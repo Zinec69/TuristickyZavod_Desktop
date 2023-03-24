@@ -1,9 +1,7 @@
-﻿using System.Collections.ObjectModel;
-using System.Security.Policy;
-using System.Text;
+﻿using System.Text;
 using System.Text.Json;
 
-namespace Data
+namespace turisticky_zavod.Data
 {
     public static class FileHelper
     {
@@ -20,16 +18,15 @@ namespace Data
                     var runner = new Runner()
                     {
                         RunnerID = !string.IsNullOrEmpty(line[0]) ? int.Parse(line[0]) : null,
-                        LastName = line[1],
-                        FirstName = line[2],
-                        BirthYear = int.TryParse(line[3], out int result) ? result : 0,
-                        Team = line[4],
-                        Partner = string.IsNullOrEmpty(line[5]) ? null : new Runner()
+                        LastName = line[1].Trim(),
+                        FirstName = line[2].Trim(),
+                        BirthYear = int.TryParse(line[3], out int result) ? result : null,
+                        Team = line[4].Trim(),
+                        Partner = string.IsNullOrEmpty(line[5]) ? null : new()
                         {
-                            LastName = line[5],
-                            FirstName = line[6],
-                            BirthYear = int.TryParse(line[7], out int result2) ? result2 : 0,
-                            Team = line[8]
+                            LastName = line[5].Trim(),
+                            FirstName = line[6].Trim(),
+                            BirthYear = int.TryParse(line[7], out int result2) ? result2 : null
                         }
                     };
                     runners.Add(runner);

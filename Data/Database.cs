@@ -1,13 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Sqlite;
+using System.Drawing;
 
-namespace Data
+namespace turisticky_zavod.Data
 {
     public sealed class Database : DbContext
     {
-        public DbSet<Runner> Runners { get; set; }
-        public DbSet<AgeCategory> AgeCategories { get; set; }
-        public DbSet<Checkpoint> Checkpoints { get; set; }
+        public DbSet<Runner> Runner { get; set; }
+        public DbSet<Partner> Partner { get; set; }
+        public DbSet<AgeCategory> AgeCategory { get; set; }
+        public DbSet<Checkpoint> Checkpoint { get; set; }
 
         private Database() { }
 
@@ -28,7 +29,7 @@ namespace Data
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-            => optionsBuilder.UseSqlite("Data Source=tz.db");
+            => optionsBuilder.UseSqlite("Data Source=../../../../Data/tz.db");
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -49,21 +50,22 @@ namespace Data
 
             modelBuilder.Entity<AgeCategory>(entity => entity.Property(e => e.ID).ValueGeneratedOnAdd());
             modelBuilder.Entity<AgeCategory>().HasData(
-                new AgeCategory() { ID = 1, AgeMin = 0, AgeMax = 10, Name = "Nejmladší žáci a žákyně", Code = "" },
-                new AgeCategory() { ID = 2, AgeMin = 11, AgeMax = 12, Name = "Mladší žáci a žákyně", Code = "" },
-                new AgeCategory() { ID = 3, AgeMin = 13, AgeMax = 14, Name = "Starší žáci a žákyně", Code = "" },
-                new AgeCategory() { ID = 4, AgeMin = 15, AgeMax = 16, Name = "Mladší dorostenci a dorostenky", Code = "" },
-                new AgeCategory() { ID = 5, AgeMin = 17, AgeMax = 18, Name = "Starší dorostenci a dorostenky", Code = "" },
-                new AgeCategory() { ID = 6, AgeMin = 19, AgeMax = 35, Name = "Dospělí A", Code = "" },
-                new AgeCategory() { ID = 7, AgeMin = 36, AgeMax = 1000, Name = "Dospělí B", Code = "" },
-                new AgeCategory() { ID = 8, AgeMin = 0, AgeMax = 30, Name = "Do 30 let", Code = "", Duo = true },
-                new AgeCategory() { ID = 9, AgeMin = 31, AgeMax = 70, Name = "31 - 70 let", Code = "", Duo = true },
-                new AgeCategory() { ID = 10, AgeMin = 71, AgeMax = 1000, Name = "Nad 70 let", Code = "", Duo = true }
+                new AgeCategory() { ID = 1, AgeMin = 0, AgeMax = 10, Name = "Nejmladší žáci a žákyně", Code = "K1", Color = "Bílá" },
+                new AgeCategory() { ID = 2, AgeMin = 11, AgeMax = 12, Name = "Mladší žáci a žákyně", Code = "K2", Color = "Bílá" },
+                new AgeCategory() { ID = 3, AgeMin = 13, AgeMax = 14, Name = "Starší žáci a žákyně", Code = "K3", Color = "Bílá" },
+                new AgeCategory() { ID = 4, AgeMin = 15, AgeMax = 16, Name = "Mladší dorostenci a dorostenky", Code = "K4", Color = "Červená" },
+                new AgeCategory() { ID = 5, AgeMin = 17, AgeMax = 18, Name = "Starší dorostenci a dorostenky", Code = "K5", Color = "Červená" },
+                new AgeCategory() { ID = 6, AgeMin = 19, AgeMax = 35, Name = "Dospělí A", Code = "K6", Color = "Červená" },
+                new AgeCategory() { ID = 7, AgeMin = 36, AgeMax = 1000, Name = "Dospělí B", Code = "K7", Color = "Červená" },
+                new AgeCategory() { ID = 8, AgeMin = 0, AgeMax = 30, Name = "Do 30 let", Code = "K8", Color = "Červená", Duo = true },
+                new AgeCategory() { ID = 9, AgeMin = 31, AgeMax = 70, Name = "31 - 70 let", Code = "K9", Color = "Červená", Duo = true },
+                new AgeCategory() { ID = 10, AgeMin = 71, AgeMax = 1000, Name = "Nad 70 let", Code = "K10", Color = "Červená", Duo = true }
             );
 
-            modelBuilder.Entity<Runner>(entity => entity.Property(e => e.ID).ValueGeneratedOnAdd());
+            modelBuilder.Entity<Partner>().HasData(new Partner() { ID = 1, Name = "Milan Kundera", BirthYear = 2012 });
+
             modelBuilder.Entity<Runner>().HasData(
-                new Runner() { ID = 1, RunnerID = 18, Name = "Jožin ZBažin", Team = "Ocean men", BirthYear = 2001, Disqualified = false },
+                new Runner() { ID = 1, RunnerID = 18, Name = "Jožin ZBažin", Team = "Ocean men", BirthYear = 2009, Disqualified = false, PartnerID = 1 },
                 new Runner() { ID = 2, RunnerID = 59, Name = "Pepa ZDepa", Team = "Bzučáci", BirthYear = 1987, Disqualified = false }
             );
         }

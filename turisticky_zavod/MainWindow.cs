@@ -1,26 +1,21 @@
 using System.Collections.Specialized;
 using System.ComponentModel;
-using System.Data.Common;
-using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
-using Data;
+using turisticky_zavod.Data;
 using Microsoft.EntityFrameworkCore;
-using System.Diagnostics;
+using System.Windows.Forms;
 
-namespace Forms
+namespace turisticky_zavod.Forms
 {
     public partial class MainWindow : Form
     {
-        private bool[] Orders = new bool[8] { false, true, true, true, false, true, true, true };
-
-        private BindingList<Runner> Runners = new();
-
         private Database database;
+
+        private bool isSorting = false;
 
         public MainWindow()
         {
             InitializeComponent();
             Program.SetDoubleBuffer(dataGridView1, true);
-            //dataGridView1.DataSource = Runners;
 
             database = Database.Instance;
         }
@@ -29,19 +24,37 @@ namespace Forms
         {
             base.OnLoad(e);
 
+            toolStripStatusLabel1.Text = "Naèítání databáze";
+            toolStripProgressBar1.Value = 0;
+            toolStripProgressBar1.Visible = true;
+
             new Thread(new ThreadStart(() =>
             {
-                // Uncomment the line below to start fresh with a new database.
-                // this.dbContext.Database.EnsureDeleted();
+                database.Database.EnsureDeleted();
                 database.Database.EnsureCreated();
 
-                dataGridView1.Invoke(() =>
+                Invoke(() =>
                 {
-                    database.Runners.Load();
-                    database.AgeCategories.Load();
-                    database.Checkpoints.Load();
+                    toolStripProgressBar1.Value += 20;
+                    database.Runner.Load();
+                    toolStripProgressBar1.Value += 20;
+                    database.Partner.Load();
+                    toolStripProgressBar1.Value += 20;
+                    database.AgeCategory.Load();
+                    toolStripProgressBar1.Value += 20;
+                    database.Checkpoint.Load();
+                    toolStripProgressBar1.Value += 20;
 
-                    dataGridView1.DataSource = database.Runners.Local.ToBindingList();
+                    dataGridView1.DataSource = database.Runner.Local.ToBindingList();
+                });
+
+                Thread.Sleep(500);
+
+                Invoke(() =>
+                {
+                    toolStripStatusLabel1.Text = string.Empty;
+                    toolStripProgressBar1.Visible = false;
+                    toolStripProgressBar1.Value = 0;
                 });
             })).Start();
         }
@@ -53,81 +66,80 @@ namespace Forms
             database.Dispose();
         }
 
-        private void AddRunners(List<Runner> runners)
+        private async void AddRunnersCSV(string filepath)
         {
-            if (runners.Find(r => r.RunnerID != null) == null)
+            try
             {
-                var prompt = MessageBox.Show("Tato data nemají vyplnìna startovní èísla, chcete je pøiøadit automaticky?", "Pøiøadit startovní èísla", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-                if (prompt == DialogResult.Yes)
+                var runners = FileHelper.LoadFromCSV(filepath);
+
+                if (runners.Find(r => r.RunnerID != null) == null)
                 {
-                    int i = 1;
+                    var prompt = MessageBox.Show("Tato data nemají vyplnìna startovní èísla, chcete je pøiøadit automaticky?", "Pøiøadit startovní èísla", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                    if (prompt == DialogResult.Yes)
+                    {
+                        var ids = database.Runner.Local.Where(r => r.RunnerID.HasValue);
+                        int i = ids.Any() ? ids.Max(r => r.RunnerID!.Value) : 0;
+                        foreach (Runner runner in runners)
+                        {
+                            runner.RunnerID = ++i;
+                        }
+                    }
+                }
+                await database.Runner.AddRangeAsync(runners);
+                database.SaveChanges();
+            }
+            catch
+            {
+                MessageBox.Show("Nepodaøilo se naèíst data z CSV souboru", "Chyba", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void AddRunnersJSON(string filepath)
+        {
+            try
+            {
+                var runners = FileHelper.LoadFromJSON(filepath);
+
+                var jsonPickerWindow = new JsonPicker(runners);
+                if (jsonPickerWindow.ShowDialog() == DialogResult.OK)
+                {
+                    var updatedRunners = new List<Runner>();
                     foreach (Runner runner in runners)
                     {
-                        runner.RunnerID = i++;
-                    }
-                }
-            }
-            //foreach (Runner runner in runners)
-            //{
-            //    Runners.Add(runner);
-            //}
-            database.Runners.AddRange(runners);
-        }
-
-        private void AddRunnersJSON(List<Runner> runners)
-        {
-            var jsonPickerWindow = new JsonPicker(runners);
-            if (jsonPickerWindow.ShowDialog() == DialogResult.OK)
-            {
-                foreach (Runner runner in runners)
-                {
-                    var current = Runners.FirstOrDefault(r => r!.RunnerID == runner.RunnerID, null);
-                    if (current != null)
-                    {
-                        current.Disqualified = runner.Disqualified;
-                        current.FinishTime = runner.FinishTime;
-                        current.StartTime = runner.StartTime;
-                        foreach (var ci in runner.CheckpointInfo)
+                        var current = database.Runner.Where(r => r.RunnerID == runner.RunnerID).FirstOrDefault();
+                        if (current != default)
                         {
-                            if (current.CheckpointInfo.FirstOrDefault(c => c.Checkpoint.CheckpointID == ci.Checkpoint.CheckpointID, null) == null)
+                            current.Disqualified = runner.Disqualified;
+                            current.FinishTime = runner.FinishTime;
+                            current.StartTime = runner.StartTime;
+                            foreach (var ci in runner.CheckpointInfo)
                             {
-                                current.CheckpointInfo.Add(ci);
-                                break;
+                                if (current.CheckpointInfo.FirstOrDefault(c => c.Checkpoint.CheckpointID == ci.Checkpoint.CheckpointID, null) == null)
+                                {
+                                    current.CheckpointInfo.Add(ci);
+                                }
                             }
+                            updatedRunners.Add(current);
+                            continue;
                         }
-                        continue;
                     }
+                    database.Runner.AddRange(updatedRunners);
+                    database.SaveChanges();
                 }
+            }
+            catch
+            {
+                MessageBox.Show("Nepodaøilo se naèíst data z JSON souboru", "Chyba", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
-        private void OnNFCScanned(object? sender, NotifyCollectionChangedEventArgs e)
+        private void OnNFCScanned(object? sender, Runner runner)
         {
-            Runner newRunner = (Runner)e.NewItems![0]!;
-            var currentRunner = Runners.FirstOrDefault(r => r!.RunnerID == newRunner.RunnerID, null);
-
-            if (currentRunner != null)
+            var dialog = MessageBox.Show("Tento bìžec není v seznamu, chcete jej i pøesto pøidat?", "Varování", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (dialog == DialogResult.Yes)
             {
-                currentRunner.StartTime = newRunner.StartTime;
-                currentRunner.FinishTime = newRunner.FinishTime;
-                currentRunner.Disqualified = newRunner.Disqualified;
-                foreach (var ci in newRunner.CheckpointInfo)
-                {
-                    if (currentRunner.CheckpointInfo.FirstOrDefault(c => c.Checkpoint.CheckpointID == ci.Checkpoint.CheckpointID, null) == null)
-                    {
-                        currentRunner.CheckpointInfo.Add(ci);
-                        break;
-                    }
-                }
-                dataGridView1.Invoke(() => Runners[Runners.IndexOf(currentRunner)] = currentRunner);
-            }
-            else
-            {
-                var dialog = MessageBox.Show("Tento bìžec není v seznamu, chcete jej i pøesto pøidat?", "Varování", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-                if (dialog == DialogResult.Yes)
-                {
-                    dataGridView1.Invoke(() => Runners.Add(newRunner));
-                }
+                database.Runner.Add(runner);
+                database.SaveChanges();
             }
         }
 
@@ -138,7 +150,7 @@ namespace Forms
                 Filter = "Soubory CSV (*.csv)|*.csv",
                 Multiselect = false
             };
-            fileDialog.FileOk += (_, _) => AddRunners(FileHelper.LoadFromCSV(fileDialog.FileName));
+            fileDialog.FileOk += (_, _) => AddRunnersCSV(fileDialog.FileName);
             fileDialog.ShowDialog();
         }
 
@@ -149,8 +161,8 @@ namespace Forms
                 Filter = "Soubory JSON (*.json)|*.json",
                 Multiselect = false
             };
-            if (fileDialog.ShowDialog() == DialogResult.OK)
-                AddRunnersJSON(FileHelper.LoadFromJSON(fileDialog.FileName));
+            fileDialog.FileOk += (_, _) => AddRunnersJSON(fileDialog.FileName);
+            fileDialog.ShowDialog();
         }
 
         private void NFCToolStripMenuItem_Click(object sender, EventArgs e)
@@ -159,49 +171,46 @@ namespace Forms
 
             if (!nfcWindow.IsDisposed)
             {
-                nfcWindow.SubscribeToNewRunners(OnNFCScanned);
+                nfcWindow.OnRunnerNotInDB += OnNFCScanned;
                 nfcWindow.ShowDialog();
             }
         }
 
-        private void dataGridView1_ColumnHeaderMouseClick(object sender, DataGridViewCellMouseEventArgs e)
+        private void dataGridView1_DragEnter(object sender, DragEventArgs e)
         {
-            switch (e.ColumnIndex)
+            Activate();
+
+            if (e.Data != null && e.Data.GetDataPresent(DataFormats.FileDrop))
+                e.Effect = DragDropEffects.Copy;
+            else
+                e.Effect = DragDropEffects.None;
+        }
+
+        private void dataGridView1_DragDrop(object sender, DragEventArgs e)
+        {
+            if (e.Data != null)
             {
-                case 0:
-                    Runners = new BindingList<Runner>((Orders[0] ? Runners.OrderBy(r => r.RunnerID) : Runners.OrderByDescending(r => r.RunnerID)).ToList());
-                    Orders[0] = !Orders[0];
-                    break;
-                case 1:
-                    Runners = new BindingList<Runner>((Orders[1] ? Runners.OrderBy(r => r.FirstName) : Runners.OrderByDescending(r => r.FirstName)).ToList());
-                    Orders[1] = !Orders[1];
-                    break;
-                case 2:
-                    Runners = new BindingList<Runner>((Orders[2] ? Runners.OrderBy(r => r.LastName) : Runners.OrderByDescending(r => r.LastName)).ToList());
-                    Orders[2] = !Orders[2];
-                    break;
-                case 3:
-                    Runners = new BindingList<Runner>((Orders[3] ? Runners.OrderBy(r => r.Team) : Runners.OrderByDescending(r => r.Team)).ToList());
-                    Orders[3] = !Orders[3];
-                    break;
-                case 4:
-                    Runners = new BindingList<Runner>((Orders[4] ? Runners.OrderBy(r => r.BirthYear) : Runners.OrderByDescending(r => r.BirthYear)).ToList());
-                    Orders[4] = !Orders[4];
-                    break;
-                case 5:
-                    Runners = new BindingList<Runner>((Orders[5] ? Runners.OrderBy(r => r.StartTime) : Runners.OrderByDescending(r => r.StartTime)).ToList());
-                    Orders[5] = !Orders[5];
-                    break;
-                case 6:
-                    Runners = new BindingList<Runner>((Orders[6] ? Runners.OrderBy(r => r.FinishTime) : Runners.OrderByDescending(r => r.FinishTime)).ToList());
-                    Orders[6] = !Orders[6];
-                    break;
-                case 7:
-                    Runners = new BindingList<Runner>((Orders[7] ? Runners.OrderBy(r => r.Disqualified) : Runners.OrderByDescending(r => r.Disqualified)).ToList());
-                    Orders[7] = !Orders[7];
-                    break;
+                var filepath = ((string[])e.Data.GetData(DataFormats.FileDrop))[0];
+
+                switch (filepath.Split('.').Last().ToLower())
+                {
+                    case "json":
+                        var dialog = MessageBox.Show("Chcete naèíst data z JSON souboru?", "Naèíst data", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                        if (dialog == DialogResult.Yes)
+                            AddRunnersJSON(filepath);
+                        break;
+
+                    case "csv":
+                        dialog = MessageBox.Show("Chcete naèíst data z CSV souboru?", "Naèíst data", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                        if (dialog == DialogResult.Yes)
+                            AddRunnersCSV(filepath);
+                        break;
+
+                    default:
+                        MessageBox.Show("Nepodporovaný typ souboru", "Chyba", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        break;
+                }
             }
-            dataGridView1.DataSource = Runners;
         }
     }
 }

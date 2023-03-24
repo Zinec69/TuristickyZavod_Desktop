@@ -1,4 +1,4 @@
-﻿namespace Forms
+﻿namespace turisticky_zavod.Forms
 {
     partial class NFCScanning
     {
@@ -88,6 +88,8 @@
             Controls.Add(readerStatusText);
             Controls.Add(statusStrip1);
             MaximizeBox = false;
+            MinimizeBox = false;
+            MinimumSize = new Size(346, 281);
             Name = "NFCScanning";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Načítání dat z čipů";

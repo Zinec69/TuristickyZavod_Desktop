@@ -1,4 +1,4 @@
-﻿namespace Data
+﻿namespace turisticky_zavod.Data
 {
     public class Checkpoint
     {

@@ -1,4 +1,4 @@
-﻿namespace Forms
+﻿namespace turisticky_zavod.Forms
 {
     partial class MainWindow
     {
@@ -29,24 +29,31 @@
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
+            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
             statusStrip1 = new StatusStrip();
             toolStripStatusLabel1 = new ToolStripStatusLabel();
+            toolStripProgressBar1 = new ToolStripProgressBar();
             dataGridView1 = new DataGridView();
-            runnerIDDataGridViewTextBoxColumn = new DataGridViewTextBoxColumn();
-            firstNameDataGridViewTextBoxColumn = new DataGridViewTextBoxColumn();
-            lastNameDataGridViewTextBoxColumn = new DataGridViewTextBoxColumn();
-            teamDataGridViewTextBoxColumn = new DataGridViewTextBoxColumn();
-            ageCategoryFormattedDataGridViewTextBoxColumn = new DataGridViewTextBoxColumn();
-            startTimeFormattedDataGridViewTextBoxColumn = new DataGridViewTextBoxColumn();
-            finishTimeFormattedDataGridViewTextBoxColumn = new DataGridViewTextBoxColumn();
-            disqualifiedDataGridViewCheckBoxColumn = new DataGridViewCheckBoxColumn();
             runnerBindingSource = new BindingSource(components);
             runnersGroupBox = new GroupBox();
             menuStrip1 = new MenuStrip();
-            importDatToolStripMenuItem = new ToolStripMenuItem();
-            cSVToolStripMenuItem = new ToolStripMenuItem();
-            jSONToolStripMenuItem = new ToolStripMenuItem();
-            nFCToolStripMenuItem = new ToolStripMenuItem();
+            toolStripMenuItem_dataImport = new ToolStripMenuItem();
+            toolStripMenuItem_csv = new ToolStripMenuItem();
+            toolStripMenuItem_json = new ToolStripMenuItem();
+            toolStripMenuItem_nfc = new ToolStripMenuItem();
+            toolStripMenuItem_settings = new ToolStripMenuItem();
+            toolStripMenuItem_ageCategories = new ToolStripMenuItem();
+            runnerIDDataGridViewTextBoxColumn = new DataGridViewTextBoxColumn();
+            firstNameDataGridViewTextBoxColumn = new DataGridViewTextBoxColumn();
+            lastNameDataGridViewTextBoxColumn = new DataGridViewTextBoxColumn();
+            BirthYear = new DataGridViewTextBoxColumn();
+            PartnerFirstName = new DataGridViewTextBoxColumn();
+            PartnerLastName = new DataGridViewTextBoxColumn();
+            PartnerBirthYear = new DataGridViewTextBoxColumn();
+            teamDataGridViewTextBoxColumn = new DataGridViewTextBoxColumn();
+            AgeCategory = new DataGridViewTextBoxColumn();
             statusStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)runnerBindingSource).BeginInit();
@@ -56,10 +63,10 @@
             // 
             // statusStrip1
             // 
-            statusStrip1.Items.AddRange(new ToolStripItem[] { toolStripStatusLabel1 });
-            statusStrip1.Location = new Point(0, 499);
+            statusStrip1.Items.AddRange(new ToolStripItem[] { toolStripStatusLabel1, toolStripProgressBar1 });
+            statusStrip1.Location = new Point(0, 539);
             statusStrip1.Name = "statusStrip1";
-            statusStrip1.Size = new Size(1034, 22);
+            statusStrip1.Size = new Size(1164, 22);
             statusStrip1.TabIndex = 2;
             statusStrip1.Text = "statusStrip1";
             // 
@@ -68,8 +75,15 @@
             toolStripStatusLabel1.Name = "toolStripStatusLabel1";
             toolStripStatusLabel1.Size = new Size(0, 17);
             // 
+            // toolStripProgressBar1
+            // 
+            toolStripProgressBar1.Name = "toolStripProgressBar1";
+            toolStripProgressBar1.Size = new Size(100, 16);
+            toolStripProgressBar1.Visible = false;
+            // 
             // dataGridView1
             // 
+            dataGridView1.AllowDrop = true;
             dataGridView1.AllowUserToAddRows = false;
             dataGridView1.AllowUserToDeleteRows = false;
             dataGridView1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
@@ -78,7 +92,7 @@
             dataGridView1.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.DisplayedCells;
             dataGridView1.ClipboardCopyMode = DataGridViewClipboardCopyMode.EnableWithoutHeaderText;
             dataGridView1.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridView1.Columns.AddRange(new DataGridViewColumn[] { runnerIDDataGridViewTextBoxColumn, firstNameDataGridViewTextBoxColumn, lastNameDataGridViewTextBoxColumn, teamDataGridViewTextBoxColumn, ageCategoryFormattedDataGridViewTextBoxColumn, startTimeFormattedDataGridViewTextBoxColumn, finishTimeFormattedDataGridViewTextBoxColumn, disqualifiedDataGridViewCheckBoxColumn });
+            dataGridView1.Columns.AddRange(new DataGridViewColumn[] { runnerIDDataGridViewTextBoxColumn, firstNameDataGridViewTextBoxColumn, lastNameDataGridViewTextBoxColumn, BirthYear, PartnerFirstName, PartnerLastName, PartnerBirthYear, teamDataGridViewTextBoxColumn, AgeCategory });
             dataGridView1.DataSource = runnerBindingSource;
             dataGridView1.EditMode = DataGridViewEditMode.EditProgrammatically;
             dataGridView1.Location = new Point(6, 22);
@@ -86,9 +100,75 @@
             dataGridView1.Name = "dataGridView1";
             dataGridView1.RowTemplate.Height = 25;
             dataGridView1.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dataGridView1.Size = new Size(998, 441);
+            dataGridView1.Size = new Size(1128, 472);
             dataGridView1.TabIndex = 3;
-            dataGridView1.ColumnHeaderMouseClick += dataGridView1_ColumnHeaderMouseClick;
+            dataGridView1.DragDrop += dataGridView1_DragDrop;
+            dataGridView1.DragEnter += dataGridView1_DragEnter;
+            // 
+            // runnerBindingSource
+            // 
+            runnerBindingSource.DataSource = typeof(Data.Runner);
+            // 
+            // runnersGroupBox
+            // 
+            runnersGroupBox.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            runnersGroupBox.Controls.Add(dataGridView1);
+            runnersGroupBox.Location = new Point(12, 36);
+            runnersGroupBox.Name = "runnersGroupBox";
+            runnersGroupBox.Size = new Size(1140, 500);
+            runnersGroupBox.TabIndex = 4;
+            runnersGroupBox.TabStop = false;
+            runnersGroupBox.Text = "Seznam běžců";
+            // 
+            // menuStrip1
+            // 
+            menuStrip1.Items.AddRange(new ToolStripItem[] { toolStripMenuItem_dataImport, toolStripMenuItem_settings });
+            menuStrip1.Location = new Point(0, 0);
+            menuStrip1.Name = "menuStrip1";
+            menuStrip1.Size = new Size(1164, 24);
+            menuStrip1.TabIndex = 6;
+            menuStrip1.Text = "menuStrip1";
+            // 
+            // toolStripMenuItem_dataImport
+            // 
+            toolStripMenuItem_dataImport.DropDownItems.AddRange(new ToolStripItem[] { toolStripMenuItem_csv, toolStripMenuItem_json, toolStripMenuItem_nfc });
+            toolStripMenuItem_dataImport.Name = "toolStripMenuItem_dataImport";
+            toolStripMenuItem_dataImport.Size = new Size(75, 20);
+            toolStripMenuItem_dataImport.Text = "Import dat";
+            // 
+            // toolStripMenuItem_csv
+            // 
+            toolStripMenuItem_csv.Name = "toolStripMenuItem_csv";
+            toolStripMenuItem_csv.Size = new Size(102, 22);
+            toolStripMenuItem_csv.Text = "CSV";
+            toolStripMenuItem_csv.Click += CSVToolStripMenuItem_Click;
+            // 
+            // toolStripMenuItem_json
+            // 
+            toolStripMenuItem_json.Name = "toolStripMenuItem_json";
+            toolStripMenuItem_json.Size = new Size(102, 22);
+            toolStripMenuItem_json.Text = "JSON";
+            toolStripMenuItem_json.Click += JSONToolStripMenuItem_Click;
+            // 
+            // toolStripMenuItem_nfc
+            // 
+            toolStripMenuItem_nfc.Name = "toolStripMenuItem_nfc";
+            toolStripMenuItem_nfc.Size = new Size(102, 22);
+            toolStripMenuItem_nfc.Text = "NFC";
+            toolStripMenuItem_nfc.Click += NFCToolStripMenuItem_Click;
+            // 
+            // toolStripMenuItem_settings
+            // 
+            toolStripMenuItem_settings.DropDownItems.AddRange(new ToolStripItem[] { toolStripMenuItem_ageCategories });
+            toolStripMenuItem_settings.Name = "toolStripMenuItem_settings";
+            toolStripMenuItem_settings.Size = new Size(71, 20);
+            toolStripMenuItem_settings.Text = "Nastavení";
+            // 
+            // toolStripMenuItem_ageCategories
+            // 
+            toolStripMenuItem_ageCategories.Name = "toolStripMenuItem_ageCategories";
+            toolStripMenuItem_ageCategories.Size = new Size(163, 22);
+            toolStripMenuItem_ageCategories.Text = "Věkové kategorie";
             // 
             // runnerIDDataGridViewTextBoxColumn
             // 
@@ -108,101 +188,62 @@
             lastNameDataGridViewTextBoxColumn.HeaderText = "Příjmení";
             lastNameDataGridViewTextBoxColumn.Name = "lastNameDataGridViewTextBoxColumn";
             // 
+            // BirthYear
+            // 
+            BirthYear.DataPropertyName = "BirthYear";
+            dataGridViewCellStyle1.NullValue = "-";
+            BirthYear.DefaultCellStyle = dataGridViewCellStyle1;
+            BirthYear.HeaderText = "Ročník";
+            BirthYear.Name = "BirthYear";
+            // 
+            // PartnerFirstName
+            // 
+            PartnerFirstName.DataPropertyName = "PartnerFirstName";
+            PartnerFirstName.HeaderText = "Jméno 2";
+            PartnerFirstName.Name = "PartnerFirstName";
+            PartnerFirstName.ReadOnly = true;
+            // 
+            // PartnerLastName
+            // 
+            PartnerLastName.DataPropertyName = "PartnerLastName";
+            PartnerLastName.HeaderText = "Příjmení 2";
+            PartnerLastName.Name = "PartnerLastName";
+            PartnerLastName.ReadOnly = true;
+            // 
+            // PartnerBirthYear
+            // 
+            PartnerBirthYear.DataPropertyName = "PartnerBirthYear";
+            dataGridViewCellStyle2.NullValue = "-";
+            PartnerBirthYear.DefaultCellStyle = dataGridViewCellStyle2;
+            PartnerBirthYear.HeaderText = "Ročník 2";
+            PartnerBirthYear.Name = "PartnerBirthYear";
+            PartnerBirthYear.ReadOnly = true;
+            // 
             // teamDataGridViewTextBoxColumn
             // 
             teamDataGridViewTextBoxColumn.DataPropertyName = "Team";
             teamDataGridViewTextBoxColumn.HeaderText = "Oddíl";
             teamDataGridViewTextBoxColumn.Name = "teamDataGridViewTextBoxColumn";
             // 
-            // ageCategoryFormattedDataGridViewTextBoxColumn
+            // AgeCategory
             // 
-            ageCategoryFormattedDataGridViewTextBoxColumn.DataPropertyName = "AgeCategoryFormatted";
-            ageCategoryFormattedDataGridViewTextBoxColumn.HeaderText = "Věková kategorie";
-            ageCategoryFormattedDataGridViewTextBoxColumn.Name = "ageCategoryFormattedDataGridViewTextBoxColumn";
-            ageCategoryFormattedDataGridViewTextBoxColumn.ReadOnly = true;
-            // 
-            // startTimeFormattedDataGridViewTextBoxColumn
-            // 
-            startTimeFormattedDataGridViewTextBoxColumn.DataPropertyName = "StartTimeFormatted";
-            startTimeFormattedDataGridViewTextBoxColumn.HeaderText = "Čas startu";
-            startTimeFormattedDataGridViewTextBoxColumn.Name = "startTimeFormattedDataGridViewTextBoxColumn";
-            startTimeFormattedDataGridViewTextBoxColumn.ReadOnly = true;
-            // 
-            // finishTimeFormattedDataGridViewTextBoxColumn
-            // 
-            finishTimeFormattedDataGridViewTextBoxColumn.DataPropertyName = "FinishTimeFormatted";
-            finishTimeFormattedDataGridViewTextBoxColumn.HeaderText = "Čas konce";
-            finishTimeFormattedDataGridViewTextBoxColumn.Name = "finishTimeFormattedDataGridViewTextBoxColumn";
-            finishTimeFormattedDataGridViewTextBoxColumn.ReadOnly = true;
-            // 
-            // disqualifiedDataGridViewCheckBoxColumn
-            // 
-            disqualifiedDataGridViewCheckBoxColumn.DataPropertyName = "Disqualified";
-            disqualifiedDataGridViewCheckBoxColumn.HeaderText = "Diskvalifikován/a";
-            disqualifiedDataGridViewCheckBoxColumn.Name = "disqualifiedDataGridViewCheckBoxColumn";
-            // 
-            // runnerBindingSource
-            // 
-            runnerBindingSource.DataSource = typeof(Data.Runner);
-            // 
-            // runnersGroupBox
-            // 
-            runnersGroupBox.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            runnersGroupBox.Controls.Add(dataGridView1);
-            runnersGroupBox.Location = new Point(12, 27);
-            runnersGroupBox.Name = "runnersGroupBox";
-            runnersGroupBox.Size = new Size(1010, 469);
-            runnersGroupBox.TabIndex = 4;
-            runnersGroupBox.TabStop = false;
-            runnersGroupBox.Text = "Seznam běžců";
-            // 
-            // menuStrip1
-            // 
-            menuStrip1.Items.AddRange(new ToolStripItem[] { importDatToolStripMenuItem });
-            menuStrip1.Location = new Point(0, 0);
-            menuStrip1.Name = "menuStrip1";
-            menuStrip1.Size = new Size(1034, 24);
-            menuStrip1.TabIndex = 6;
-            menuStrip1.Text = "menuStrip1";
-            // 
-            // importDatToolStripMenuItem
-            // 
-            importDatToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { cSVToolStripMenuItem, jSONToolStripMenuItem, nFCToolStripMenuItem });
-            importDatToolStripMenuItem.Name = "importDatToolStripMenuItem";
-            importDatToolStripMenuItem.Size = new Size(75, 20);
-            importDatToolStripMenuItem.Text = "Import dat";
-            // 
-            // cSVToolStripMenuItem
-            // 
-            cSVToolStripMenuItem.Name = "cSVToolStripMenuItem";
-            cSVToolStripMenuItem.Size = new Size(102, 22);
-            cSVToolStripMenuItem.Text = "CSV";
-            cSVToolStripMenuItem.Click += CSVToolStripMenuItem_Click;
-            // 
-            // jSONToolStripMenuItem
-            // 
-            jSONToolStripMenuItem.Name = "jSONToolStripMenuItem";
-            jSONToolStripMenuItem.Size = new Size(102, 22);
-            jSONToolStripMenuItem.Text = "JSON";
-            jSONToolStripMenuItem.Click += JSONToolStripMenuItem_Click;
-            // 
-            // nFCToolStripMenuItem
-            // 
-            nFCToolStripMenuItem.Name = "nFCToolStripMenuItem";
-            nFCToolStripMenuItem.Size = new Size(102, 22);
-            nFCToolStripMenuItem.Text = "NFC";
-            nFCToolStripMenuItem.Click += NFCToolStripMenuItem_Click;
+            AgeCategory.DataPropertyName = "AgeCategory";
+            dataGridViewCellStyle3.NullValue = "-";
+            AgeCategory.DefaultCellStyle = dataGridViewCellStyle3;
+            AgeCategory.HeaderText = "Věková kategorie";
+            AgeCategory.Name = "AgeCategory";
+            AgeCategory.ReadOnly = true;
             // 
             // MainWindow
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1034, 521);
+            ClientSize = new Size(1164, 561);
             Controls.Add(runnersGroupBox);
             Controls.Add(statusStrip1);
             Controls.Add(menuStrip1);
             MainMenuStrip = menuStrip1;
-            MinimumSize = new Size(1050, 215);
+            MinimumSize = new Size(1180, 215);
             Name = "MainWindow";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Turistický závod";
@@ -223,18 +264,22 @@
         private DataGridView dataGridView1;
         private GroupBox runnersGroupBox;
         private MenuStrip menuStrip1;
-        private ToolStripMenuItem importDatToolStripMenuItem;
-        private ToolStripMenuItem cSVToolStripMenuItem;
-        private ToolStripMenuItem jSONToolStripMenuItem;
-        private ToolStripMenuItem nFCToolStripMenuItem;
+        private ToolStripMenuItem toolStripMenuItem_dataImport;
+        private ToolStripMenuItem toolStripMenuItem_csv;
+        private ToolStripMenuItem toolStripMenuItem_json;
+        private ToolStripMenuItem toolStripMenuItem_nfc;
         private BindingSource runnerBindingSource;
+        private ToolStripProgressBar toolStripProgressBar1;
+        private ToolStripMenuItem toolStripMenuItem_settings;
+        private ToolStripMenuItem toolStripMenuItem_ageCategories;
         private DataGridViewTextBoxColumn runnerIDDataGridViewTextBoxColumn;
         private DataGridViewTextBoxColumn firstNameDataGridViewTextBoxColumn;
         private DataGridViewTextBoxColumn lastNameDataGridViewTextBoxColumn;
+        private DataGridViewTextBoxColumn BirthYear;
+        private DataGridViewTextBoxColumn PartnerFirstName;
+        private DataGridViewTextBoxColumn PartnerLastName;
+        private DataGridViewTextBoxColumn PartnerBirthYear;
         private DataGridViewTextBoxColumn teamDataGridViewTextBoxColumn;
-        private DataGridViewTextBoxColumn ageCategoryFormattedDataGridViewTextBoxColumn;
-        private DataGridViewTextBoxColumn startTimeFormattedDataGridViewTextBoxColumn;
-        private DataGridViewTextBoxColumn finishTimeFormattedDataGridViewTextBoxColumn;
-        private DataGridViewCheckBoxColumn disqualifiedDataGridViewCheckBoxColumn;
+        private DataGridViewTextBoxColumn AgeCategory;
     }
 }

@@ -1,8 +1,9 @@
 ﻿using System.IO.Ports;
 using System.Text;
-using Data;
+using turisticky_zavod.Data;
+using Usb.Events;
 
-namespace Logic
+namespace turisticky_zavod.Logic
 {
     public class NFCReaderSerial
     {
@@ -12,21 +13,34 @@ namespace Logic
         private bool awaitingResponse = false;
         private int expectedResponseLength = 2;
 
-        public NFCReaderSerial()
+        public NFCReaderSerial() { }
+
+        public bool Connect()
         {
-            if (!serialPort.IsOpen)
+            try
             {
-                serialPort = new()
+                if (!serialPort.IsOpen)
                 {
-                    PortName = SerialPort.GetPortNames().Last(),
-                    BaudRate = 9600,
-                    DataBits = 8,
-                    Parity   = Parity.None,
-                    StopBits = StopBits.One
-                };
-                serialPort.Open();
-                serialPort.ReadTimeout = 2000;
-                serialPort.DataReceived += new SerialDataReceivedEventHandler(DataReceivedCallback);
+                    serialPort = new()
+                    {
+                        PortName = SerialPort.GetPortNames().Last(),
+                        BaudRate = 9600,
+                        DataBits = 8,
+                        Parity = Parity.None,
+                        StopBits = StopBits.One
+                    };
+                    serialPort.Open();
+                    serialPort.ReadTimeout = 2000;
+                    serialPort.DataReceived += new SerialDataReceivedEventHandler(DataReceivedCallback);
+
+                    return true;
+                }
+                else
+                    return false;
+            }
+            catch
+            {
+                return false;
             }
         }
 
@@ -97,8 +111,8 @@ namespace Logic
                 FirstName = name[0],
                 LastName = name[1],
                 Team = runner_split[2],
-                StartTime = long.Parse(runner_split[3]) * 1000,
-                FinishTime = runner_split[4] == "0" ? null : long.Parse(runner_split[4]) * 1000,
+                StartTime = new DateTime().AddSeconds(long.Parse(runner_split[3])),
+                FinishTime = runner_split[4] == "0" ? null : new DateTime().AddSeconds(long.Parse(runner_split[4])),
                 Disqualified = runner_split[5] == "1"
             };
         }

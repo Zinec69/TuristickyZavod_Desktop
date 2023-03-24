@@ -1,18 +1,53 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Data
+namespace turisticky_zavod.Data
 {
+    [System.ComponentModel.DataAnnotations.Schema.NotMapped]
     public class Person
     {
-        public int ID { get; set; }
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
+        private string firstName;
+        public string FirstName
+        {
+            get
+            {
+                return firstName;
+            }
+            set
+            {
+                firstName = value;
+                if (!string.IsNullOrEmpty(lastName))
+                {
+                    name = $"{FirstName} {LastName}";
+                }
+            }
+        }
+
+        private string lastName;
+        public string LastName
+        {
+            get
+            {
+                return lastName;
+            }
+            set
+            {
+                lastName = value;
+                if (!string.IsNullOrEmpty(firstName))
+                {
+                    name = $"{FirstName} {LastName}";
+                }
+            }
+        }
+
         private string name;
+        [NotMapped]
         public string Name
         {
             get

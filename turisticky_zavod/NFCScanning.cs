@@ -1,29 +1,29 @@
 ﻿using PCSC.Monitoring;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
 using System.Diagnostics;
-using Data;
-using Usb.Events;
-using Logic;
+using turisticky_zavod.Data;
+//using Usb.Events;
+using turisticky_zavod.Logic;
 
-namespace Forms
+namespace turisticky_zavod.Forms
 {
     public partial class NFCScanning : Form
     {
-        private NFCReaderPCSC Reader;
-        private NFCReaderSerial ReaderSerial;
-        private IUsbEventWatcher UsbEventWatcher = new UsbEventWatcher();
+        private readonly NFCReaderPCSC Reader = new();
+        private NFCReaderSerial ReaderSerial = new();
+        //private IUsbEventWatcher UsbEventWatcher = new UsbEventWatcher();
 
-        private ObservableCollection<Runner> Runners = new();
+        public event EventHandler<Runner> OnRunnerNotInDB;
+
+        private readonly Database database;
 
         public NFCScanning()
         {
             InitializeComponent();
 
+            database = Database.Instance;
+
             try
             {
-                Reader = new();
-
                 if (!Reader!.Connect())
                 {
                     readerStatusTextVar.Text = "Nenalezena";
@@ -34,8 +34,10 @@ namespace Forms
                     Reader.AddOnCardInserted(OnTagDiscovered);
                 }
 
-                UsbEventWatcher.UsbDeviceRemoved += (_, _) => OnUSBDisconnected();
-                UsbEventWatcher.UsbDeviceAdded += (_, _) => OnUSBConnected();
+                //UsbEventWatcher.UsbDeviceRemoved += (_, _) => OnUSBDisconnected();
+                //UsbEventWatcher.UsbDeviceAdded += (_, _) => OnUSBConnected();
+
+                //Reader.Monitor.StatusChanged += (_, args) => MessageBox.Show(args.NewState.ToString());
             }
             catch (Exception e)
             {
@@ -43,17 +45,13 @@ namespace Forms
                 Close();
             }
 
-            try
-            {
-                ReaderSerial = new();
+            if (ReaderSerial.Connect())
                 button_scanSerialPort.Enabled = true;
-            }
-            catch { }
         }
 
         private void OnTagDiscovered(object sender, CardStatusEventArgs args)
         {
-            if (!Reader.CheckTagCompatibility(args.Atr))
+            if (!NFCReaderPCSC.CheckTagCompatibility(args.Atr))
             {
                 MessageBox.Show("Nepodporovaný typ čipu");
                 return;
@@ -65,7 +63,28 @@ namespace Forms
             {
                 var runner = Reader.ReadRunnerFromTag();
                 timer.Stop();
-                Runners.Add(runner);
+                Invoke(() =>
+                {
+                    var dbRunner = database.Runner.Where(r => r.RunnerID == runner.RunnerID).FirstOrDefault();
+
+                    if (dbRunner == default)
+                        OnRunnerNotInDB?.Invoke(null, runner);
+                    else
+                    {
+                        dbRunner.StartTime = runner.StartTime;
+                        dbRunner.FinishTime = runner.FinishTime;
+                        dbRunner.Disqualified = runner.Disqualified;
+                        foreach (var ci in runner.CheckpointInfo)
+                        {
+                            if (dbRunner.CheckpointInfo.FirstOrDefault(c => c.Checkpoint.CheckpointID == ci.Checkpoint.CheckpointID, null) == null)
+                            {
+                                dbRunner.CheckpointInfo.Add(ci);
+                            }
+                        }
+                        database.Runner.Update(dbRunner);
+                        database.SaveChanges();
+                    }
+                });
                 toolStripStatusLabel.Text = $"Běžec č. {runner.RunnerID} úspěšně načten [{timer.ElapsedMilliseconds}ms]";
             }
             catch (NFCException ex)
@@ -107,11 +126,8 @@ namespace Forms
             }
         }
 
-        public void SubscribeToNewRunners(NotifyCollectionChangedEventHandler event_handler) => Runners.CollectionChanged += event_handler;
-
         private void NFCScanning_FormClosed(object sender, EventArgs e)
         {
-            UsbEventWatcher?.Dispose();
             Reader?.Dispose();
             ReaderSerial?.Dispose();
         }
@@ -124,7 +140,7 @@ namespace Forms
             {
                 var runner = ReaderSerial.ReadRunner();
                 timer.Stop();
-                Runners.Add(runner);
+                database.Runner.Add(runner);
                 toolStripStatusLabel.Text = $"Běžec č. {runner.RunnerID} úspěšně načten [{timer.ElapsedMilliseconds}ms]";
             }
             catch (NFCException ex)
