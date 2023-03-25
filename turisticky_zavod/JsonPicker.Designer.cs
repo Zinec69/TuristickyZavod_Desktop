@@ -29,20 +29,22 @@
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
+            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
             dataGridView1 = new DataGridView();
-            RunnerID = new DataGridViewTextBoxColumn();
-            FirstName = new DataGridViewTextBoxColumn();
-            LastName = new DataGridViewTextBoxColumn();
-            teamDataGridViewTextBoxColumn = new DataGridViewTextBoxColumn();
-            StartTimeFormatted = new DataGridViewTextBoxColumn();
-            FinishTimeFormatted = new DataGridViewTextBoxColumn();
-            disqualifiedDataGridViewCheckBoxColumn = new DataGridViewCheckBoxColumn();
             runnerBindingSource = new BindingSource(components);
             button_cancel = new Button();
             button_save = new Button();
             groupBox1 = new GroupBox();
             label_title = new Label();
             label_hint = new Label();
+            RunnerID = new DataGridViewTextBoxColumn();
+            FirstName = new DataGridViewTextBoxColumn();
+            LastName = new DataGridViewTextBoxColumn();
+            teamDataGridViewTextBoxColumn = new DataGridViewTextBoxColumn();
+            StartTime = new DataGridViewTextBoxColumn();
+            FinishTime = new DataGridViewTextBoxColumn();
+            disqualifiedDataGridViewCheckBoxColumn = new DataGridViewCheckBoxColumn();
             ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)runnerBindingSource).BeginInit();
             groupBox1.SuspendLayout();
@@ -57,7 +59,7 @@
             dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             dataGridView1.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.DisplayedCells;
             dataGridView1.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridView1.Columns.AddRange(new DataGridViewColumn[] { RunnerID, FirstName, LastName, teamDataGridViewTextBoxColumn, StartTimeFormatted, FinishTimeFormatted, disqualifiedDataGridViewCheckBoxColumn });
+            dataGridView1.Columns.AddRange(new DataGridViewColumn[] { RunnerID, FirstName, LastName, teamDataGridViewTextBoxColumn, StartTime, FinishTime, disqualifiedDataGridViewCheckBoxColumn });
             dataGridView1.DataSource = runnerBindingSource;
             dataGridView1.EditMode = DataGridViewEditMode.EditProgrammatically;
             dataGridView1.Location = new Point(8, 22);
@@ -69,55 +71,6 @@
             dataGridView1.Size = new Size(777, 309);
             dataGridView1.TabIndex = 0;
             dataGridView1.ColumnHeaderMouseClick += dataGridView1_ColumnHeaderMouseClick;
-            // 
-            // RunnerID
-            // 
-            RunnerID.DataPropertyName = "RunnerID";
-            RunnerID.HeaderText = "Startovní číslo";
-            RunnerID.Name = "RunnerID";
-            RunnerID.ReadOnly = true;
-            // 
-            // FirstName
-            // 
-            FirstName.DataPropertyName = "FirstName";
-            FirstName.HeaderText = "Jméno";
-            FirstName.Name = "FirstName";
-            FirstName.ReadOnly = true;
-            // 
-            // LastName
-            // 
-            LastName.DataPropertyName = "LastName";
-            LastName.HeaderText = "Příjmení";
-            LastName.Name = "LastName";
-            LastName.ReadOnly = true;
-            // 
-            // teamDataGridViewTextBoxColumn
-            // 
-            teamDataGridViewTextBoxColumn.DataPropertyName = "Team";
-            teamDataGridViewTextBoxColumn.HeaderText = "Oddíl";
-            teamDataGridViewTextBoxColumn.Name = "teamDataGridViewTextBoxColumn";
-            teamDataGridViewTextBoxColumn.ReadOnly = true;
-            // 
-            // StartTimeFormatted
-            // 
-            StartTimeFormatted.DataPropertyName = "StartTimeFormatted";
-            StartTimeFormatted.HeaderText = "Čas startu";
-            StartTimeFormatted.Name = "StartTimeFormatted";
-            StartTimeFormatted.ReadOnly = true;
-            // 
-            // FinishTimeFormatted
-            // 
-            FinishTimeFormatted.DataPropertyName = "FinishTimeFormatted";
-            FinishTimeFormatted.HeaderText = "Čas konce";
-            FinishTimeFormatted.Name = "FinishTimeFormatted";
-            FinishTimeFormatted.ReadOnly = true;
-            // 
-            // disqualifiedDataGridViewCheckBoxColumn
-            // 
-            disqualifiedDataGridViewCheckBoxColumn.DataPropertyName = "Disqualified";
-            disqualifiedDataGridViewCheckBoxColumn.HeaderText = "Diskvalifikován/a";
-            disqualifiedDataGridViewCheckBoxColumn.Name = "disqualifiedDataGridViewCheckBoxColumn";
-            disqualifiedDataGridViewCheckBoxColumn.ReadOnly = true;
             // 
             // runnerBindingSource
             // 
@@ -176,6 +129,61 @@
             label_hint.TabIndex = 5;
             label_hint.Text = "(Přidržením klávesy ctrl zvolíte více řádků)";
             // 
+            // RunnerID
+            // 
+            RunnerID.DataPropertyName = "RunnerID";
+            RunnerID.HeaderText = "Startovní číslo";
+            RunnerID.Name = "RunnerID";
+            RunnerID.ReadOnly = true;
+            // 
+            // FirstName
+            // 
+            FirstName.DataPropertyName = "FirstName";
+            FirstName.HeaderText = "Jméno";
+            FirstName.Name = "FirstName";
+            FirstName.ReadOnly = true;
+            // 
+            // LastName
+            // 
+            LastName.DataPropertyName = "LastName";
+            LastName.HeaderText = "Příjmení";
+            LastName.Name = "LastName";
+            LastName.ReadOnly = true;
+            // 
+            // teamDataGridViewTextBoxColumn
+            // 
+            teamDataGridViewTextBoxColumn.DataPropertyName = "Team";
+            teamDataGridViewTextBoxColumn.HeaderText = "Oddíl";
+            teamDataGridViewTextBoxColumn.Name = "teamDataGridViewTextBoxColumn";
+            teamDataGridViewTextBoxColumn.ReadOnly = true;
+            // 
+            // StartTime
+            // 
+            StartTime.DataPropertyName = "StartTime";
+            dataGridViewCellStyle1.Format = "T";
+            dataGridViewCellStyle1.NullValue = "-";
+            StartTime.DefaultCellStyle = dataGridViewCellStyle1;
+            StartTime.HeaderText = "Čas startu";
+            StartTime.Name = "StartTime";
+            StartTime.ReadOnly = true;
+            // 
+            // FinishTime
+            // 
+            FinishTime.DataPropertyName = "FinishTime";
+            dataGridViewCellStyle2.Format = "T";
+            dataGridViewCellStyle2.NullValue = "-";
+            FinishTime.DefaultCellStyle = dataGridViewCellStyle2;
+            FinishTime.HeaderText = "Čas konce";
+            FinishTime.Name = "FinishTime";
+            FinishTime.ReadOnly = true;
+            // 
+            // disqualifiedDataGridViewCheckBoxColumn
+            // 
+            disqualifiedDataGridViewCheckBoxColumn.DataPropertyName = "Disqualified";
+            disqualifiedDataGridViewCheckBoxColumn.HeaderText = "Diskvalifikován/a";
+            disqualifiedDataGridViewCheckBoxColumn.Name = "disqualifiedDataGridViewCheckBoxColumn";
+            disqualifiedDataGridViewCheckBoxColumn.ReadOnly = true;
+            // 
             // JsonPicker
             // 
             AcceptButton = button_save;
@@ -214,8 +222,8 @@
         private DataGridViewTextBoxColumn FirstName;
         private DataGridViewTextBoxColumn LastName;
         private DataGridViewTextBoxColumn teamDataGridViewTextBoxColumn;
-        private DataGridViewTextBoxColumn StartTimeFormatted;
-        private DataGridViewTextBoxColumn FinishTimeFormatted;
+        private DataGridViewTextBoxColumn StartTime;
+        private DataGridViewTextBoxColumn FinishTime;
         private DataGridViewCheckBoxColumn disqualifiedDataGridViewCheckBoxColumn;
     }
 }

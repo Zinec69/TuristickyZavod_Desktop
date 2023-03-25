@@ -1,7 +1,6 @@
 ﻿using PCSC.Monitoring;
 using System.Diagnostics;
 using turisticky_zavod.Data;
-//using Usb.Events;
 using turisticky_zavod.Logic;
 
 namespace turisticky_zavod.Forms
@@ -10,11 +9,13 @@ namespace turisticky_zavod.Forms
     {
         private readonly NFCReaderPCSC Reader = new();
         private NFCReaderSerial ReaderSerial = new();
-        //private IUsbEventWatcher UsbEventWatcher = new UsbEventWatcher();
 
         public event EventHandler<Runner> OnRunnerNotInDB;
 
         private readonly Database database;
+
+        private readonly Image nfcOn = Image.FromFile("../../../Resources/nfc_icon.png");
+        private readonly Image nfcOff = Image.FromFile("../../../Resources/nfc_off_icon.png");
 
         public NFCScanning()
         {
@@ -24,20 +25,31 @@ namespace turisticky_zavod.Forms
 
             try
             {
-                if (!Reader!.Connect())
+                if (!Reader.Connect())
                 {
+                    pictureBox_nfcIcon.Image = nfcOff;
                     readerStatusTextVar.Text = "Nenalezena";
                 }
                 else
                 {
+                    pictureBox_nfcIcon.Image = nfcOn;
                     readerStatusTextVar.Text = "Připravena";
-                    Reader.AddOnCardInserted(OnTagDiscovered);
+                    Reader.OnCardDetected += OnTagDiscovered;
                 }
-
-                //UsbEventWatcher.UsbDeviceRemoved += (_, _) => OnUSBDisconnected();
-                //UsbEventWatcher.UsbDeviceAdded += (_, _) => OnUSBConnected();
-
-                //Reader.Monitor.StatusChanged += (_, args) => MessageBox.Show(args.NewState.ToString());
+                Reader.OnReaderDisconnected += (_, _) => Invoke(() =>
+                {
+                    pictureBox_nfcIcon.Image = nfcOff;
+                    readerStatusTextVar.Text = "Odpojena";
+                });
+                Reader.OnReaderReconnected += (_, _) =>
+                {
+                    Reader.OnCardDetected += OnTagDiscovered;
+                    Invoke(() =>
+                    {
+                        pictureBox_nfcIcon.Image = nfcOn;
+                        readerStatusTextVar.Text = "Připojena";
+                    });
+                };
             }
             catch (Exception e)
             {
@@ -49,7 +61,7 @@ namespace turisticky_zavod.Forms
                 button_scanSerialPort.Enabled = true;
         }
 
-        private void OnTagDiscovered(object sender, CardStatusEventArgs args)
+        private void OnTagDiscovered(object? sender, CardStatusEventArgs args)
         {
             if (!NFCReaderPCSC.CheckTagCompatibility(args.Atr))
             {
@@ -62,29 +74,10 @@ namespace turisticky_zavod.Forms
             try
             {
                 var runner = Reader.ReadRunnerFromTag();
+                // TODO
+                // var runner = Reader.ReadRunnerFromTag(checkBox_eraseTag.Checked);
                 timer.Stop();
-                Invoke(() =>
-                {
-                    var dbRunner = database.Runner.Where(r => r.RunnerID == runner.RunnerID).FirstOrDefault();
-
-                    if (dbRunner == default)
-                        OnRunnerNotInDB?.Invoke(null, runner);
-                    else
-                    {
-                        dbRunner.StartTime = runner.StartTime;
-                        dbRunner.FinishTime = runner.FinishTime;
-                        dbRunner.Disqualified = runner.Disqualified;
-                        foreach (var ci in runner.CheckpointInfo)
-                        {
-                            if (dbRunner.CheckpointInfo.FirstOrDefault(c => c.Checkpoint.CheckpointID == ci.Checkpoint.CheckpointID, null) == null)
-                            {
-                                dbRunner.CheckpointInfo.Add(ci);
-                            }
-                        }
-                        database.Runner.Update(dbRunner);
-                        database.SaveChanges();
-                    }
-                });
+                SaveRunner(runner);
                 toolStripStatusLabel.Text = $"Běžec č. {runner.RunnerID} úspěšně načten [{timer.ElapsedMilliseconds}ms]";
             }
             catch (NFCException ex)
@@ -97,33 +90,30 @@ namespace turisticky_zavod.Forms
             }
         }
 
-        private void OnUSBConnected()
+        private void SaveRunner(Runner runner)
         {
-            if (!Reader.IsConnected())
+            Invoke(() =>
             {
-                if (Reader.Connect())
-                {
-                    readerStatusTextVar.Invoke(() => readerStatusTextVar.Text = "Připravena");
-                    Reader.AddOnCardInserted(OnTagDiscovered);
-                }
-            }
-            if (ReaderSerial == default)
-            {
-                try
-                {
-                    ReaderSerial = new();
-                    button_scanSerialPort.Enabled = true;
-                }
-                catch { }
-            }
-        }
+                var dbRunner = database.Runner.Where(r => r.RunnerID == runner.RunnerID).FirstOrDefault();
 
-        private void OnUSBDisconnected()
-        {
-            if (!Reader.IsConnected())
-            {
-                readerStatusTextVar.Invoke(() => readerStatusTextVar.Text = "Odpojena");
-            }
+                if (dbRunner == default)
+                    OnRunnerNotInDB?.Invoke(null, runner);
+                else
+                {
+                    dbRunner.StartTime = runner.StartTime;
+                    dbRunner.FinishTime = runner.FinishTime;
+                    dbRunner.Disqualified = runner.Disqualified;
+                    foreach (var ci in runner.CheckpointInfo)
+                    {
+                        if (dbRunner.CheckpointInfo.FirstOrDefault(c => c.Checkpoint.CheckpointID == ci.Checkpoint.CheckpointID, null) == null)
+                        {
+                            dbRunner.CheckpointInfo.Add(ci);
+                        }
+                    }
+                    database.Runner.Update(dbRunner);
+                    database.SaveChanges();
+                }
+            });
         }
 
         private void NFCScanning_FormClosed(object sender, EventArgs e)
@@ -140,7 +130,7 @@ namespace turisticky_zavod.Forms
             {
                 var runner = ReaderSerial.ReadRunner();
                 timer.Stop();
-                database.Runner.Add(runner);
+                SaveRunner(runner);
                 toolStripStatusLabel.Text = $"Běžec č. {runner.RunnerID} úspěšně načten [{timer.ElapsedMilliseconds}ms]";
             }
             catch (NFCException ex)

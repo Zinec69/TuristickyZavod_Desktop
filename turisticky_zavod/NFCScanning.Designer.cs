@@ -33,15 +33,18 @@
             readerStatusText = new Label();
             readerStatusTextVar = new Label();
             button_scanSerialPort = new Button();
+            checkBox_eraseTag = new CheckBox();
+            pictureBox_nfcIcon = new PictureBox();
             statusStrip1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)pictureBox_nfcIcon).BeginInit();
             SuspendLayout();
             // 
             // statusStrip1
             // 
             statusStrip1.Items.AddRange(new ToolStripItem[] { toolStripStatusLabel });
-            statusStrip1.Location = new Point(0, 220);
+            statusStrip1.Location = new Point(0, 239);
             statusStrip1.Name = "statusStrip1";
-            statusStrip1.Size = new Size(330, 22);
+            statusStrip1.Size = new Size(334, 22);
             statusStrip1.TabIndex = 0;
             statusStrip1.Text = "statusStrip1";
             // 
@@ -69,8 +72,9 @@
             // 
             // button_scanSerialPort
             // 
+            button_scanSerialPort.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             button_scanSerialPort.Enabled = false;
-            button_scanSerialPort.Location = new Point(208, 12);
+            button_scanSerialPort.Location = new Point(212, 12);
             button_scanSerialPort.Name = "button_scanSerialPort";
             button_scanSerialPort.Size = new Size(101, 38);
             button_scanSerialPort.TabIndex = 3;
@@ -78,24 +82,51 @@
             button_scanSerialPort.UseVisualStyleBackColor = true;
             button_scanSerialPort.Click += button_scanSerialPort_Click;
             // 
+            // checkBox_eraseTag
+            // 
+            checkBox_eraseTag.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            checkBox_eraseTag.AutoSize = true;
+            checkBox_eraseTag.Checked = true;
+            checkBox_eraseTag.CheckState = CheckState.Checked;
+            checkBox_eraseTag.Font = new Font("Segoe UI", 8F, FontStyle.Regular, GraphicsUnit.Point);
+            checkBox_eraseTag.Location = new Point(12, 217);
+            checkBox_eraseTag.Name = "checkBox_eraseTag";
+            checkBox_eraseTag.Size = new Size(223, 17);
+            checkBox_eraseTag.TabIndex = 4;
+            checkBox_eraseTag.Text = "Vymazat data na čipu po jeho přečtení";
+            checkBox_eraseTag.UseVisualStyleBackColor = true;
+            // 
+            // pictureBox_nfcIcon
+            // 
+            pictureBox_nfcIcon.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            pictureBox_nfcIcon.Location = new Point(98, 55);
+            pictureBox_nfcIcon.Name = "pictureBox_nfcIcon";
+            pictureBox_nfcIcon.Size = new Size(130, 130);
+            pictureBox_nfcIcon.SizeMode = PictureBoxSizeMode.Zoom;
+            pictureBox_nfcIcon.TabIndex = 5;
+            pictureBox_nfcIcon.TabStop = false;
+            // 
             // NFCScanning
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(330, 242);
+            ClientSize = new Size(334, 261);
+            Controls.Add(pictureBox_nfcIcon);
+            Controls.Add(checkBox_eraseTag);
             Controls.Add(button_scanSerialPort);
             Controls.Add(readerStatusTextVar);
             Controls.Add(readerStatusText);
             Controls.Add(statusStrip1);
             MaximizeBox = false;
             MinimizeBox = false;
-            MinimumSize = new Size(346, 281);
+            MinimumSize = new Size(350, 300);
             Name = "NFCScanning";
             StartPosition = FormStartPosition.CenterScreen;
-            Text = "Načítání dat z čipů";
+            Text = "Načítání dat z NFC čipů";
             FormClosed += NFCScanning_FormClosed;
             statusStrip1.ResumeLayout(false);
             statusStrip1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)pictureBox_nfcIcon).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -107,5 +138,7 @@
         private Label readerStatusText;
         private Label readerStatusTextVar;
         private Button button_scanSerialPort;
+        private CheckBox checkBox_eraseTag;
+        private PictureBox pictureBox_nfcIcon;
     }
 }

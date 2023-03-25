@@ -8,7 +8,7 @@ namespace turisticky_zavod.Data
     public class BaseRunner : Person
     {
         [Key]
-        public int ID { get; set; }
+        public int ID { get; set; } = -1;
         public int? BirthYear { get; set; }
     }
 

@@ -1,8 +1,6 @@
-using System.Collections.Specialized;
 using System.ComponentModel;
 using turisticky_zavod.Data;
 using Microsoft.EntityFrameworkCore;
-using System.Windows.Forms;
 
 namespace turisticky_zavod.Forms
 {
@@ -44,6 +42,7 @@ namespace turisticky_zavod.Forms
                     toolStripProgressBar1.Value += 20;
                     database.Checkpoint.Load();
                     toolStripProgressBar1.Value += 20;
+                    database.Referee.Load();
 
                     dataGridView1.DataSource = database.Runner.Local.ToBindingList();
                 });
@@ -123,7 +122,7 @@ namespace turisticky_zavod.Forms
                             continue;
                         }
                     }
-                    database.Runner.AddRange(updatedRunners);
+                    database.Runner.UpdateRange(updatedRunners);
                     database.SaveChanges();
                 }
             }
@@ -135,7 +134,7 @@ namespace turisticky_zavod.Forms
 
         private void OnNFCScanned(object? sender, Runner runner)
         {
-            var dialog = MessageBox.Show("Tento bìžec není v seznamu, chcete jej i pøesto pøidat?", "Varování", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            var dialog = MessageBox.Show("Tento bìžec není v seznamu, chcete jej i pøesto pøidat? Nebude mít vyplnìna všechna data.", "Varování", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             if (dialog == DialogResult.Yes)
             {
                 database.Runner.Add(runner);

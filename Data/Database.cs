@@ -7,6 +7,7 @@ namespace turisticky_zavod.Data
     {
         public DbSet<Runner> Runner { get; set; }
         public DbSet<Partner> Partner { get; set; }
+        public DbSet<Referee> Referee { get; set; }
         public DbSet<AgeCategory> AgeCategory { get; set; }
         public DbSet<Checkpoint> Checkpoint { get; set; }
 
@@ -68,6 +69,8 @@ namespace turisticky_zavod.Data
                 new Runner() { ID = 1, RunnerID = 18, Name = "Jožin ZBažin", Team = "Ocean men", BirthYear = 2009, Disqualified = false, PartnerID = 1 },
                 new Runner() { ID = 2, RunnerID = 59, Name = "Pepa ZDepa", Team = "Bzučáci", BirthYear = 1987, Disqualified = false }
             );
+
+            modelBuilder.Entity<Referee>().HasKey(r => r.ID);
         }
     }
 }

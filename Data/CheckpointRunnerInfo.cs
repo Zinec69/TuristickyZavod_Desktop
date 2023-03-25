@@ -1,16 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text.Json.Serialization;
 
 namespace turisticky_zavod.Data
 {
+    public class Referee : Person
+    {
+        public int ID { get; set; }
+    }
+
     public class CheckpointRunnerInfo
     {
         public int ID { get; set; }
-        public Checkpoint Checkpoint { get; set; }
-        public Person Referee { get; set; }
+
+        [JsonPropertyName("checkpointId")]
+        public virtual Checkpoint Checkpoint { get; set; }
+
+        [JsonPropertyName("refereeName")]
+        public virtual Referee Referee { get; set; }
         public DateTime TimeArrived { get; set; }
         public DateTime? TimeDeparted { get; set; }
         public TimeSpan TimeWaitedSeconds { get; set; }

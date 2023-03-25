@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace turisticky_zavod.Data
 {
@@ -44,9 +45,14 @@ namespace turisticky_zavod.Data
             {
                 var options = new JsonSerializerOptions
                 {
-                    Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-                    WriteIndented = true,
                     PropertyNameCaseInsensitive = true,
+                    Converters =
+                    {
+                        new RefereeJsonConverter(),
+                        new CheckpointJsonConverter(),
+                        new DateTimeJsonConverter(),
+                        new TimeSpanJsonConverter()
+                    }
                 };
                 runners = JsonSerializer.Deserialize<List<Runner>>(reader.ReadToEnd(), options);
             }
@@ -65,6 +71,49 @@ namespace turisticky_zavod.Data
                 };
                 writer.Write(JsonSerializer.Serialize(runners, options));
             }
+        }
+    }
+
+    internal class RefereeJsonConverter : JsonConverter<Referee>
+    {
+        public override Referee Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+            => new() { Name = reader.GetString() };
+
+        public override void Write(Utf8JsonWriter writer, Referee value, JsonSerializerOptions options)
+            => writer.WriteStringValue(value.Name);
+    }
+
+    internal class CheckpointJsonConverter : JsonConverter<Checkpoint>
+    {
+        public override Checkpoint Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        {
+            var id = reader.GetInt32();
+            return Database.Instance.Checkpoint.Single(c => c.CheckpointID == id);
+        }
+
+        public override void Write(Utf8JsonWriter writer, Checkpoint value, JsonSerializerOptions options)
+            => writer.WriteNumberValue(value.CheckpointID);
+    }
+
+    internal class DateTimeJsonConverter : JsonConverter<DateTime>
+    {
+        public override DateTime Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+            => DateTimeOffset.FromUnixTimeMilliseconds(reader.GetInt64()).DateTime.ToLocalTime();
+
+        public override void Write(Utf8JsonWriter writer, DateTime value, JsonSerializerOptions options)
+        {
+            writer.WriteNumberValue(new DateTimeOffset(value).ToUnixTimeMilliseconds());
+        }
+    }
+
+    internal class TimeSpanJsonConverter : JsonConverter<TimeSpan>
+    {
+        public override TimeSpan Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+            => new(0, 0, reader.GetInt32());
+
+        public override void Write(Utf8JsonWriter writer, TimeSpan value, JsonSerializerOptions options)
+        {
+            writer.WriteNumberValue(value.TotalSeconds);
         }
     }
 }

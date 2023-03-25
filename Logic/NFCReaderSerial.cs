@@ -1,4 +1,5 @@
 ﻿using System.IO.Ports;
+using System.Management;
 using System.Text;
 using turisticky_zavod.Data;
 using Usb.Events;
@@ -7,36 +8,51 @@ namespace turisticky_zavod.Logic
 {
     public class NFCReaderSerial
     {
+        private readonly IUsbEventWatcher UsbEventWatcher = new UsbEventWatcher();
+
         private SerialPort serialPort = new();
 
         private List<byte[]> Data = new();
         private bool awaitingResponse = false;
         private int expectedResponseLength = 2;
 
-        public NFCReaderSerial() { }
+        public NFCReaderSerial()
+        {
+            UsbEventWatcher.UsbDeviceAdded += (_, _) =>
+            {
+                if (!IsConnected())
+                    Connect();
+            };
+        }
 
         public bool Connect()
         {
             try
             {
-                if (!serialPort.IsOpen)
+                var serialDevices = new ManagementObjectSearcher("SELECT * FROM Win32_SerialPort").Get();
+
+                foreach (var device in serialDevices)
                 {
+                    var name = Encoding.UTF8.GetString(Encoding.GetEncoding("ISO-8859-8").GetBytes(device["Name"].ToString().ToLower()));
+                    if (!(name.Contains("usb") && name.Contains("seri")))
+                        continue;
+
                     serialPort = new()
                     {
-                        PortName = SerialPort.GetPortNames().Last(),
+                        PortName = device["DeviceID"].ToString(),
                         BaudRate = 9600,
                         DataBits = 8,
                         Parity = Parity.None,
-                        StopBits = StopBits.One
+                        StopBits = StopBits.One,
+                        ReadTimeout = 2000
                     };
                     serialPort.Open();
-                    serialPort.ReadTimeout = 2000;
                     serialPort.DataReceived += new SerialDataReceivedEventHandler(DataReceivedCallback);
 
                     return true;
                 }
-                else
-                    return false;
+                
+                return false;
             }
             catch
             {
@@ -195,6 +211,9 @@ namespace turisticky_zavod.Logic
 
             return false;
         }
+
+
+        public bool IsConnected() => serialPort.IsOpen;
 
         public void Dispose()
         {

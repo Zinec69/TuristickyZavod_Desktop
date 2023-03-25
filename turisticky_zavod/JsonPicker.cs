@@ -1,4 +1,5 @@
-﻿using turisticky_zavod.Data;
+﻿using System.ComponentModel;
+using turisticky_zavod.Data;
 
 namespace turisticky_zavod.Forms
 {
