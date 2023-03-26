@@ -145,14 +145,19 @@ namespace turisticky_zavod.Logic
             {
                 for (int j = 6; j < runner_split.Length; j += 6)
                 {
+                    var referee = new Referee() { Name = runner_split[j + 1] };
+                    referee = Database.Instance.Referee.ToList().FirstOrDefault(r => r.Name == referee.Name, referee);
+
+                    var checkpoint = Database.Instance.Checkpoint.First(ch => ch.CheckpointID == int.Parse(runner_split[j]));
+                    checkpoint.Referee ??= referee;
+
                     checkpointInfos.Add(new CheckpointRunnerInfo()
                     {
-                        Checkpoint = Database.Instance.Checkpoint.First(ch => ch.CheckpointID == int.Parse(runner_split[j])),
-                        Referee = new() { Name = runner_split[j + 1] },
+                        Checkpoint = checkpoint,
                         TimeArrived = DateTimeOffset.FromUnixTimeSeconds(long.Parse(runner_split[j + 2])).DateTime.ToLocalTime(),
                         TimeDeparted = runner_split[j + 3] == "0" ? null : DateTimeOffset.FromUnixTimeSeconds(long.Parse(runner_split[j + 3])).DateTime.ToLocalTime(),
-                        TimeWaitedSeconds = new TimeSpan(0, 0, int.Parse(runner_split[j + 4])),
-                        PenaltySeconds = new TimeSpan(0, 0, int.Parse(runner_split[j + 5]))
+                        TimeWaited = new TimeSpan(0, 0, int.Parse(runner_split[j + 4])),
+                        Penalty = new TimeSpan(0, 0, int.Parse(runner_split[j + 5]))
                     });
                 }
             }

@@ -59,6 +59,8 @@ namespace turisticky_zavod.Forms
 
             if (ReaderSerial.Connect())
                 button_scanSerialPort.Enabled = true;
+
+            ReaderSerial.OnReaderReconnected += (_, _) => Invoke(() => button_scanSerialPort.Enabled = true);
         }
 
         private void OnTagDiscovered(object? sender, CardStatusEventArgs args)

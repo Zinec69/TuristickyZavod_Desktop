@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.Drawing;
 
 namespace turisticky_zavod.Data
 {
@@ -30,7 +29,12 @@ namespace turisticky_zavod.Data
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-            => optionsBuilder.UseSqlite("Data Source=../../../../Data/tz.db");
+        {
+            optionsBuilder
+                .UseSqlite("Data Source=../../../../Data/tz.db")
+                .EnableSensitiveDataLogging()
+                .ConfigureWarnings(b => b.Ignore());
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -57,12 +61,13 @@ namespace turisticky_zavod.Data
                 new AgeCategory() { ID = 4, AgeMin = 15, AgeMax = 16, Name = "Mladší dorostenci a dorostenky", Code = "K4", Color = "Červená" },
                 new AgeCategory() { ID = 5, AgeMin = 17, AgeMax = 18, Name = "Starší dorostenci a dorostenky", Code = "K5", Color = "Červená" },
                 new AgeCategory() { ID = 6, AgeMin = 19, AgeMax = 35, Name = "Dospělí A", Code = "K6", Color = "Červená" },
-                new AgeCategory() { ID = 7, AgeMin = 36, AgeMax = 1000, Name = "Dospělí B", Code = "K7", Color = "Červená" },
+                new AgeCategory() { ID = 7, AgeMin = 36, AgeMax = null, Name = "Dospělí B", Code = "K7", Color = "Červená" },
                 new AgeCategory() { ID = 8, AgeMin = 0, AgeMax = 30, Name = "Do 30 let", Code = "K8", Color = "Červená", Duo = true },
                 new AgeCategory() { ID = 9, AgeMin = 31, AgeMax = 70, Name = "31 - 70 let", Code = "K9", Color = "Červená", Duo = true },
-                new AgeCategory() { ID = 10, AgeMin = 71, AgeMax = 1000, Name = "Nad 70 let", Code = "K10", Color = "Červená", Duo = true }
+                new AgeCategory() { ID = 10, AgeMin = 71, AgeMax = null, Name = "Nad 70 let", Code = "K10", Color = "Červená", Duo = true }
             );
 
+            // TODO smazat
             modelBuilder.Entity<Partner>().HasData(new Partner() { ID = 1, Name = "Milan Kundera", BirthYear = 2012 });
 
             modelBuilder.Entity<Runner>().HasData(
@@ -70,7 +75,8 @@ namespace turisticky_zavod.Data
                 new Runner() { ID = 2, RunnerID = 59, Name = "Pepa ZDepa", Team = "Bzučáci", BirthYear = 1987, Disqualified = false }
             );
 
-            modelBuilder.Entity<Referee>().HasKey(r => r.ID);
+            modelBuilder.Entity<Referee>().HasKey("ID");
+            modelBuilder.Entity<Referee>().HasIndex(r => new {r.FirstName, r.LastName}).IsUnique();
         }
     }
 }

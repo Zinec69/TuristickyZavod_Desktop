@@ -10,6 +10,8 @@ namespace turisticky_zavod.Logic
     {
         private readonly IUsbEventWatcher UsbEventWatcher = new UsbEventWatcher();
 
+        public event EventHandler OnReaderReconnected;
+
         private SerialPort serialPort = new();
 
         private List<byte[]> Data = new();
@@ -20,8 +22,8 @@ namespace turisticky_zavod.Logic
         {
             UsbEventWatcher.UsbDeviceAdded += (_, _) =>
             {
-                if (!IsConnected())
-                    Connect();
+                if (!IsConnected() && Connect())
+                    OnReaderReconnected?.Invoke(null, new());
             };
         }
 

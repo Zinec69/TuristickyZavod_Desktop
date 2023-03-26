@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
+            DataGridViewCellStyle dataGridViewCellStyle4 = new DataGridViewCellStyle();
             DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
             DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
             DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
@@ -94,10 +95,19 @@
             dataGridView1.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dataGridView1.Columns.AddRange(new DataGridViewColumn[] { runnerIDDataGridViewTextBoxColumn, firstNameDataGridViewTextBoxColumn, lastNameDataGridViewTextBoxColumn, BirthYear, PartnerFirstName, PartnerLastName, PartnerBirthYear, teamDataGridViewTextBoxColumn, AgeCategory });
             dataGridView1.DataSource = runnerBindingSource;
+            dataGridViewCellStyle4.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle4.BackColor = SystemColors.Window;
+            dataGridViewCellStyle4.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewCellStyle4.ForeColor = SystemColors.ControlText;
+            dataGridViewCellStyle4.SelectionBackColor = SystemColors.MenuHighlight;
+            dataGridViewCellStyle4.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle4.WrapMode = DataGridViewTriState.False;
+            dataGridView1.DefaultCellStyle = dataGridViewCellStyle4;
             dataGridView1.EditMode = DataGridViewEditMode.EditProgrammatically;
             dataGridView1.Location = new Point(6, 22);
             dataGridView1.MultiSelect = false;
             dataGridView1.Name = "dataGridView1";
+            dataGridView1.RowHeadersVisible = false;
             dataGridView1.RowTemplate.Height = 25;
             dataGridView1.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dataGridView1.Size = new Size(1128, 472);
@@ -169,6 +179,7 @@
             toolStripMenuItem_ageCategories.Name = "toolStripMenuItem_ageCategories";
             toolStripMenuItem_ageCategories.Size = new Size(163, 22);
             toolStripMenuItem_ageCategories.Text = "Věkové kategorie";
+            toolStripMenuItem_ageCategories.Click += toolStripMenuItem_ageCategories_Click;
             // 
             // runnerIDDataGridViewTextBoxColumn
             // 
@@ -221,18 +232,22 @@
             // 
             // teamDataGridViewTextBoxColumn
             // 
+            teamDataGridViewTextBoxColumn.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
             teamDataGridViewTextBoxColumn.DataPropertyName = "Team";
             teamDataGridViewTextBoxColumn.HeaderText = "Oddíl";
             teamDataGridViewTextBoxColumn.Name = "teamDataGridViewTextBoxColumn";
+            teamDataGridViewTextBoxColumn.Width = 61;
             // 
             // AgeCategory
             // 
+            AgeCategory.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
             AgeCategory.DataPropertyName = "AgeCategory";
             dataGridViewCellStyle3.NullValue = "-";
             AgeCategory.DefaultCellStyle = dataGridViewCellStyle3;
             AgeCategory.HeaderText = "Věková kategorie";
             AgeCategory.Name = "AgeCategory";
             AgeCategory.ReadOnly = true;
+            AgeCategory.Width = 111;
             // 
             // MainWindow
             // 
@@ -268,10 +283,10 @@
         private ToolStripMenuItem toolStripMenuItem_csv;
         private ToolStripMenuItem toolStripMenuItem_json;
         private ToolStripMenuItem toolStripMenuItem_nfc;
-        private BindingSource runnerBindingSource;
         private ToolStripProgressBar toolStripProgressBar1;
         private ToolStripMenuItem toolStripMenuItem_settings;
         private ToolStripMenuItem toolStripMenuItem_ageCategories;
+        private BindingSource runnerBindingSource;
         private DataGridViewTextBoxColumn runnerIDDataGridViewTextBoxColumn;
         private DataGridViewTextBoxColumn firstNameDataGridViewTextBoxColumn;
         private DataGridViewTextBoxColumn lastNameDataGridViewTextBoxColumn;

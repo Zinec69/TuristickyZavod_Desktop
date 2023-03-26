@@ -1,21 +1,18 @@
 using System.ComponentModel;
 using turisticky_zavod.Data;
 using Microsoft.EntityFrameworkCore;
+using Forms;
 
 namespace turisticky_zavod.Forms
 {
     public partial class MainWindow : Form
     {
-        private Database database;
-
-        private bool isSorting = false;
+        private readonly Database database = Database.Instance;
 
         public MainWindow()
         {
             InitializeComponent();
             Program.SetDoubleBuffer(dataGridView1, true);
-
-            database = Database.Instance;
         }
 
         protected override void OnLoad(EventArgs e)
@@ -114,9 +111,7 @@ namespace turisticky_zavod.Forms
                             foreach (var ci in runner.CheckpointInfo)
                             {
                                 if (current.CheckpointInfo.FirstOrDefault(c => c.Checkpoint.CheckpointID == ci.Checkpoint.CheckpointID, null) == null)
-                                {
                                     current.CheckpointInfo.Add(ci);
-                                }
                             }
                             updatedRunners.Add(current);
                             continue;
@@ -210,6 +205,11 @@ namespace turisticky_zavod.Forms
                         break;
                 }
             }
+        }
+
+        private void toolStripMenuItem_ageCategories_Click(object sender, EventArgs e)
+        {
+            new AgeCategoriesEditor().ShowDialog();
         }
     }
 }

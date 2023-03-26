@@ -1,19 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
 namespace turisticky_zavod.Data
 {
-    public class BaseRunner : Person
-    {
-        [Key]
-        public int ID { get; set; } = -1;
-        public int? BirthYear { get; set; }
-    }
-
-    public class Partner : BaseRunner { }
-
     [JsonSerializable(typeof(Runner), TypeInfoPropertyName = "Runners")]
     public class Runner : BaseRunner
     {
@@ -31,7 +21,7 @@ namespace turisticky_zavod.Data
 
         public List<CheckpointRunnerInfo> CheckpointInfo { get; set; } = new();
 
-        public AgeCategory? AgeCategory { get { return BirthYear.HasValue ? AgeCategory.GetByBirthYear(BirthYear.Value) : null; } }
+        public AgeCategory? AgeCategory { get { return BirthYear.HasValue ? AgeCategory.GetByBirthYear(BirthYear.Value, Partner != null) : null; } }
 
 
         [NotMapped]

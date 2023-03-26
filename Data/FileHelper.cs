@@ -101,9 +101,7 @@ namespace turisticky_zavod.Data
             => DateTimeOffset.FromUnixTimeMilliseconds(reader.GetInt64()).DateTime.ToLocalTime();
 
         public override void Write(Utf8JsonWriter writer, DateTime value, JsonSerializerOptions options)
-        {
-            writer.WriteNumberValue(new DateTimeOffset(value).ToUnixTimeMilliseconds());
-        }
+            => writer.WriteNumberValue(new DateTimeOffset(value).ToUnixTimeMilliseconds());
     }
 
     internal class TimeSpanJsonConverter : JsonConverter<TimeSpan>
@@ -112,8 +110,6 @@ namespace turisticky_zavod.Data
             => new(0, 0, reader.GetInt32());
 
         public override void Write(Utf8JsonWriter writer, TimeSpan value, JsonSerializerOptions options)
-        {
-            writer.WriteNumberValue(value.TotalSeconds);
-        }
+            => writer.WriteNumberValue(value.TotalSeconds);
     }
 }
