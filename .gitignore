@@ -364,3 +364,4 @@ FodyWeavers.xsd
 /Data/tz.db
 /Data/tz.db-shm
 /Data/tz.db-wal
+/test
