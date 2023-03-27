@@ -70,7 +70,7 @@
             dataGridView1.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dataGridView1.Size = new Size(780, 311);
             dataGridView1.TabIndex = 0;
-            dataGridView1.ColumnHeaderMouseClick += dataGridView1_ColumnHeaderMouseClick;
+            dataGridView1.RowsAdded += dataGridView1_RowsAdded;
             // 
             // RunnerID
             // 

@@ -11,6 +11,8 @@
     <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
     <RootNamespace>$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
     <AssemblyName>turisticky_zavod</AssemblyName>
+    <StartupObject>turisticky_zavod.Forms.Program</StartupObject>
+    <SupportedOSPlatformVersion>10.0.19041.0</SupportedOSPlatformVersion>
   </PropertyGroup>
 
   <ItemGroup>

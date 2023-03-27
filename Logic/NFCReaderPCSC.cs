@@ -14,7 +14,7 @@ namespace turisticky_zavod.Logic
         private string ReaderName = string.Empty;
         public SCRState ReaderState;
 
-        private readonly IntPtr controlCode = new(0x310000 + (3500 * 4));
+        private readonly IntPtr controlCode = new(0x310000 + 3500 * 4);
 
         public event EventHandler OnReaderDisconnected;
         public event EventHandler OnReaderReconnected;

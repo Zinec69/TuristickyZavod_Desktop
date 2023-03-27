@@ -31,7 +31,7 @@ namespace turisticky_zavod.Data
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder
-                .UseSqlite("Data Source=../../../../Data/tz.db")
+                .UseSqlite(@"Data Source=C:\Users\Zinec\Desktop\Škola\BP\Desktop\Data\tz.db") // TODO
                 .EnableSensitiveDataLogging()
                 .ConfigureWarnings(b => b.Ignore());
         }
@@ -55,14 +55,14 @@ namespace turisticky_zavod.Data
 
             modelBuilder.Entity<AgeCategory>(entity => entity.Property(e => e.ID).ValueGeneratedOnAdd());
             modelBuilder.Entity<AgeCategory>().HasData(
-                new AgeCategory() { ID = 1, AgeMin = 0, AgeMax = 10, Name = "Nejmladší žáci a žákyně", Code = "K1", Color = "Bílá" },
+                new AgeCategory() { ID = 1, AgeMin = null, AgeMax = 10, Name = "Nejmladší žáci a žákyně", Code = "K1", Color = "Bílá" },
                 new AgeCategory() { ID = 2, AgeMin = 11, AgeMax = 12, Name = "Mladší žáci a žákyně", Code = "K2", Color = "Bílá" },
                 new AgeCategory() { ID = 3, AgeMin = 13, AgeMax = 14, Name = "Starší žáci a žákyně", Code = "K3", Color = "Bílá" },
                 new AgeCategory() { ID = 4, AgeMin = 15, AgeMax = 16, Name = "Mladší dorostenci a dorostenky", Code = "K4", Color = "Červená" },
                 new AgeCategory() { ID = 5, AgeMin = 17, AgeMax = 18, Name = "Starší dorostenci a dorostenky", Code = "K5", Color = "Červená" },
                 new AgeCategory() { ID = 6, AgeMin = 19, AgeMax = 35, Name = "Dospělí A", Code = "K6", Color = "Červená" },
                 new AgeCategory() { ID = 7, AgeMin = 36, AgeMax = null, Name = "Dospělí B", Code = "K7", Color = "Červená" },
-                new AgeCategory() { ID = 8, AgeMin = 0, AgeMax = 30, Name = "Do 30 let", Code = "K8", Color = "Červená", Duo = true },
+                new AgeCategory() { ID = 8, AgeMin = null, AgeMax = 30, Name = "Do 30 let", Code = "K8", Color = "Červená", Duo = true },
                 new AgeCategory() { ID = 9, AgeMin = 31, AgeMax = 70, Name = "31 - 70 let", Code = "K9", Color = "Červená", Duo = true },
                 new AgeCategory() { ID = 10, AgeMin = 71, AgeMax = null, Name = "Nad 70 let", Code = "K10", Color = "Červená", Duo = true }
             );

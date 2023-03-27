@@ -8,14 +8,14 @@ namespace turisticky_zavod.Forms
     public partial class NFCScanning : Form
     {
         private readonly NFCReaderPCSC Reader = new();
-        private NFCReaderSerial ReaderSerial = new();
+        private readonly NFCReaderSerial ReaderSerial = new();
 
         public event EventHandler<Runner> OnRunnerNotInDB;
 
         private readonly Database database;
 
-        private readonly Image nfcOn = Image.FromFile("../../../Resources/nfc_icon.png");
-        private readonly Image nfcOff = Image.FromFile("../../../Resources/nfc_off_icon.png");
+        private readonly Image nfcOn = Image.FromFile(@"C:\Users\Zinec\Desktop\Škola\BP\Desktop\turisticky_zavod\Resources\nfc_icon.png");
+        private readonly Image nfcOff = Image.FromFile(@"C:\Users\Zinec\Desktop\Škola\BP\Desktop\turisticky_zavod\Resources\nfc_off_icon.png");
 
         public NFCScanning()
         {
@@ -44,7 +44,7 @@ namespace turisticky_zavod.Forms
                 Reader.OnReaderReconnected += (_, _) =>
                 {
                     Reader.OnCardDetected += OnTagDiscovered;
-                    Invoke(() =>
+                    pictureBox_nfcIcon.Invoke(() =>
                     {
                         pictureBox_nfcIcon.Image = nfcOn;
                         readerStatusTextVar.Text = "Připojena";
@@ -73,23 +73,23 @@ namespace turisticky_zavod.Forms
 
             var timer = Stopwatch.StartNew();
 
-            try
-            {
+            //try
+            //{
                 var runner = Reader.ReadRunnerFromTag();
                 // TODO
                 // var runner = Reader.ReadRunnerFromTag(checkBox_eraseTag.Checked);
                 timer.Stop();
                 SaveRunner(runner);
                 toolStripStatusLabel.Text = $"Běžec č. {runner.RunnerID} úspěšně načten [{timer.ElapsedMilliseconds}ms]";
-            }
-            catch (NFCException ex)
-            {
-                toolStripStatusLabel.Text = ex.Message;
-            }
-            catch
-            {
-                toolStripStatusLabel.Text = $"Nastala neočekávaná chyba, zkuste to prosím znovu";
-            }
+            //}
+            //catch (NFCException ex)
+            //{
+            //    toolStripStatusLabel.Text = ex.Message;
+            //}
+            //catch
+            //{
+            //    toolStripStatusLabel.Text = $"Nastala neočekávaná chyba, zkuste to prosím znovu";
+            //}
         }
 
         private void SaveRunner(Runner runner)

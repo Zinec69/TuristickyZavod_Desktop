@@ -53,7 +53,7 @@ namespace turisticky_zavod.Logic
 
                     return true;
                 }
-                
+
                 return false;
             }
             catch
@@ -79,7 +79,7 @@ namespace turisticky_zavod.Logic
             Data.Add(buffer);
             awaitingResponse = false;
         }
-        
+
         public Runner ReadRunner()
         {
             SendKeyToReader();
@@ -122,7 +122,7 @@ namespace turisticky_zavod.Logic
 
             var runner_split = all_str.Split(";");
             var name = runner_split[1].Split(' ');
-            
+
             return new Runner()
             {
                 RunnerID = int.Parse(runner_split[0]),
@@ -180,7 +180,7 @@ namespace turisticky_zavod.Logic
             return Encoding.GetEncoding("iso-8859-2")
                     .GetString(buffer.Take(16).TakeWhile(b => b != 0x00).ToArray());
         }
-        
+
         private bool WriteToBlock(int block, byte[] data)
         {
             var reader_data = new byte[21];

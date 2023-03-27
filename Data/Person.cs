@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Xml.Linq;
 
 namespace turisticky_zavod.Data
 {
@@ -6,6 +8,8 @@ namespace turisticky_zavod.Data
     public class Person
     {
         private string firstName;
+
+        [Display(AutoGenerateField = true, Name = "Jméno", Order = 2)]
         public string FirstName
         {
             get
@@ -23,6 +27,8 @@ namespace turisticky_zavod.Data
         }
 
         private string lastName;
+
+        [Display(AutoGenerateField = true, Name = "Příjmení", Order = 3)]
         public string LastName
         {
             get
@@ -40,7 +46,9 @@ namespace turisticky_zavod.Data
         }
 
         private string name;
+
         [NotMapped]
+        [Display(AutoGenerateField = false)]
         public string Name
         {
             get

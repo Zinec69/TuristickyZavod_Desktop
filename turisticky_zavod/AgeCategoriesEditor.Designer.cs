@@ -1,4 +1,4 @@
-﻿namespace Forms
+﻿namespace turisticky_zavod.Forms
 {
     partial class AgeCategoriesEditor
     {
@@ -61,7 +61,7 @@
             // 
             // ageCategoryBindingSource
             // 
-            ageCategoryBindingSource.DataSource = typeof(turisticky_zavod.Data.AgeCategory);
+            ageCategoryBindingSource.DataSource = typeof(Data.AgeCategory);
             // 
             // dataGridView1
             // 
@@ -75,11 +75,12 @@
             dataGridView1.DataSource = ageCategoryBindingSource;
             dataGridView1.Location = new Point(6, 22);
             dataGridView1.Name = "dataGridView1";
-            dataGridView1.RowHeadersVisible = false;
+            dataGridView1.RowHeadersWidth = 50;
             dataGridView1.RowTemplate.Height = 25;
-            dataGridView1.Size = new Size(719, 330);
+            dataGridView1.Size = new Size(718, 330);
             dataGridView1.TabIndex = 0;
             dataGridView1.CellEndEdit += dataGridView1_CellEndEdit;
+            dataGridView1.RowsAdded += dataGridView1_RowsAdded;
             // 
             // nameDataGridViewTextBoxColumn
             // 
@@ -127,14 +128,14 @@
             groupBox1.Controls.Add(dataGridView1);
             groupBox1.Location = new Point(12, 111);
             groupBox1.Name = "groupBox1";
-            groupBox1.Size = new Size(731, 358);
+            groupBox1.Size = new Size(730, 358);
             groupBox1.TabIndex = 8;
             groupBox1.TabStop = false;
             groupBox1.Text = "Všechny věkové kategorie";
             // 
             // groupBox2
             // 
-            groupBox2.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            groupBox2.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             groupBox2.Controls.Add(textBox_color);
             groupBox2.Controls.Add(label5);
             groupBox2.Controls.Add(checkBox_duo);
@@ -149,7 +150,7 @@
             groupBox2.Controls.Add(button_add);
             groupBox2.Location = new Point(12, 12);
             groupBox2.Name = "groupBox2";
-            groupBox2.Size = new Size(731, 93);
+            groupBox2.Size = new Size(730, 93);
             groupBox2.TabIndex = 9;
             groupBox2.TabStop = false;
             groupBox2.Text = "Přidat novou kategorii";
@@ -185,9 +186,9 @@
             label4.AutoSize = true;
             label4.Location = new Point(357, 28);
             label4.Name = "label4";
-            label4.Size = new Size(47, 15);
+            label4.Size = new Size(42, 15);
             label4.TabIndex = 13;
-            label4.Text = "Věk do*";
+            label4.Text = "Věk do";
             // 
             // textBox_ageMax
             // 
@@ -202,9 +203,9 @@
             label3.AutoSize = true;
             label3.Location = new Point(288, 28);
             label3.Name = "label3";
-            label3.Size = new Size(47, 15);
+            label3.Size = new Size(42, 15);
             label3.TabIndex = 11;
-            label3.Text = "Věk od*";
+            label3.Text = "Věk od";
             // 
             // label2
             // 
@@ -249,7 +250,7 @@
             // button_add
             // 
             button_add.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            button_add.Location = new Point(623, 34);
+            button_add.Location = new Point(622, 34);
             button_add.Name = "button_add";
             button_add.Size = new Size(90, 33);
             button_add.TabIndex = 6;
@@ -259,6 +260,7 @@
             // 
             // label6
             // 
+            label6.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             label6.AutoSize = true;
             label6.Font = new Font("Segoe UI", 9F, FontStyle.Italic, GraphicsUnit.Point);
             label6.Location = new Point(18, 472);
@@ -271,10 +273,11 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(755, 496);
+            ClientSize = new Size(754, 496);
             Controls.Add(label6);
             Controls.Add(groupBox2);
             Controls.Add(groupBox1);
+            MinimumSize = new Size(770, 300);
             Name = "AgeCategoriesEditor";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Nastavení věkových kategorií";

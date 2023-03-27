@@ -1,7 +1,6 @@
 using System.ComponentModel;
 using turisticky_zavod.Data;
 using Microsoft.EntityFrameworkCore;
-using Forms;
 
 namespace turisticky_zavod.Forms
 {
@@ -210,6 +209,14 @@ namespace turisticky_zavod.Forms
         private void toolStripMenuItem_ageCategories_Click(object sender, EventArgs e)
         {
             new AgeCategoriesEditor().ShowDialog();
+        }
+
+        private void dataGridView1_RowsAdded(object sender, DataGridViewRowsAddedEventArgs e)
+        {
+            foreach (DataGridViewRow row in dataGridView1.Rows)
+            {
+                row.HeaderCell.Value = (row.Index + 1).ToString();
+            }
         }
     }
 }

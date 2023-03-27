@@ -1,7 +1,6 @@
 ﻿using turisticky_zavod.Data;
-using turisticky_zavod.Forms;
 
-namespace Forms
+namespace turisticky_zavod.Forms
 {
     public partial class AgeCategoriesEditor : Form
     {
@@ -22,15 +21,23 @@ namespace Forms
         {
             var name = textBox_name.Text.Trim();
             var code = textBox_code.Text.Trim();
+            var ageMin = textBox_ageMin.Text;
+            var ageMax = textBox_ageMax.Text;
 
-            if (name.Length > 0 && code.Length > 0 && textBox_ageMin.Text.Length > 0)
+            if (string.IsNullOrEmpty(name))
+                MessageBox.Show("Název je povinná položka", "Chyba", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            else if (string.IsNullOrEmpty(code))
+                MessageBox.Show("Zkratka je povinná položka", "Chyba", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            else if (string.IsNullOrEmpty(ageMin) && string.IsNullOrEmpty(ageMax))
+                MessageBox.Show("Musíte vyplnit alespoň jeden z věků", "Chyba", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            else
             {
                 database.AgeCategory.Add(new()
                 {
                     Name = name,
                     Code = code,
-                    AgeMin = int.Parse(textBox_ageMin.Text),
-                    AgeMax = (textBox_ageMax.Text.Length > 0 && int.TryParse(textBox_ageMax.Text, out int ageMax)) ? ageMax : null
+                    AgeMin = int.TryParse(ageMin, out int ageMinParsed) ? ageMinParsed : null,
+                    AgeMax = int.TryParse(textBox_ageMax.Text, out int ageMaxParsed) ? ageMaxParsed : null
                 });
                 database.SaveChanges();
                 textBox_name.Clear();
@@ -39,8 +46,6 @@ namespace Forms
                 textBox_ageMax.Clear();
                 textBox_color.Clear();
             }
-            else
-                MessageBox.Show("Nejsou vyplněna všechna povinná pole", "Chyba", MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
 
         private void textBox_ageMin_KeyDown(object sender, KeyEventArgs e)
@@ -109,6 +114,14 @@ namespace Forms
 
             database.AgeCategory.Update(ageCategory);
             database.SaveChanges();
+        }
+
+        private void dataGridView1_RowsAdded(object sender, DataGridViewRowsAddedEventArgs e)
+        {
+            foreach (DataGridViewRow row in dataGridView1.Rows)
+            {
+                row.HeaderCell.Value = (row.Index + 1).ToString();
+            }
         }
     }
 }
