@@ -6,13 +6,13 @@ using Usb.Events;
 
 namespace turisticky_zavod.Logic
 {
-    public class NFCReaderPCSC
+    public class NFCReaderPCSC : IDisposable
     {
         private readonly IUsbEventWatcher UsbEventWatcher = new UsbEventWatcher();
         private static ISCardMonitor Monitor;
 
         private string ReaderName = string.Empty;
-        public SCRState ReaderState;
+        public SCRState ReaderState { get; private set; }
 
         private readonly IntPtr controlCode = new(0x310000 + 3500 * 4);
 
@@ -148,7 +148,7 @@ namespace turisticky_zavod.Logic
                     var referee = new Referee() { Name = runner_split[j + 1] };
                     referee = Database.Instance.Referee.ToList().FirstOrDefault(r => r.Name == referee.Name, referee);
 
-                    var checkpoint = Database.Instance.Checkpoint.First(ch => ch.CheckpointID == int.Parse(runner_split[j]));
+                    var checkpoint = Database.Instance.Checkpoint.First(ch => ch.ID == int.Parse(runner_split[j]));
                     checkpoint.Referee ??= referee;
 
                     checkpointInfos.Add(new CheckpointRunnerInfo()
@@ -164,9 +164,9 @@ namespace turisticky_zavod.Logic
 
             return new Runner()
             {
-                RunnerID = int.Parse(runner_split[0]),
+                StartNumber = int.Parse(runner_split[0]),
                 Name = runner_split[1],
-                Team = runner_split[2],
+                Team = new() { Name = runner_split[2] },
                 StartTime = DateTimeOffset.FromUnixTimeSeconds(long.Parse(runner_split[3])).DateTime.ToLocalTime(),
                 FinishTime = runner_split[4] == "0" ? null : DateTimeOffset.FromUnixTimeSeconds(long.Parse(runner_split[4])).DateTime.ToLocalTime(),
                 Disqualified = runner_split[5] == "1",
@@ -225,8 +225,13 @@ namespace turisticky_zavod.Logic
             if (!(buffer[16] == 0x90 && buffer[17] == 0x00))
                 throw new NFCException("Nastala chyba při čtení dat");
 
-            return Encoding.GetEncoding("iso-8859-2")
+            return Encoding.GetEncoding("ISO-8859-2")
                 .GetString(buffer.Take(16).TakeWhile(b => b != 0x00).ToArray());
+        }
+
+        public string ReadFirstBlock()
+        {
+            return "";
         }
 
         private bool UpdateBlock(ICardReader reader, int block, byte[] data)
@@ -269,6 +274,12 @@ namespace turisticky_zavod.Logic
         {
             Monitor.Cancel();
             Monitor.Dispose();
+            foreach (var del in OnCardDetected.GetInvocationList())
+                OnCardDetected -= (EventHandler<CardStatusEventArgs>)del;
+            foreach (var del in OnReaderDisconnected.GetInvocationList())
+                OnReaderDisconnected -= (EventHandler)del;
+            foreach (var del in OnReaderReconnected.GetInvocationList())
+                OnReaderReconnected -= (EventHandler)del;
         }
     }
 

@@ -365,3 +365,4 @@ FodyWeavers.xsd
 /Data/tz.db-shm
 /Data/tz.db-wal
 /test
+/db_diagram.pdf

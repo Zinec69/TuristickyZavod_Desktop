@@ -99,9 +99,9 @@
             // pictureBox_nfcIcon
             // 
             pictureBox_nfcIcon.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            pictureBox_nfcIcon.Location = new Point(98, 55);
+            pictureBox_nfcIcon.Location = new Point(109, 71);
             pictureBox_nfcIcon.Name = "pictureBox_nfcIcon";
-            pictureBox_nfcIcon.Size = new Size(130, 130);
+            pictureBox_nfcIcon.Size = new Size(110, 110);
             pictureBox_nfcIcon.SizeMode = PictureBoxSizeMode.Zoom;
             pictureBox_nfcIcon.TabIndex = 5;
             pictureBox_nfcIcon.TabStop = false;

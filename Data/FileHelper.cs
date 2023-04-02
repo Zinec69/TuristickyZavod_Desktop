@@ -10,27 +10,46 @@ namespace turisticky_zavod.Data
         {
             List<Runner> runners = new();
 
-            using (var reader = new StreamReader(filepath, Encoding.GetEncoding("iso-8859-2")))
+            using (var reader = new StreamReader(filepath, Encoding.GetEncoding("Windows-1250")))
             {
                 reader.ReadLine();
                 while (!reader.EndOfStream)
                 {
                     var line = reader.ReadLine()?.Split(';');
-                    var runner = new Runner()
+                    if (line != null && line.Length >= 5)
                     {
-                        RunnerID = !string.IsNullOrEmpty(line[0]) ? int.Parse(line[0]) : null,
-                        LastName = line[1].Trim(),
-                        FirstName = line[2].Trim(),
-                        BirthYear = int.TryParse(line[3], out int result) ? result : null,
-                        Team = line[4].Trim(),
-                        Partner = string.IsNullOrEmpty(line[5]) ? null : new()
+                        var runner = new Runner()
                         {
-                            LastName = line[5].Trim(),
-                            FirstName = line[6].Trim(),
-                            BirthYear = int.TryParse(line[7], out int result2) ? result2 : null
+                            StartNumber = !string.IsNullOrEmpty(line[0].Trim()) ? int.Parse(line[0].Trim()) : null,
+                            LastName = line[1].Trim(),
+                            FirstName = line[2].Trim(),
+                            BirthYear = int.TryParse(line[3].Trim(), out int result) ? result : null,
+                            Team = new() { Name = line[4].Trim() }
+                        };
+
+                        if (line.Length >= 8)
+                        {
+                            runner.Partner = string.IsNullOrEmpty(line[5].Trim()) ? null : new()
+                            {
+                                LastName = line[5].Trim(),
+                                FirstName = line[6].Trim(),
+                                BirthYear = int.TryParse(line[7].Trim(), out int result2) ? result2 : null
+                            };
                         }
-                    };
-                    runners.Add(runner);
+                        else
+                            runner.Partner = null;
+
+                        if (line.Length >= 10 && AgeCategory.TryGetByString(line[9].Trim(), runner.Partner != null, out AgeCategory? category))
+                        {
+                            runner.AgeCategory = category;
+                        }
+                        else
+                        {
+                            runner.AgeCategory = runner.BirthYear.HasValue ? AgeCategory.GetByBirthYear(runner.BirthYear.Value, runner.Partner != null) : null;
+                        }
+
+                        runners.Add(runner);
+                    }
                 }
             }
 
@@ -39,9 +58,9 @@ namespace turisticky_zavod.Data
 
         public static List<Runner> LoadFromJSON(string filepath)
         {
-            List<Runner> runners = new();
+            var runners = new List<Runner>();
 
-            using (var reader = new StreamReader(filepath, Encoding.GetEncoding("iso-8859-2")))
+            using (var reader = new StreamReader(filepath, Encoding.GetEncoding("ISO-8859-2")))
             {
                 var options = new JsonSerializerOptions
                 {
@@ -62,14 +81,17 @@ namespace turisticky_zavod.Data
 
         public static void ExportToJSON(List<Runner> runners, string filepath)
         {
-            using (var writer = new StreamWriter(filepath, Encoding.GetEncoding("iso-8859-2"), new FileStreamOptions() { Mode = FileMode.Create }))
+            using (var fs = new FileStream(filepath, FileMode.Create))
             {
-                var options = new JsonSerializerOptions
+                using (var writer = new StreamWriter(fs, Encoding.GetEncoding("ISO-8859-2")))
                 {
-                    Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-                    WriteIndented = true,
-                };
-                writer.Write(JsonSerializer.Serialize(runners, options));
+                    var options = new JsonSerializerOptions
+                    {
+                        Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+                        WriteIndented = true
+                    };
+                    writer.Write(JsonSerializer.Serialize(runners, options));
+                }
             }
         }
     }
@@ -88,11 +110,11 @@ namespace turisticky_zavod.Data
         public override Checkpoint Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             var id = reader.GetInt32();
-            return Database.Instance.Checkpoint.Single(c => c.CheckpointID == id);
+            return Database.Instance.Checkpoint.Single(c => c.ID == id);
         }
 
         public override void Write(Utf8JsonWriter writer, Checkpoint value, JsonSerializerOptions options)
-            => writer.WriteNumberValue(value.CheckpointID);
+            => writer.WriteNumberValue(value.ID);
     }
 
     internal class DateTimeJsonConverter : JsonConverter<DateTime>

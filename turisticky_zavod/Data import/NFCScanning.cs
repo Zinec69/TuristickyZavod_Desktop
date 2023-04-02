@@ -14,8 +14,8 @@ namespace turisticky_zavod.Forms
 
         private readonly Database database;
 
-        private readonly Image nfcOn = Image.FromFile(@"C:\Users\Zinec\Desktop\Škola\BP\Desktop\turisticky_zavod\Resources\nfc_icon.png");
-        private readonly Image nfcOff = Image.FromFile(@"C:\Users\Zinec\Desktop\Škola\BP\Desktop\turisticky_zavod\Resources\nfc_off_icon.png");
+        private readonly Image nfcOn = Image.FromFile(Path.GetFullPath("../../../Resources/nfc_icon.png")); // TODO
+        private readonly Image nfcOff = Image.FromFile(Path.GetFullPath("../../../Resources/nfc_off_icon.png")); // TODO
 
         public NFCScanning()
         {
@@ -36,11 +36,14 @@ namespace turisticky_zavod.Forms
                     readerStatusTextVar.Text = "Připravena";
                     Reader.OnCardDetected += OnTagDiscovered;
                 }
-                Reader.OnReaderDisconnected += (_, _) => Invoke(() =>
+                Reader.OnReaderDisconnected += (_, _) =>
                 {
-                    pictureBox_nfcIcon.Image = nfcOff;
-                    readerStatusTextVar.Text = "Odpojena";
-                });
+                    Invoke(() =>
+                    {
+                        pictureBox_nfcIcon.Image = nfcOff;
+                        readerStatusTextVar.Text = "Odpojena";
+                    });
+                };
                 Reader.OnReaderReconnected += (_, _) =>
                 {
                     Reader.OnCardDetected += OnTagDiscovered;
@@ -67,36 +70,36 @@ namespace turisticky_zavod.Forms
         {
             if (!NFCReaderPCSC.CheckTagCompatibility(args.Atr))
             {
-                MessageBox.Show("Nepodporovaný typ čipu");
+                MessageBox.Show("Nepodporovaný typ čipu", "Chyba", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
             var timer = Stopwatch.StartNew();
 
-            //try
-            //{
-                var runner = Reader.ReadRunnerFromTag();
+            try
+            {
                 // TODO
                 // var runner = Reader.ReadRunnerFromTag(checkBox_eraseTag.Checked);
+                var runner = Reader.ReadRunnerFromTag();
                 timer.Stop();
                 SaveRunner(runner);
-                toolStripStatusLabel.Text = $"Běžec č. {runner.RunnerID} úspěšně načten [{timer.ElapsedMilliseconds}ms]";
-            //}
-            //catch (NFCException ex)
-            //{
-            //    toolStripStatusLabel.Text = ex.Message;
-            //}
-            //catch
-            //{
-            //    toolStripStatusLabel.Text = $"Nastala neočekávaná chyba, zkuste to prosím znovu";
-            //}
+                toolStripStatusLabel.Text = $"Běžec č. {runner.StartNumber} úspěšně načten [{timer.ElapsedMilliseconds}ms]";
+            }
+            catch (NFCException ex)
+            {
+                toolStripStatusLabel.Text = ex.Message;
+            }
+            catch
+            {
+                toolStripStatusLabel.Text = $"Nastala neočekávaná chyba, zkuste to prosím znovu";
+            }
         }
 
         private void SaveRunner(Runner runner)
         {
             Invoke(() =>
             {
-                var dbRunner = database.Runner.Where(r => r.RunnerID == runner.RunnerID).FirstOrDefault();
+                var dbRunner = database.Runner.Where(r => r.StartNumber == runner.StartNumber).FirstOrDefault();
 
                 if (dbRunner == default)
                     OnRunnerNotInDB?.Invoke(null, runner);
@@ -107,7 +110,7 @@ namespace turisticky_zavod.Forms
                     dbRunner.Disqualified = runner.Disqualified;
                     foreach (var ci in runner.CheckpointInfo)
                     {
-                        if (dbRunner.CheckpointInfo.FirstOrDefault(c => c.Checkpoint.CheckpointID == ci.Checkpoint.CheckpointID, null) == null)
+                        if (dbRunner.CheckpointInfo.FirstOrDefault(c => c.Checkpoint.ID == ci.Checkpoint.ID, null) == null)
                         {
                             dbRunner.CheckpointInfo.Add(ci);
                         }
@@ -133,7 +136,7 @@ namespace turisticky_zavod.Forms
                 var runner = ReaderSerial.ReadRunner();
                 timer.Stop();
                 SaveRunner(runner);
-                toolStripStatusLabel.Text = $"Běžec č. {runner.RunnerID} úspěšně načten [{timer.ElapsedMilliseconds}ms]";
+                toolStripStatusLabel.Text = $"Běžec č. {runner.StartNumber} úspěšně načten [{timer.ElapsedMilliseconds}ms]";
             }
             catch (NFCException ex)
             {

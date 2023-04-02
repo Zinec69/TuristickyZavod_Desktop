@@ -9,7 +9,7 @@ namespace turisticky_zavod.Data
     {
         private string firstName;
 
-        [Display(AutoGenerateField = true, Name = "Jméno", Order = 2)]
+        //[Display(AutoGenerateField = true, Name = "Jméno", Order = 2)]
         public string FirstName
         {
             get
@@ -28,7 +28,7 @@ namespace turisticky_zavod.Data
 
         private string lastName;
 
-        [Display(AutoGenerateField = true, Name = "Příjmení", Order = 3)]
+        //[Display(AutoGenerateField = true, Name = "Příjmení", Order = 3)]
         public string LastName
         {
             get
@@ -48,7 +48,7 @@ namespace turisticky_zavod.Data
         private string name;
 
         [NotMapped]
-        [Display(AutoGenerateField = false)]
+        //[Display(AutoGenerateField = false)]
         public string Name
         {
             get

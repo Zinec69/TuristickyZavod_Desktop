@@ -6,7 +6,7 @@ namespace turisticky_zavod.Data
     {
         public int ID { get; set; }
 
-        [JsonPropertyName("checkpointId")]
+        [JsonPropertyName("checkpointID")]
         public virtual Checkpoint Checkpoint { get; set; }
 
         public DateTime TimeArrived { get; set; }

@@ -6,7 +6,7 @@ using Usb.Events;
 
 namespace turisticky_zavod.Logic
 {
-    public class NFCReaderSerial
+    public class NFCReaderSerial : IDisposable
     {
         private readonly IUsbEventWatcher UsbEventWatcher = new UsbEventWatcher();
 
@@ -121,14 +121,12 @@ namespace turisticky_zavod.Logic
             }
 
             var runner_split = all_str.Split(";");
-            var name = runner_split[1].Split(' ');
 
             return new Runner()
             {
-                RunnerID = int.Parse(runner_split[0]),
-                FirstName = name[0],
-                LastName = name[1],
-                Team = runner_split[2],
+                StartNumber = int.Parse(runner_split[0]),
+                Name = runner_split[1],
+                Team = new() { Name = runner_split[2] },
                 StartTime = new DateTime().AddSeconds(long.Parse(runner_split[3])),
                 FinishTime = runner_split[4] == "0" ? null : new DateTime().AddSeconds(long.Parse(runner_split[4])),
                 Disqualified = runner_split[5] == "1"
@@ -177,7 +175,7 @@ namespace turisticky_zavod.Logic
             if (!DetectResult(buffer, expectedResponseLength))
                 throw new Exception();
 
-            return Encoding.GetEncoding("iso-8859-2")
+            return Encoding.GetEncoding("ISO-8859-2")
                     .GetString(buffer.Take(16).TakeWhile(b => b != 0x00).ToArray());
         }
 
@@ -220,6 +218,8 @@ namespace turisticky_zavod.Logic
         public void Dispose()
         {
             serialPort.Dispose();
+            foreach (var del in OnReaderReconnected.GetInvocationList())
+                OnReaderReconnected -= (EventHandler)del;
         }
     }
 }

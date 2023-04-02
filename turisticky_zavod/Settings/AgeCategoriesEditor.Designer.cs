@@ -30,6 +30,7 @@
         {
             components = new System.ComponentModel.Container();
             DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
             ageCategoryBindingSource = new BindingSource(components);
             dataGridView1 = new DataGridView();
             nameDataGridViewTextBoxColumn = new DataGridViewTextBoxColumn();
@@ -53,10 +54,12 @@
             textBox_name = new TextBox();
             button_add = new Button();
             label6 = new Label();
+            errorProvider = new ErrorProvider(components);
             ((System.ComponentModel.ISupportInitialize)ageCategoryBindingSource).BeginInit();
             ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
             groupBox1.SuspendLayout();
             groupBox2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)errorProvider).BeginInit();
             SuspendLayout();
             // 
             // ageCategoryBindingSource
@@ -74,13 +77,18 @@
             dataGridView1.Columns.AddRange(new DataGridViewColumn[] { nameDataGridViewTextBoxColumn, codeDataGridViewTextBoxColumn, ageMinDataGridViewTextBoxColumn, ageMaxDataGridViewTextBoxColumn, colorDataGridViewTextBoxColumn, duoDataGridViewCheckBoxColumn });
             dataGridView1.DataSource = ageCategoryBindingSource;
             dataGridView1.Location = new Point(6, 22);
+            dataGridView1.MultiSelect = false;
             dataGridView1.Name = "dataGridView1";
+            dataGridView1.ReadOnly = true;
             dataGridView1.RowHeadersWidth = 50;
             dataGridView1.RowTemplate.Height = 25;
+            dataGridView1.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dataGridView1.Size = new Size(718, 330);
             dataGridView1.TabIndex = 0;
-            dataGridView1.CellEndEdit += dataGridView1_CellEndEdit;
+            dataGridView1.CellClick += dataGridView1_CellClick;
             dataGridView1.RowsAdded += dataGridView1_RowsAdded;
+            dataGridView1.UserDeletedRow += dataGridView1_UserDeletedRow;
+            dataGridView1.UserDeletingRow += dataGridView1_UserDeletingRow;
             // 
             // nameDataGridViewTextBoxColumn
             // 
@@ -88,6 +96,7 @@
             nameDataGridViewTextBoxColumn.DataPropertyName = "Name";
             nameDataGridViewTextBoxColumn.HeaderText = "Název";
             nameDataGridViewTextBoxColumn.Name = "nameDataGridViewTextBoxColumn";
+            nameDataGridViewTextBoxColumn.ReadOnly = true;
             nameDataGridViewTextBoxColumn.Width = 64;
             // 
             // codeDataGridViewTextBoxColumn
@@ -95,32 +104,39 @@
             codeDataGridViewTextBoxColumn.DataPropertyName = "Code";
             codeDataGridViewTextBoxColumn.HeaderText = "Zkratka";
             codeDataGridViewTextBoxColumn.Name = "codeDataGridViewTextBoxColumn";
+            codeDataGridViewTextBoxColumn.ReadOnly = true;
             // 
             // ageMinDataGridViewTextBoxColumn
             // 
             ageMinDataGridViewTextBoxColumn.DataPropertyName = "AgeMin";
+            dataGridViewCellStyle1.NullValue = "∞";
+            ageMinDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle1;
             ageMinDataGridViewTextBoxColumn.HeaderText = "Věk od";
             ageMinDataGridViewTextBoxColumn.Name = "ageMinDataGridViewTextBoxColumn";
+            ageMinDataGridViewTextBoxColumn.ReadOnly = true;
             // 
             // ageMaxDataGridViewTextBoxColumn
             // 
             ageMaxDataGridViewTextBoxColumn.DataPropertyName = "AgeMax";
-            dataGridViewCellStyle1.NullValue = "∞";
-            ageMaxDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle2.NullValue = "∞";
+            ageMaxDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle2;
             ageMaxDataGridViewTextBoxColumn.HeaderText = "Věk do";
             ageMaxDataGridViewTextBoxColumn.Name = "ageMaxDataGridViewTextBoxColumn";
+            ageMaxDataGridViewTextBoxColumn.ReadOnly = true;
             // 
             // colorDataGridViewTextBoxColumn
             // 
             colorDataGridViewTextBoxColumn.DataPropertyName = "Color";
             colorDataGridViewTextBoxColumn.HeaderText = "Barva";
             colorDataGridViewTextBoxColumn.Name = "colorDataGridViewTextBoxColumn";
+            colorDataGridViewTextBoxColumn.ReadOnly = true;
             // 
             // duoDataGridViewCheckBoxColumn
             // 
             duoDataGridViewCheckBoxColumn.DataPropertyName = "Duo";
             duoDataGridViewCheckBoxColumn.HeaderText = "Dvojice";
             duoDataGridViewCheckBoxColumn.Name = "duoDataGridViewCheckBoxColumn";
+            duoDataGridViewCheckBoxColumn.ReadOnly = true;
             // 
             // groupBox1
             // 
@@ -157,15 +173,16 @@
             // 
             // textBox_color
             // 
-            textBox_color.Location = new Point(426, 46);
+            errorProvider.SetIconAlignment(textBox_color, ErrorIconAlignment.MiddleLeft);
+            textBox_color.Location = new Point(444, 46);
             textBox_color.Name = "textBox_color";
             textBox_color.Size = new Size(68, 23);
-            textBox_color.TabIndex = 17;
+            textBox_color.TabIndex = 4;
             // 
             // label5
             // 
             label5.AutoSize = true;
-            label5.Location = new Point(426, 28);
+            label5.Location = new Point(444, 28);
             label5.Name = "label5";
             label5.Size = new Size(36, 15);
             label5.TabIndex = 16;
@@ -174,7 +191,7 @@
             // checkBox_duo
             // 
             checkBox_duo.AutoSize = true;
-            checkBox_duo.Location = new Point(525, 42);
+            checkBox_duo.Location = new Point(531, 42);
             checkBox_duo.Name = "checkBox_duo";
             checkBox_duo.Size = new Size(65, 19);
             checkBox_duo.TabIndex = 5;
@@ -184,7 +201,7 @@
             // label4
             // 
             label4.AutoSize = true;
-            label4.Location = new Point(357, 28);
+            label4.Location = new Point(375, 28);
             label4.Name = "label4";
             label4.Size = new Size(42, 15);
             label4.TabIndex = 13;
@@ -192,25 +209,27 @@
             // 
             // textBox_ageMax
             // 
-            textBox_ageMax.Location = new Point(357, 46);
+            errorProvider.SetIconAlignment(textBox_ageMax, ErrorIconAlignment.MiddleLeft);
+            textBox_ageMax.Location = new Point(375, 46);
             textBox_ageMax.Name = "textBox_ageMax";
             textBox_ageMax.Size = new Size(54, 23);
             textBox_ageMax.TabIndex = 3;
             textBox_ageMax.KeyDown += textBox_ageMax_KeyDown;
+            textBox_ageMax.Validating += textBox_ageMax_Validating;
             // 
             // label3
             // 
             label3.AutoSize = true;
-            label3.Location = new Point(288, 28);
+            label3.Location = new Point(306, 28);
             label3.Name = "label3";
-            label3.Size = new Size(42, 15);
+            label3.Size = new Size(47, 15);
             label3.TabIndex = 11;
-            label3.Text = "Věk od";
+            label3.Text = "Věk od*";
             // 
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(180, 28);
+            label2.Location = new Point(198, 28);
             label2.Name = "label2";
             label2.Size = new Size(51, 15);
             label2.TabIndex = 4;
@@ -218,18 +237,22 @@
             // 
             // textBox_ageMin
             // 
-            textBox_ageMin.Location = new Point(288, 46);
+            errorProvider.SetIconAlignment(textBox_ageMin, ErrorIconAlignment.MiddleLeft);
+            textBox_ageMin.Location = new Point(306, 46);
             textBox_ageMin.Name = "textBox_ageMin";
             textBox_ageMin.Size = new Size(54, 23);
             textBox_ageMin.TabIndex = 2;
             textBox_ageMin.KeyDown += textBox_ageMin_KeyDown;
+            textBox_ageMin.Validating += textBox_ageMin_Validating;
             // 
             // textBox_code
             // 
-            textBox_code.Location = new Point(180, 46);
+            errorProvider.SetIconAlignment(textBox_code, ErrorIconAlignment.MiddleLeft);
+            textBox_code.Location = new Point(198, 46);
             textBox_code.Name = "textBox_code";
             textBox_code.Size = new Size(93, 23);
             textBox_code.TabIndex = 1;
+            textBox_code.Validating += textBox_code_Validating;
             // 
             // label1
             // 
@@ -242,14 +265,15 @@
             // 
             // textBox_name
             // 
+            errorProvider.SetIconAlignment(textBox_name, ErrorIconAlignment.MiddleLeft);
             textBox_name.Location = new Point(30, 46);
             textBox_name.Name = "textBox_name";
-            textBox_name.Size = new Size(135, 23);
+            textBox_name.Size = new Size(152, 23);
             textBox_name.TabIndex = 0;
+            textBox_name.Validating += textBox_name_Validating;
             // 
             // button_add
             // 
-            button_add.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             button_add.Location = new Point(622, 34);
             button_add.Name = "button_add";
             button_add.Size = new Size(90, 33);
@@ -265,14 +289,20 @@
             label6.Font = new Font("Segoe UI", 9F, FontStyle.Italic, GraphicsUnit.Point);
             label6.Location = new Point(18, 472);
             label6.Name = "label6";
-            label6.Size = new Size(223, 15);
+            label6.Size = new Size(236, 15);
             label6.TabIndex = 10;
-            label6.Text = "Upravit kategorie můžete přímo v tabulce";
+            label6.Text = "Odstranit kategorie můžete klávesou Delete";
+            // 
+            // errorProvider
+            // 
+            errorProvider.BlinkStyle = ErrorBlinkStyle.NeverBlink;
+            errorProvider.ContainerControl = this;
             // 
             // AgeCategoriesEditor
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
+            AutoValidate = AutoValidate.EnableAllowFocusChange;
             ClientSize = new Size(754, 496);
             Controls.Add(label6);
             Controls.Add(groupBox2);
@@ -287,6 +317,7 @@
             groupBox1.ResumeLayout(false);
             groupBox2.ResumeLayout(false);
             groupBox2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)errorProvider).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -308,12 +339,13 @@
         private Label label3;
         private TextBox textBox_ageMin;
         private Label label6;
+        private TextBox textBox_color;
+        private ErrorProvider errorProvider;
         private DataGridViewTextBoxColumn nameDataGridViewTextBoxColumn;
         private DataGridViewTextBoxColumn codeDataGridViewTextBoxColumn;
         private DataGridViewTextBoxColumn ageMinDataGridViewTextBoxColumn;
         private DataGridViewTextBoxColumn ageMaxDataGridViewTextBoxColumn;
         private DataGridViewTextBoxColumn colorDataGridViewTextBoxColumn;
         private DataGridViewCheckBoxColumn duoDataGridViewCheckBoxColumn;
-        private TextBox textBox_color;
     }
 }
