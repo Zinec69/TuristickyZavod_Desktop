@@ -9,6 +9,7 @@ namespace turisticky_zavod.Data
         public DbSet<Referee> Referee { get; set; }
         public DbSet<AgeCategory> AgeCategory { get; set; }
         public DbSet<Checkpoint> Checkpoint { get; set; }
+        public DbSet<CheckpointAgeCategoryParticipation> CheckpointAgeCategoryParticipation { get; set; }
 
         public DbSet<Team> Team { get; set; }
 
@@ -52,7 +53,8 @@ namespace turisticky_zavod.Data
                 new Checkpoint() { ID = 9, Name = "Hod kriketovým míčkem" },
                 new Checkpoint() { ID = 10, Name = "Turistické a topografické značky" },
                 new Checkpoint() { ID = 11, Name = "Poznávání dřevin" },
-                new Checkpoint() { ID = 12, Name = "Kulturně poznávací činnost" }
+                new Checkpoint() { ID = 12, Name = "Kulturně poznávací činnost" },
+                new Checkpoint() { ID = 13, Name = "Kontrola \"X\"" }
             );
 
             modelBuilder.Entity<AgeCategory>(entity => entity.Property(e => e.ID).ValueGeneratedOnAdd());
@@ -78,12 +80,154 @@ namespace turisticky_zavod.Data
             //    new Runner() { ID = 2, StartNumber = 59, Name = "Pepa ZDepa", TeamID = 1, BirthYear = 1987, Disqualified = false }
             //);
 
-            modelBuilder.Entity<Runner>();
+            modelBuilder.Entity<Runner>().HasIndex(x => x.StartNumber).IsUnique();
             modelBuilder.Entity<Partner>();
-            modelBuilder.Entity<Team>();
+            modelBuilder.Entity<Team>().HasIndex(x => x.Name).IsUnique();
 
             modelBuilder.Entity<Referee>().HasKey("ID");
-            modelBuilder.Entity<Referee>().HasIndex(r => new {r.FirstName, r.LastName}).IsUnique();
+            modelBuilder.Entity<Referee>().HasIndex(r => new { r.FirstName, r.LastName }).IsUnique();
+
+            modelBuilder.Entity<CheckpointAgeCategoryParticipation>().HasData(
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 1, CheckpointID = 1, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 1, CheckpointID = 2, IsParticipating = false },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 1, CheckpointID = 3, IsParticipating = false },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 1, CheckpointID = 4, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 1, CheckpointID = 5, IsParticipating = false },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 1, CheckpointID = 6, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 1, CheckpointID = 7, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 1, CheckpointID = 8, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 1, CheckpointID = 9, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 1, CheckpointID = 10, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 1, CheckpointID = 11, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 1, CheckpointID = 12, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 1, CheckpointID = 13, IsParticipating = false },
+
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 2, CheckpointID = 1, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 2, CheckpointID = 2, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 2, CheckpointID = 3, IsParticipating = false },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 2, CheckpointID = 4, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 2, CheckpointID = 5, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 2, CheckpointID = 6, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 2, CheckpointID = 7, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 2, CheckpointID = 8, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 2, CheckpointID = 9, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 2, CheckpointID = 10, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 2, CheckpointID = 11, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 2, CheckpointID = 12, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 2, CheckpointID = 13, IsParticipating = false },
+
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 3, CheckpointID = 1, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 3, CheckpointID = 2, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 3, CheckpointID = 3, IsParticipating = false },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 3, CheckpointID = 4, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 3, CheckpointID = 5, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 3, CheckpointID = 6, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 3, CheckpointID = 7, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 3, CheckpointID = 8, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 3, CheckpointID = 9, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 3, CheckpointID = 10, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 3, CheckpointID = 11, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 3, CheckpointID = 12, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 3, CheckpointID = 13, IsParticipating = false },
+
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 4, CheckpointID = 1, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 4, CheckpointID = 2, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 4, CheckpointID = 3, IsParticipating = false },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 4, CheckpointID = 4, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 4, CheckpointID = 5, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 4, CheckpointID = 6, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 4, CheckpointID = 7, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 4, CheckpointID = 8, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 4, CheckpointID = 9, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 4, CheckpointID = 10, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 4, CheckpointID = 11, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 4, CheckpointID = 12, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 4, CheckpointID = 13, IsParticipating = false },
+
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 5, CheckpointID = 1, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 5, CheckpointID = 2, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 5, CheckpointID = 3, IsParticipating = false },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 5, CheckpointID = 4, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 5, CheckpointID = 5, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 5, CheckpointID = 6, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 5, CheckpointID = 7, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 5, CheckpointID = 8, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 5, CheckpointID = 9, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 5, CheckpointID = 10, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 5, CheckpointID = 11, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 5, CheckpointID = 12, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 5, CheckpointID = 13, IsParticipating = false },
+
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 6, CheckpointID = 1, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 6, CheckpointID = 2, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 6, CheckpointID = 3, IsParticipating = false },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 6, CheckpointID = 4, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 6, CheckpointID = 5, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 6, CheckpointID = 6, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 6, CheckpointID = 7, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 6, CheckpointID = 8, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 6, CheckpointID = 9, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 6, CheckpointID = 10, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 6, CheckpointID = 11, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 6, CheckpointID = 12, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 6, CheckpointID = 13, IsParticipating = false },
+
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 7, CheckpointID = 1, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 7, CheckpointID = 2, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 7, CheckpointID = 3, IsParticipating = false },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 7, CheckpointID = 4, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 7, CheckpointID = 5, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 7, CheckpointID = 6, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 7, CheckpointID = 7, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 7, CheckpointID = 8, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 7, CheckpointID = 9, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 7, CheckpointID = 10, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 7, CheckpointID = 11, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 7, CheckpointID = 12, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 7, CheckpointID = 13, IsParticipating = false },
+
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 8, CheckpointID = 1, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 8, CheckpointID = 2, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 8, CheckpointID = 3, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 8, CheckpointID = 4, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 8, CheckpointID = 5, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 8, CheckpointID = 6, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 8, CheckpointID = 7, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 8, CheckpointID = 8, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 8, CheckpointID = 9, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 8, CheckpointID = 10, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 8, CheckpointID = 11, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 8, CheckpointID = 12, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 8, CheckpointID = 13, IsParticipating = true },
+
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 9, CheckpointID = 1, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 9, CheckpointID = 2, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 9, CheckpointID = 3, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 9, CheckpointID = 4, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 9, CheckpointID = 5, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 9, CheckpointID = 6, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 9, CheckpointID = 7, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 9, CheckpointID = 8, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 9, CheckpointID = 9, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 9, CheckpointID = 10, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 9, CheckpointID = 11, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 9, CheckpointID = 12, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 9, CheckpointID = 13, IsParticipating = true },
+
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 10, CheckpointID = 1, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 10, CheckpointID = 2, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 10, CheckpointID = 3, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 10, CheckpointID = 4, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 10, CheckpointID = 5, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 10, CheckpointID = 6, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 10, CheckpointID = 7, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 10, CheckpointID = 8, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 10, CheckpointID = 9, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 10, CheckpointID = 10, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 10, CheckpointID = 11, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 10, CheckpointID = 12, IsParticipating = true },
+                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 10, CheckpointID = 13, IsParticipating = true }
+            );
         }
     }
 }

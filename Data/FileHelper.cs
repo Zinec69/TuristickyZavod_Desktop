@@ -9,6 +9,7 @@ namespace turisticky_zavod.Data
         public static List<Runner> LoadFromCSV(string filepath)
         {
             List<Runner> runners = new();
+            var database = Database.Instance;
 
             using (var reader = new StreamReader(filepath, Encoding.GetEncoding("Windows-1250")))
             {
@@ -24,7 +25,7 @@ namespace turisticky_zavod.Data
                             LastName = line[1].Trim(),
                             FirstName = line[2].Trim(),
                             BirthYear = int.TryParse(line[3].Trim(), out int result) ? result : null,
-                            Team = new() { Name = line[4].Trim() }
+                            Team = database.ChangeTracker.Entries<Team>().FirstOrDefault(x => x.Entity.Name == line[4].Trim(), null)?.Entity ?? new() { Name = line[4].Trim() }
                         };
 
                         if (line.Length >= 8)
@@ -49,6 +50,7 @@ namespace turisticky_zavod.Data
                         }
 
                         runners.Add(runner);
+                        database.Runner.Local.Add(runner);
                     }
                 }
             }
@@ -70,7 +72,8 @@ namespace turisticky_zavod.Data
                         new RefereeJsonConverter(),
                         new CheckpointJsonConverter(),
                         new DateTimeJsonConverter(),
-                        new TimeSpanJsonConverter()
+                        new TimeSpanJsonConverter(),
+                        new TeamJsonConverter()
                     }
                 };
                 runners = JsonSerializer.Deserialize<List<Runner>>(reader.ReadToEnd(), options);
@@ -115,6 +118,18 @@ namespace turisticky_zavod.Data
 
         public override void Write(Utf8JsonWriter writer, Checkpoint value, JsonSerializerOptions options)
             => writer.WriteNumberValue(value.ID);
+    }
+
+    internal class TeamJsonConverter : JsonConverter<Team>
+    {
+        public override Team Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        {
+            var name = reader.GetString();
+            return Database.Instance.Team.ToList().FirstOrDefault(x => x.Name == name, null) ?? new() { Name = name };
+        }
+
+        public override void Write(Utf8JsonWriter writer, Team value, JsonSerializerOptions options)
+            => writer.WriteStringValue(value.Name);
     }
 
     internal class DateTimeJsonConverter : JsonConverter<DateTime>

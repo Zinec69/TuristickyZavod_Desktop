@@ -1,4 +1,5 @@
-﻿namespace turisticky_zavod.Data
+﻿
+namespace turisticky_zavod.Data
 {
     public class Referee : Person
     {

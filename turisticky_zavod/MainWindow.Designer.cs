@@ -29,29 +29,36 @@
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
-            DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle6 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle4 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle5 = new DataGridViewCellStyle();
             statusStrip1 = new StatusStrip();
             toolStripStatusLabel1 = new ToolStripStatusLabel();
             toolStripProgressBar1 = new ToolStripProgressBar();
             menuStrip1 = new MenuStrip();
-            toolStripMenuItem_dataImport = new ToolStripMenuItem();
-            toolStripMenuItem_csv = new ToolStripMenuItem();
-            toolStripMenuItem_json = new ToolStripMenuItem();
+            souborToolStripMenuItem = new ToolStripMenuItem();
+            toolStripMenuItem_close = new ToolStripMenuItem();
+            toolStripMenuItem_save = new ToolStripMenuItem();
+            toolStripMenuItem_import = new ToolStripMenuItem();
+            toolStripMenuItem_csvImport = new ToolStripMenuItem();
+            toolStripMenuItem_jsonImport = new ToolStripMenuItem();
             toolStripMenuItem_nfc = new ToolStripMenuItem();
+            toolStripMenuItem_export = new ToolStripMenuItem();
+            toolStripMenuItem_csvExport = new ToolStripMenuItem();
+            toolStripMenuItem_jsonExport = new ToolStripMenuItem();
             toolStripMenuItem_settings = new ToolStripMenuItem();
             toolStripMenuItem_ageCategories = new ToolStripMenuItem();
+            toolStripSeparator1 = new ToolStripSeparator();
             toolStripMenuItem_test = new ToolStripMenuItem();
-            testQRToolStripMenuItem = new ToolStripMenuItem();
+            toolStripMenuItem_testQR = new ToolStripMenuItem();
             nápovědaToolStripMenuItem = new ToolStripMenuItem();
-            oAplikaciToolStripMenuItem = new ToolStripMenuItem();
-            laděníToolStripMenuItem1 = new ToolStripMenuItem();
-            logToolStripMenuItem1 = new ToolStripMenuItem();
+            toolStripMenuItem_about = new ToolStripMenuItem();
+            toolStripMenuItem_debug = new ToolStripMenuItem();
+            toolStripMenuItem_log = new ToolStripMenuItem();
             dataGridView1 = new DataGridView();
             runnerBindingSource = new BindingSource(components);
             runnersGroupBox = new GroupBox();
-            Column1 = new DataGridViewTextBoxColumn();
+            StartNumber = new DataGridViewTextBoxColumn();
             FirstName = new DataGridViewTextBoxColumn();
             LastName = new DataGridViewTextBoxColumn();
             BirthYear = new DataGridViewTextBoxColumn();
@@ -90,44 +97,84 @@
             // menuStrip1
             // 
             menuStrip1.BackColor = SystemColors.MenuBar;
-            menuStrip1.Items.AddRange(new ToolStripItem[] { toolStripMenuItem_dataImport, toolStripMenuItem_settings, nápovědaToolStripMenuItem });
+            menuStrip1.Items.AddRange(new ToolStripItem[] { souborToolStripMenuItem, toolStripMenuItem_settings, nápovědaToolStripMenuItem });
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
             menuStrip1.Size = new Size(1164, 24);
             menuStrip1.TabIndex = 6;
             menuStrip1.Text = "menuStrip1";
             // 
-            // toolStripMenuItem_dataImport
+            // souborToolStripMenuItem
             // 
-            toolStripMenuItem_dataImport.DropDownItems.AddRange(new ToolStripItem[] { toolStripMenuItem_csv, toolStripMenuItem_json, toolStripMenuItem_nfc });
-            toolStripMenuItem_dataImport.Name = "toolStripMenuItem_dataImport";
-            toolStripMenuItem_dataImport.Size = new Size(75, 20);
-            toolStripMenuItem_dataImport.Text = "Import dat";
+            souborToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { toolStripMenuItem_close, toolStripMenuItem_save, toolStripMenuItem_import, toolStripMenuItem_export });
+            souborToolStripMenuItem.Name = "souborToolStripMenuItem";
+            souborToolStripMenuItem.Size = new Size(57, 20);
+            souborToolStripMenuItem.Text = "Soubor";
             // 
-            // toolStripMenuItem_csv
+            // toolStripMenuItem_close
             // 
-            toolStripMenuItem_csv.Name = "toolStripMenuItem_csv";
-            toolStripMenuItem_csv.Size = new Size(102, 22);
-            toolStripMenuItem_csv.Text = "CSV";
-            toolStripMenuItem_csv.Click += CSVToolStripMenuItem_Click;
+            toolStripMenuItem_close.Name = "toolStripMenuItem_close";
+            toolStripMenuItem_close.Size = new Size(110, 22);
+            toolStripMenuItem_close.Text = "Zavřít";
+            toolStripMenuItem_close.Click += CloseToolStripMenuItem_Click;
             // 
-            // toolStripMenuItem_json
+            // toolStripMenuItem_save
             // 
-            toolStripMenuItem_json.Name = "toolStripMenuItem_json";
-            toolStripMenuItem_json.Size = new Size(102, 22);
-            toolStripMenuItem_json.Text = "JSON";
-            toolStripMenuItem_json.Click += JSONToolStripMenuItem_Click;
+            toolStripMenuItem_save.Name = "toolStripMenuItem_save";
+            toolStripMenuItem_save.Size = new Size(110, 22);
+            toolStripMenuItem_save.Text = "Uložit";
+            toolStripMenuItem_save.Click += SaveToolStripMenuItem_Click;
+            // 
+            // toolStripMenuItem_import
+            // 
+            toolStripMenuItem_import.DropDownItems.AddRange(new ToolStripItem[] { toolStripMenuItem_csvImport, toolStripMenuItem_jsonImport, toolStripMenuItem_nfc });
+            toolStripMenuItem_import.Name = "toolStripMenuItem_import";
+            toolStripMenuItem_import.Size = new Size(180, 22);
+            toolStripMenuItem_import.Text = "Import";
+            // 
+            // toolStripMenuItem_csvImport
+            // 
+            toolStripMenuItem_csvImport.Name = "toolStripMenuItem_csvImport";
+            toolStripMenuItem_csvImport.Size = new Size(180, 22);
+            toolStripMenuItem_csvImport.Text = "CSV";
+            toolStripMenuItem_csvImport.Click += CSVImportToolStripMenuItem_Click;
+            // 
+            // toolStripMenuItem_jsonImport
+            // 
+            toolStripMenuItem_jsonImport.Name = "toolStripMenuItem_jsonImport";
+            toolStripMenuItem_jsonImport.Size = new Size(180, 22);
+            toolStripMenuItem_jsonImport.Text = "JSON";
+            toolStripMenuItem_jsonImport.Click += JSONImportToolStripMenuItem_Click;
             // 
             // toolStripMenuItem_nfc
             // 
             toolStripMenuItem_nfc.Name = "toolStripMenuItem_nfc";
-            toolStripMenuItem_nfc.Size = new Size(102, 22);
+            toolStripMenuItem_nfc.Size = new Size(180, 22);
             toolStripMenuItem_nfc.Text = "NFC";
-            toolStripMenuItem_nfc.Click += NFCToolStripMenuItem_Click;
+            toolStripMenuItem_nfc.Click += NFCImportToolStripMenuItem_Click;
+            // 
+            // toolStripMenuItem_export
+            // 
+            toolStripMenuItem_export.DropDownItems.AddRange(new ToolStripItem[] { toolStripMenuItem_csvExport, toolStripMenuItem_jsonExport });
+            toolStripMenuItem_export.Name = "toolStripMenuItem_export";
+            toolStripMenuItem_export.Size = new Size(110, 22);
+            toolStripMenuItem_export.Text = "Export";
+            // 
+            // toolStripMenuItem_csvExport
+            // 
+            toolStripMenuItem_csvExport.Name = "toolStripMenuItem_csvExport";
+            toolStripMenuItem_csvExport.Size = new Size(102, 22);
+            toolStripMenuItem_csvExport.Text = "CSV";
+            // 
+            // toolStripMenuItem_jsonExport
+            // 
+            toolStripMenuItem_jsonExport.Name = "toolStripMenuItem_jsonExport";
+            toolStripMenuItem_jsonExport.Size = new Size(102, 22);
+            toolStripMenuItem_jsonExport.Text = "JSON";
             // 
             // toolStripMenuItem_settings
             // 
-            toolStripMenuItem_settings.DropDownItems.AddRange(new ToolStripItem[] { toolStripMenuItem_ageCategories, toolStripMenuItem_test, testQRToolStripMenuItem });
+            toolStripMenuItem_settings.DropDownItems.AddRange(new ToolStripItem[] { toolStripMenuItem_ageCategories, toolStripSeparator1, toolStripMenuItem_test, toolStripMenuItem_testQR });
             toolStripMenuItem_settings.Name = "toolStripMenuItem_settings";
             toolStripMenuItem_settings.Size = new Size(71, 20);
             toolStripMenuItem_settings.Text = "Nastavení";
@@ -137,48 +184,53 @@
             toolStripMenuItem_ageCategories.Name = "toolStripMenuItem_ageCategories";
             toolStripMenuItem_ageCategories.Size = new Size(163, 22);
             toolStripMenuItem_ageCategories.Text = "Věkové kategorie";
-            toolStripMenuItem_ageCategories.Click += toolStripMenuItem_ageCategories_Click;
+            toolStripMenuItem_ageCategories.Click += AgeCategoriesToolStripMenuItem_Click;
+            // 
+            // toolStripSeparator1
+            // 
+            toolStripSeparator1.Name = "toolStripSeparator1";
+            toolStripSeparator1.Size = new Size(160, 6);
             // 
             // toolStripMenuItem_test
             // 
             toolStripMenuItem_test.Name = "toolStripMenuItem_test";
             toolStripMenuItem_test.Size = new Size(163, 22);
             toolStripMenuItem_test.Text = "Test Wifi";
-            toolStripMenuItem_test.Click += toolStripMenuItem_test_Click;
+            toolStripMenuItem_test.Click += TestWifiToolStripMenuItem_Click;
             // 
-            // testQRToolStripMenuItem
+            // toolStripMenuItem_testQR
             // 
-            testQRToolStripMenuItem.Name = "testQRToolStripMenuItem";
-            testQRToolStripMenuItem.Size = new Size(163, 22);
-            testQRToolStripMenuItem.Text = "Test QR";
-            testQRToolStripMenuItem.Click += testQRToolStripMenuItem_Click;
+            toolStripMenuItem_testQR.Name = "toolStripMenuItem_testQR";
+            toolStripMenuItem_testQR.Size = new Size(163, 22);
+            toolStripMenuItem_testQR.Text = "Test QR";
+            toolStripMenuItem_testQR.Click += TestQRToolStripMenuItem_Click;
             // 
             // nápovědaToolStripMenuItem
             // 
-            nápovědaToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { oAplikaciToolStripMenuItem, laděníToolStripMenuItem1 });
+            nápovědaToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { toolStripMenuItem_about, toolStripMenuItem_debug });
             nápovědaToolStripMenuItem.Name = "nápovědaToolStripMenuItem";
             nápovědaToolStripMenuItem.Size = new Size(73, 20);
             nápovědaToolStripMenuItem.Text = "Nápověda";
             // 
-            // oAplikaciToolStripMenuItem
+            // toolStripMenuItem_about
             // 
-            oAplikaciToolStripMenuItem.Name = "oAplikaciToolStripMenuItem";
-            oAplikaciToolStripMenuItem.Size = new Size(126, 22);
-            oAplikaciToolStripMenuItem.Text = "O aplikaci";
+            toolStripMenuItem_about.Name = "toolStripMenuItem_about";
+            toolStripMenuItem_about.Size = new Size(126, 22);
+            toolStripMenuItem_about.Text = "O aplikaci";
             // 
-            // laděníToolStripMenuItem1
+            // toolStripMenuItem_debug
             // 
-            laděníToolStripMenuItem1.DropDownItems.AddRange(new ToolStripItem[] { logToolStripMenuItem1 });
-            laděníToolStripMenuItem1.Name = "laděníToolStripMenuItem1";
-            laděníToolStripMenuItem1.Size = new Size(126, 22);
-            laděníToolStripMenuItem1.Text = "Ladění";
+            toolStripMenuItem_debug.DropDownItems.AddRange(new ToolStripItem[] { toolStripMenuItem_log });
+            toolStripMenuItem_debug.Name = "toolStripMenuItem_debug";
+            toolStripMenuItem_debug.Size = new Size(126, 22);
+            toolStripMenuItem_debug.Text = "Ladění";
             // 
-            // logToolStripMenuItem1
+            // toolStripMenuItem_log
             // 
-            logToolStripMenuItem1.Name = "logToolStripMenuItem1";
-            logToolStripMenuItem1.Size = new Size(94, 22);
-            logToolStripMenuItem1.Text = "Log";
-            logToolStripMenuItem1.Click += logToolStripMenuItem1_Click;
+            toolStripMenuItem_log.Name = "toolStripMenuItem_log";
+            toolStripMenuItem_log.Size = new Size(94, 22);
+            toolStripMenuItem_log.Text = "Log";
+            toolStripMenuItem_log.Click += LogToolStripMenuItem_Click;
             // 
             // dataGridView1
             // 
@@ -191,16 +243,16 @@
             dataGridView1.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.DisplayedCells;
             dataGridView1.ClipboardCopyMode = DataGridViewClipboardCopyMode.EnableWithoutHeaderText;
             dataGridView1.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridView1.Columns.AddRange(new DataGridViewColumn[] { Column1, FirstName, LastName, BirthYear, Team, AgeCategory, PartnerFirstName, PartnerLastName, PartnerBirthYear });
+            dataGridView1.Columns.AddRange(new DataGridViewColumn[] { StartNumber, FirstName, LastName, BirthYear, Team, AgeCategory, PartnerFirstName, PartnerLastName, PartnerBirthYear });
             dataGridView1.DataSource = runnerBindingSource;
-            dataGridViewCellStyle3.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle3.BackColor = SystemColors.Window;
-            dataGridViewCellStyle3.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewCellStyle3.ForeColor = SystemColors.ControlText;
-            dataGridViewCellStyle3.SelectionBackColor = SystemColors.Highlight;
-            dataGridViewCellStyle3.SelectionForeColor = SystemColors.HighlightText;
-            dataGridViewCellStyle3.WrapMode = DataGridViewTriState.False;
-            dataGridView1.DefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle6.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle6.BackColor = SystemColors.Window;
+            dataGridViewCellStyle6.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewCellStyle6.ForeColor = SystemColors.ControlText;
+            dataGridViewCellStyle6.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle6.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle6.WrapMode = DataGridViewTriState.False;
+            dataGridView1.DefaultCellStyle = dataGridViewCellStyle6;
             dataGridView1.EditMode = DataGridViewEditMode.EditProgrammatically;
             dataGridView1.Location = new Point(6, 22);
             dataGridView1.MultiSelect = false;
@@ -210,9 +262,10 @@
             dataGridView1.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dataGridView1.Size = new Size(1128, 472);
             dataGridView1.TabIndex = 3;
-            dataGridView1.RowsAdded += dataGridView1_RowsAdded;
-            dataGridView1.DragDrop += dataGridView1_DragDrop;
-            dataGridView1.DragEnter += dataGridView1_DragEnter;
+            dataGridView1.RowsAdded += DataGridView_RowsAdded;
+            dataGridView1.DragDrop += DataGridView_DragDrop;
+            dataGridView1.DragEnter += DataGridView_DragEnter;
+            dataGridView1.KeyDown += DataGridView_KeyDown;
             // 
             // runnerBindingSource
             // 
@@ -229,11 +282,11 @@
             runnersGroupBox.TabStop = false;
             runnersGroupBox.Text = "Seznam běžců";
             // 
-            // Column1
+            // StartNumber
             // 
-            Column1.DataPropertyName = "StartNumber";
-            Column1.HeaderText = "Startovní číslo";
-            Column1.Name = "Column1";
+            StartNumber.DataPropertyName = "StartNumber";
+            StartNumber.HeaderText = "Startovní číslo";
+            StartNumber.Name = "StartNumber";
             // 
             // FirstName
             // 
@@ -250,8 +303,8 @@
             // BirthYear
             // 
             BirthYear.DataPropertyName = "BirthYear";
-            dataGridViewCellStyle1.NullValue = "-";
-            BirthYear.DefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle4.NullValue = "-";
+            BirthYear.DefaultCellStyle = dataGridViewCellStyle4;
             BirthYear.HeaderText = "Ročník";
             BirthYear.Name = "BirthYear";
             // 
@@ -267,8 +320,8 @@
             // 
             AgeCategory.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
             AgeCategory.DataPropertyName = "AgeCategory";
-            dataGridViewCellStyle2.NullValue = "-";
-            AgeCategory.DefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle5.NullValue = "-";
+            AgeCategory.DefaultCellStyle = dataGridViewCellStyle5;
             AgeCategory.HeaderText = "Věková kategorie";
             AgeCategory.Name = "AgeCategory";
             AgeCategory.ReadOnly = true;
@@ -325,23 +378,30 @@
         private StatusStrip statusStrip1;
         private ToolStripStatusLabel toolStripStatusLabel1;
         private MenuStrip menuStrip1;
-        private ToolStripMenuItem toolStripMenuItem_dataImport;
-        private ToolStripMenuItem toolStripMenuItem_csv;
-        private ToolStripMenuItem toolStripMenuItem_json;
-        private ToolStripMenuItem toolStripMenuItem_nfc;
         private ToolStripProgressBar toolStripProgressBar1;
         private ToolStripMenuItem toolStripMenuItem_settings;
         private ToolStripMenuItem toolStripMenuItem_ageCategories;
         private DataGridView dataGridView1;
         private GroupBox runnersGroupBox;
         private ToolStripMenuItem toolStripMenuItem_test;
-        private ToolStripMenuItem testQRToolStripMenuItem;
+        private ToolStripMenuItem toolStripMenuItem_testQR;
         private ToolStripMenuItem nápovědaToolStripMenuItem;
-        private ToolStripMenuItem oAplikaciToolStripMenuItem;
-        private ToolStripMenuItem laděníToolStripMenuItem1;
-        private ToolStripMenuItem logToolStripMenuItem1;
+        private ToolStripMenuItem toolStripMenuItem_about;
+        private ToolStripMenuItem toolStripMenuItem_debug;
+        private ToolStripMenuItem toolStripMenuItem_log;
         private BindingSource runnerBindingSource;
-        private DataGridViewTextBoxColumn Column1;
+        private ToolStripMenuItem souborToolStripMenuItem;
+        private ToolStripMenuItem toolStripMenuItem_close;
+        private ToolStripMenuItem toolStripMenuItem_save;
+        private ToolStripMenuItem toolStripMenuItem_import;
+        private ToolStripMenuItem toolStripMenuItem_csvImport;
+        private ToolStripMenuItem toolStripMenuItem_jsonImport;
+        private ToolStripMenuItem toolStripMenuItem_nfc;
+        private ToolStripMenuItem toolStripMenuItem_export;
+        private ToolStripSeparator toolStripSeparator1;
+        private ToolStripMenuItem toolStripMenuItem_csvExport;
+        private ToolStripMenuItem toolStripMenuItem_jsonExport;
+        private DataGridViewTextBoxColumn StartNumber;
         private DataGridViewTextBoxColumn FirstName;
         private DataGridViewTextBoxColumn LastName;
         private DataGridViewTextBoxColumn BirthYear;

@@ -4,17 +4,9 @@ using turisticky_zavod.Logic;
 using Microsoft.EntityFrameworkCore;
 using Windows.Devices.WiFiDirect;
 using System.Diagnostics;
-using System.Collections.Concurrent;
-using Windows.Networking.Sockets;
 using Windows.Devices.Enumeration;
 using Windows.Foundation;
 using Forms;
-using Windows.Storage.Streams;
-using Windows.Devices.WiFiDirect.Services;
-using Windows.Security.Cryptography;
-using System.Security.Policy;
-using Windows.Security.Credentials;
-using System.Text;
 
 namespace turisticky_zavod.Forms
 {
@@ -22,6 +14,9 @@ namespace turisticky_zavod.Forms
     {
         private readonly Database database = Database.Instance;
         private readonly LogWindow logWindow = new();
+
+        private bool isSaved = false;
+        private string saveFilePath = string.Empty;
 
         public MainWindow()
         {
@@ -34,19 +29,20 @@ namespace turisticky_zavod.Forms
             base.OnLoad(e);
 
             InitDatabase();
-            // TODO
-            logWindow.Show();
-
-            int? lmao = 5;
-            var xd = lmao ?? -1;
+            logWindow.Show(); // TODO
         }
 
         protected override void OnClosing(CancelEventArgs e)
         {
-            base.OnClosing(e);
+            if (HandleClosing())
+            {
+                base.OnClosing(e);
 
-            database.Dispose();
-            StopAdvertisement();
+                database.Dispose();
+                StopAdvertisement();
+            }
+            else
+                e.Cancel = true;
         }
 
         private void InitDatabase()
@@ -61,54 +57,50 @@ namespace turisticky_zavod.Forms
 
                 try
                 {
-                    database.Database.EnsureDeleted();
-                    Log("[DATABASE] Deleting database");
+                    // TODO
+                    //database.Database.EnsureDeleted();
+                    //Log("[DATABASE] Deleting database");
                     database.Database.EnsureCreated();
                     Log("[DATABASE] Loading/creating database");
 
-                    if (!this.IsDisposed)
+                    Invoke(() =>
                     {
-                        Invoke(() =>
-                        {
-                            toolStripProgressBar1.Value += 20;
-                            database.Runner.Load();
-                            toolStripProgressBar1.Value += 20;
-                            database.Partner.Load();
-                            toolStripProgressBar1.Value += 10;
-                            database.AgeCategory.Load();
-                            toolStripProgressBar1.Value += 15;
-                            database.Checkpoint.Load();
-                            toolStripProgressBar1.Value += 15;
-                            database.Referee.Load();
-                            toolStripProgressBar1.Value += 10;
-                            database.Team.Load();
-                            toolStripProgressBar1.Value += 10;
+                        toolStripProgressBar1.Value += 20;
+                        database.Runner.Load();
+                        toolStripProgressBar1.Value += 20;
+                        database.Partner.Load();
+                        toolStripProgressBar1.Value += 10;
+                        database.AgeCategory.Load();
+                        toolStripProgressBar1.Value += 15;
+                        database.Checkpoint.Load();
+                        toolStripProgressBar1.Value += 15;
+                        database.Referee.Load();
+                        toolStripProgressBar1.Value += 10;
+                        database.Team.Load();
+                        toolStripProgressBar1.Value += 10;
+                        database.CheckpointAgeCategoryParticipation.Load();
 
-                            dataGridView1.DataSource = database.Runner.Local.ToBindingList();
-                        });
-                    }
+                        dataGridView1.DataSource = database.Runner.Local.ToBindingList();
+                    });
 
                     timer.Stop();
                     Log($"[DATABASE] Done loading database in {timer.ElapsedMilliseconds}ms");
 
                     Thread.Sleep(500);
 
-                    if (!this.IsDisposed)
+                    Invoke(() =>
                     {
-                        Invoke(() =>
-                        {
-                            toolStripStatusLabel1.Text = string.Empty;
-                            toolStripProgressBar1.Visible = false;
-                            toolStripProgressBar1.Value = 0;
-                        });
-                    }
+                        toolStripStatusLabel1.Text = string.Empty;
+                        toolStripProgressBar1.Visible = false;
+                        toolStripProgressBar1.Value = 0;
+                    });
                 }
                 catch (ObjectDisposedException ex) { }
-                catch (InvalidOperationException ex) { }
+                //catch (InvalidOperationException ex) { }
             })).Start();
         }
 
-        private async void AddRunnersCSV(string filepath)
+        private void AddRunnersCSV(string filepath)
         {
             try
             {
@@ -123,27 +115,18 @@ namespace turisticky_zavod.Forms
                     {
                         var ids = database.Runner.Local.Where(r => r.StartNumber.HasValue);
                         int i = ids.Any() ? ids.Max(r => r.StartNumber!.Value) : 0;
-                        foreach (Runner runner in runners)
+                        foreach (Runner runner in database.ChangeTracker.Entries<Runner>().Select(x => x.Entity))
                         {
                             runner.StartNumber = ++i;
                         }
+                        dataGridView1.Refresh();
                     }
                 }
 
-                timer.Stop();
-                Log($"[FILES] Loaded from csv in {timer.ElapsedMilliseconds}ms");
-                timer.Restart();
-
-                await database.Runner.AddRangeAsync(runners);
+                database.SaveChanges();
 
                 timer.Stop();
-                Log($"[FILES] Added to database in {timer.ElapsedMilliseconds}ms");
-                timer.Restart();
-
-                await database.SaveChangesAsync();
-
-                timer.Stop();
-                Log($"[FILES] Saved in database in {timer.ElapsedMilliseconds}ms");
+                Log($"[FILES] Csv loaded and saved to database in {timer.ElapsedMilliseconds}ms");
             }
             catch
             {
@@ -151,7 +134,7 @@ namespace turisticky_zavod.Forms
             }
         }
 
-        private async void AddRunnersJSON(string filepath)
+        private void AddRunnersJSON(string filepath)
         {
             try
             {
@@ -191,7 +174,7 @@ namespace turisticky_zavod.Forms
                     Log($"[FILES] Updated database in {timer.ElapsedMilliseconds}ms");
                     timer.Restart();
 
-                    await database.SaveChangesAsync();
+                    database.SaveChanges();
 
                     timer.Stop();
                     Log($"[FILES] Saved in database in {timer.ElapsedMilliseconds}ms");
@@ -205,7 +188,8 @@ namespace turisticky_zavod.Forms
 
         private void OnNFCScanned(object? sender, Runner runner)
         {
-            var dialog = MessageBox.Show("Tento bìžec není v seznamu, chcete jej i pøesto pøidat? Nebude mít vyplnìna všechna data.", "Varování", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            var dialog = MessageBox.Show("Tento bìžec není v seznamu, chcete jej i pøesto pøidat? Nebude mít vyplnìna všechna data.",
+                                         "Varování", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             if (dialog == DialogResult.Yes)
             {
                 database.Runner.Add(runner);
@@ -213,96 +197,51 @@ namespace turisticky_zavod.Forms
             }
         }
 
-        private void CSVToolStripMenuItem_Click(object sender, EventArgs e)
+        private bool HandleClosing()
         {
-            OpenFileDialog fileDialog = new()
+            if (!isSaved)
             {
-                Filter = "Soubory CSV (*.csv)|*.csv",
-                Multiselect = false
-            };
-            fileDialog.FileOk += (_, _) => AddRunnersCSV(fileDialog.FileName);
-            fileDialog.ShowDialog();
-        }
-
-        private void JSONToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            OpenFileDialog fileDialog = new()
-            {
-                Filter = "Soubory JSON (*.json)|*.json",
-                Multiselect = false
-            };
-            fileDialog.FileOk += (_, _) => AddRunnersJSON(fileDialog.FileName);
-            fileDialog.ShowDialog();
-        }
-
-        private void NFCToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            var nfcWindow = new NFCScanning();
-
-            if (!nfcWindow.IsDisposed)
-            {
-                nfcWindow.OnRunnerNotInDB += OnNFCScanned;
-                nfcWindow.ShowDialog();
-            }
-        }
-
-        private void dataGridView1_DragEnter(object sender, DragEventArgs e)
-        {
-            Activate();
-
-            if (e.Data != null && e.Data.GetDataPresent(DataFormats.FileDrop))
-                e.Effect = DragDropEffects.Copy;
-            else
-                e.Effect = DragDropEffects.None;
-        }
-
-        private void dataGridView1_DragDrop(object sender, DragEventArgs e)
-        {
-            if (e.Data != null)
-            {
-                var filepath = ((string[])e.Data.GetData(DataFormats.FileDrop))[0];
-
-                switch (filepath.Split('.').Last().ToLower())
+                switch (MessageBox.Show("Chcete svou práci pøed ukonèením uložit?",
+                                        "Uložit pøed ukonèením",
+                                        MessageBoxButtons.YesNoCancel,
+                                        MessageBoxIcon.Question))
                 {
-                    case "json":
-                        var dialog = MessageBox.Show("Chcete naèíst data z JSON souboru?", "Naèíst data", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-                        if (dialog == DialogResult.Yes)
-                            AddRunnersJSON(filepath);
-                        break;
+                    case DialogResult.Yes:
+                        return HandleSaving();
 
-                    case "csv":
-                        dialog = MessageBox.Show("Chcete naèíst data z CSV souboru?", "Naèíst data", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-                        if (dialog == DialogResult.Yes)
-                            AddRunnersCSV(filepath);
-                        break;
+                    case DialogResult.No:
+                        return true;
+
+                    case DialogResult.Cancel:
+                        return false;
 
                     default:
-                        MessageBox.Show("Nepodporovaný typ souboru", "Chyba", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        break;
+                        return false;
                 }
             }
-        }
-
-        private void toolStripMenuItem_ageCategories_Click(object sender, EventArgs e)
-            => new AgeCategoriesEditor().ShowDialog();
-
-        private void dataGridView1_RowsAdded(object sender, DataGridViewRowsAddedEventArgs e)
-        {
-            foreach (DataGridViewRow row in dataGridView1.Rows)
+            else
             {
-                row.HeaderCell.Value = (row.Index + 1).ToString();
-                //row.HeaderCell.Value = ((BindingList<Runner>)dataGridView1.DataSource)[row.Index].ID.ToString();
+                if (MessageBox.Show("Opravdu chcete aplikaci ukonèit?",
+                                    "Ukonèit aplikaci",
+                                    MessageBoxButtons.YesNo,
+                                    MessageBoxIcon.Question) == DialogResult.Yes)
+                    return true;
+                else
+                    return false;
             }
         }
+
+        private bool HandleSaving()
+        {
+            // TODO
+            return true;
+        }
+
+
+        #region WiFi Direct stuff
 
         WiFiDirectAdvertisementPublisher? _publisher = null;
         WiFiDirectConnectionListener? _listener = null;
-
-        private void toolStripMenuItem_test_Click(object sender, EventArgs e)
-        {
-            StopAdvertisement();
-            StartAdvertisement();
-        }
 
         private void StartAdvertisement()
         {
@@ -361,10 +300,14 @@ namespace turisticky_zavod.Forms
             var customPairing = request.DeviceInformation.Pairing.Custom;
             customPairing.PairingRequested += (_, args) => HandlePairing(args, this);
 
-            Log($"[WIFI DIRECT] Is paired already: {(request.DeviceInformation.Pairing.IsPaired ? "Yes" : "No")}");
-            var pairResult = await customPairing.PairAsync(devicePairingKinds, DevicePairingProtectionLevel.Default, connectionParams);
-            Log($"[WIFI DIRECT] Pairing status: {pairResult.Status}");
-            Log($"[WIFI DIRECT] Protection level: {pairResult.ProtectionLevelUsed}");
+            if (!request.DeviceInformation.Pairing.IsPaired)
+            {
+                var pairResult = await customPairing.PairAsync(devicePairingKinds, DevicePairingProtectionLevel.Default, connectionParams);
+                Log($"[WIFI DIRECT] Pairing status: {pairResult.Status}");
+                Log($"[WIFI DIRECT] Protection level: {pairResult.ProtectionLevelUsed}");
+            }
+            else
+                Log("[WIFI DIRECT] Device is already paired");
         }
 
         private void OnStatusChanged(WiFiDirectAdvertisementPublisher sender, WiFiDirectAdvertisementPublisherStatusChangedEventArgs args)
@@ -430,29 +373,137 @@ namespace turisticky_zavod.Forms
             }
         }
 
-        public void Log(string text)
+        #endregion
+
+
+        #region ToolStripMenu events
+
+        private void CSVImportToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            try
+            OpenFileDialog fileDialog = new()
             {
-                if (!this.IsDisposed)
-                {
-                    Invoke(() =>
-                    {
-                        logWindow.ListBox.Items.Add(text);
-                        logWindow.ListBox.Update();
-                    });
-                }
-            }
-            catch (ObjectDisposedException ex) { }
+                Filter = "Soubory CSV (*.csv)|*.csv",
+                Multiselect = false
+            };
+            fileDialog.FileOk += (_, _) => AddRunnersCSV(fileDialog.FileName);
+            fileDialog.ShowDialog();
         }
 
-        private void testQRToolStripMenuItem_Click(object sender, EventArgs e)
+        private void JSONImportToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog fileDialog = new()
+            {
+                Filter = "Soubory JSON (*.json)|*.json",
+                Multiselect = false
+            };
+            fileDialog.FileOk += (_, _) => AddRunnersJSON(fileDialog.FileName);
+            fileDialog.ShowDialog();
+        }
+
+        private void NFCImportToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var nfcWindow = new NFCScanning();
+
+            if (!nfcWindow.IsDisposed)
+            {
+                nfcWindow.OnRunnerNotInDB += OnNFCScanned;
+                nfcWindow.ShowDialog();
+            }
+        }
+
+        private void AgeCategoriesToolStripMenuItem_Click(object sender, EventArgs e) => new AgeCategoriesEditor().ShowDialog();
+
+        private void TestWifiToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            StopAdvertisement();
+            StartAdvertisement();
+        }
+
+        private void TestQRToolStripMenuItem_Click(object sender, EventArgs e)
         {
             var qrCodes = QRHelper.GetQRImages(database.Runner.ToList());
             new QR(qrCodes[0]).ShowDialog();
         }
 
-        private void logToolStripMenuItem1_Click(object sender, EventArgs e)
-            => logWindow.Show();
+        private void LogToolStripMenuItem_Click(object sender, EventArgs e) => logWindow.Show();
+
+        private void CloseToolStripMenuItem_Click(object sender, EventArgs e) => Close();
+
+        private void SaveToolStripMenuItem_Click(object sender, EventArgs e) => HandleSaving();
+
+        #endregion
+
+
+        #region DataGridView events
+
+        private void DataGridView_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Escape)
+            {
+                dataGridView1.ClearSelection();
+                dataGridView1.CurrentCell = null;
+            }
+        }
+
+        private void DataGridView_RowsAdded(object sender, DataGridViewRowsAddedEventArgs e)
+        {
+            foreach (DataGridViewRow row in dataGridView1.Rows)
+            {
+                row.HeaderCell.Value = (row.Index + 1).ToString();
+                //row.HeaderCell.Value = ((BindingList<Runner>)dataGridView1.DataSource)[row.Index].ID.ToString();
+            }
+        }
+
+        private void DataGridView_DragEnter(object sender, DragEventArgs e)
+        {
+            Activate();
+
+            if (e.Data != null && e.Data.GetDataPresent(DataFormats.FileDrop))
+                e.Effect = DragDropEffects.Copy;
+            else
+                e.Effect = DragDropEffects.None;
+        }
+
+        private void DataGridView_DragDrop(object sender, DragEventArgs e)
+        {
+            if (e.Data != null)
+            {
+                var filepath = ((string[])e.Data.GetData(DataFormats.FileDrop))[0];
+
+                switch (filepath.Split('.').Last().ToLower())
+                {
+                    case "json":
+                        var dialog = MessageBox.Show("Chcete naèíst data z JSON souboru?", "Naèíst data", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                        if (dialog == DialogResult.Yes)
+                            AddRunnersJSON(filepath);
+                        break;
+
+                    case "csv":
+                        dialog = MessageBox.Show("Chcete naèíst data z CSV souboru?", "Naèíst data", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                        if (dialog == DialogResult.Yes)
+                            AddRunnersCSV(filepath);
+                        break;
+
+                    default:
+                        MessageBox.Show("Nepodporovaný typ souboru", "Chyba", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        break;
+                }
+            }
+        }
+
+        #endregion
+
+
+        public void Log(string text)
+        {
+            if (!logWindow.IsDisposed)
+            {
+                Invoke(() =>
+                {
+                    logWindow.ListBox.Items.Add(text);
+                    logWindow.ListBox.Update();
+                });
+            }
+        }
     }
 }

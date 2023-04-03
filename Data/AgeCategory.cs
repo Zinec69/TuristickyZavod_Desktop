@@ -12,7 +12,7 @@ namespace turisticky_zavod.Data
         public int AgeMin { get; set; }
         public int? AgeMax { get; set; }
         public bool Duo { get; set; } = false;
-        public string? Color { get; set; }
+        public string Color { get; set; }
 
         public static AgeCategory? GetByBirthYear(int birthYear, bool hasPartner)
         {
