@@ -31,6 +31,191 @@ namespace turisticky_zavod.Data
             }
         }
 
+        public bool IsSaved { get; private set; } = false;
+        public string? SavedFilePath { get; private set; } = null;
+
+
+        public override int SaveChanges()
+        {
+            IsSaved = false;
+            return base.SaveChanges();
+        }
+
+        public bool SaveToFile(string? filePath = null)
+        {
+            try
+            {
+                var allData = new AllData()
+                {
+                    Runners = instance.Runner.ToList(),
+                    Teams = instance.Team.ToList(),
+                    Referees = instance.Referee.ToList(),
+                    Partners = instance.Partner.ToList(),
+                    Checkpoints = instance.Checkpoint.ToList(),
+                    CheckpointAgeCategoryParticipations = instance.CheckpointAgeCategoryParticipation.ToList(),
+                    AgeCategories = instance.AgeCategory.ToList()
+                };
+
+                FileHelper.ExportEverythingToJSON(allData, filePath ?? SavedFilePath!);
+
+                IsSaved = true;
+                SavedFilePath = filePath;
+
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        public async static void LoadFromFile(string filePath)
+        {
+            var allData = FileHelper.LoadEverythingFromJSON(filePath);
+
+            using var transaction = await instance.Database.BeginTransactionAsync();
+
+            try
+            {
+                foreach (var entity in instance.AgeCategory)
+                {
+                    var newDataItem = allData.AgeCategories.FirstOrDefault(x => x.ID == entity.ID);
+                    if (newDataItem != null)
+                    {
+                        instance.Entry(entity).CurrentValues.SetValues(newDataItem);
+                    }
+                    else
+                    {
+                        instance.AgeCategory.Remove(entity);
+                    }
+                }
+
+                foreach (var newDataItem in allData.AgeCategories.Where(x => !instance.AgeCategory.Any(y => y.ID == x.ID)))
+                {
+                    instance.AgeCategory.Add(newDataItem);
+                }
+
+                foreach (var entity in instance.Checkpoint)
+                {
+                    var newDataItem = allData.Checkpoints.FirstOrDefault(x => x.ID == entity.ID);
+                    if (newDataItem != null)
+                    {
+                        instance.Entry(entity).CurrentValues.SetValues(newDataItem);
+                    }
+                    else
+                    {
+                        instance.Checkpoint.Remove(entity);
+                    }
+                }
+
+                foreach (var newDataItem in allData.Checkpoints.Where(x => !instance.Checkpoint.Any(y => y.ID == x.ID)))
+                {
+                    instance.Checkpoint.Add(newDataItem);
+                }
+
+                foreach (var entity in instance.CheckpointAgeCategoryParticipation)
+                {
+                    var newDataItem = allData.CheckpointAgeCategoryParticipations
+                                             .FirstOrDefault(x => x.AgeCategoryID == entity.AgeCategoryID && x.CheckpointID == entity.CheckpointID);
+                    if (newDataItem != null)
+                    {
+                        instance.Entry(entity).CurrentValues.SetValues(newDataItem);
+                    }
+                    else
+                    {
+                        instance.CheckpointAgeCategoryParticipation.Remove(entity);
+                    }
+                }
+
+                foreach (var newDataItem in allData.CheckpointAgeCategoryParticipations
+                                                   .Where(x => !instance.CheckpointAgeCategoryParticipation
+                                                                        .Any(y => y.AgeCategoryID == x.AgeCategoryID && y.CheckpointID == x.CheckpointID)))
+                {
+                    instance.CheckpointAgeCategoryParticipation.Add(newDataItem);
+                }
+
+                foreach (var entity in instance.Partner)
+                {
+                    var newDataItem = allData.Partners.FirstOrDefault(x => x.ID == entity.ID);
+                    if (newDataItem != null)
+                    {
+                        instance.Entry(entity).CurrentValues.SetValues(newDataItem);
+                    }
+                    else
+                    {
+                        instance.Partner.Remove(entity);
+                    }
+                }
+
+                foreach (var newDataItem in allData.Partners.Where(x => !instance.Partner.Any(y => y.ID == x.ID)))
+                {
+                    instance.Partner.Add(newDataItem);
+                }
+
+                foreach (var entity in instance.Runner)
+                {
+                    var newDataItem = allData.Runners.FirstOrDefault(x => x.ID == entity.ID);
+                    if (newDataItem != null)
+                    {
+                        instance.Entry(entity).CurrentValues.SetValues(newDataItem);
+                    }
+                    else
+                    {
+                        instance.Runner.Remove(entity);
+                    }
+                }
+
+                foreach (var newDataItem in allData.Runners.Where(x => !instance.Runner.Any(y => y.ID == x.ID)))
+                {
+                    instance.Runner.Add(newDataItem);
+                }
+
+                foreach (var entity in instance.Team)
+                {
+                    var newDataItem = allData.Teams.FirstOrDefault(x => x.ID == entity.ID);
+                    if (newDataItem != null)
+                    {
+                        instance.Entry(entity).CurrentValues.SetValues(newDataItem);
+                    }
+                    else
+                    {
+                        instance.Team.Remove(entity);
+                    }
+                }
+
+                foreach (var newDataItem in allData.Teams.Where(x => !instance.Team.Any(y => y.ID == x.ID)))
+                {
+                    instance.Team.Add(newDataItem);
+                }
+
+                foreach (var entity in instance.Referee)
+                {
+                    var newDataItem = allData.Referees.FirstOrDefault(x => x.ID == entity.ID);
+                    if (newDataItem != null)
+                    {
+                        instance.Entry(entity).CurrentValues.SetValues(newDataItem);
+                    }
+                    else
+                    {
+                        instance.Referee.Remove(entity);
+                    }
+                }
+
+                foreach (var newDataItem in allData.Referees.Where(x => !instance.Referee.Any(y => y.ID == x.ID)))
+                {
+                    instance.Referee.Add(newDataItem);
+                }
+
+                await instance.SaveChangesAsync();
+
+                await transaction.CommitAsync();
+            }
+            catch (Exception)
+            {
+                await transaction.RollbackAsync();
+            }
+        }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder

@@ -1,7 +1,9 @@
 ﻿using System.Text;
+using System.Text.Json.Serialization;
 
 namespace turisticky_zavod.Data
 {
+    [JsonSerializable(typeof(AgeCategory))]
     public class AgeCategory
     {
         public int ID { get; set; }

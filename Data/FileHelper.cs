@@ -58,7 +58,7 @@ namespace turisticky_zavod.Data
             return runners;
         }
 
-        public static List<Runner> LoadFromJSON(string filepath)
+        public static List<Runner> LoadRunnersFromJSON(string filepath)
         {
             var runners = new List<Runner>();
 
@@ -82,18 +82,25 @@ namespace turisticky_zavod.Data
             return runners;
         }
 
-        public static void ExportToJSON(List<Runner> runners, string filepath)
+        public static AllData LoadEverythingFromJSON(string filepath)
+        {
+            using var reader = new StreamReader(filepath, Encoding.GetEncoding("Windows-1250"));
+
+            return JsonSerializer.Deserialize<AllData>(reader.ReadToEnd())!;
+        }
+
+        public static void ExportEverythingToJSON(AllData allData, string filepath)
         {
             using (var fs = new FileStream(filepath, FileMode.Create))
             {
-                using (var writer = new StreamWriter(fs, Encoding.GetEncoding("ISO-8859-2")))
+                using (var writer = new StreamWriter(fs, Encoding.GetEncoding("Windows-1250")))
                 {
                     var options = new JsonSerializerOptions
                     {
                         Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
                         WriteIndented = true
                     };
-                    writer.Write(JsonSerializer.Serialize(runners, options));
+                    writer.Write(JsonSerializer.Serialize(allData, options));
                 }
             }
         }

@@ -5,7 +5,7 @@ namespace turisticky_zavod.Forms
 {
     public partial class JsonPicker : Form
     {
-        private List<Runner> Runners;
+        private readonly List<Runner> Runners;
 
         public JsonPicker(List<Runner> runners)
         {

@@ -2,6 +2,7 @@
 
 namespace turisticky_zavod.Data
 {
+    [JsonSerializable(typeof(CheckpointRunnerInfo))]
     public class CheckpointRunnerInfo
     {
         public int ID { get; set; }

@@ -3,13 +3,37 @@ namespace Forms
 {
     public partial class LogWindow : Form
     {
-        public ListBox ListBox { get; }
+        private static readonly object _lock = new();
+        private static LogWindow instance = null;
+        public static LogWindow Instance
+        {
+            get
+            {
+                lock (_lock)
+                {
+                    instance ??= new LogWindow();
 
-        public LogWindow()
+                    return instance;
+                }
+            }
+        }
+
+        private ListBox ListBox { get; }
+
+        private LogWindow()
         {
             InitializeComponent();
 
             ListBox = listBox_log;
+        }
+
+        public void Log(string message)
+        {
+            Invoke(() =>
+            {
+                ListBox.Items.Add($"{DateTime.Now:HH:mm:ss} {message}");
+                ListBox.Update();
+            });
         }
 
         private void Log_FormClosing(object sender, FormClosingEventArgs e)

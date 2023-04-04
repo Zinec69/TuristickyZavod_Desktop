@@ -4,6 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace turisticky_zavod.Data
 {
+    [JsonSerializable(typeof(Checkpoint))]
     public class Checkpoint
     {
         public int ID { get; set; }
@@ -14,6 +15,7 @@ namespace turisticky_zavod.Data
         [JsonPropertyName("refereeName")]
         [ForeignKey(nameof(RefereeID))]
         [DeleteBehavior(DeleteBehavior.SetNull)]
+        [JsonIgnore]
         public virtual Referee? Referee { get; set; }
     }
 }

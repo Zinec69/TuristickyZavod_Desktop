@@ -7,28 +7,27 @@ using System.Diagnostics;
 using Windows.Devices.Enumeration;
 using Windows.Foundation;
 using Forms;
+using System.Text.Json;
 
 namespace turisticky_zavod.Forms
 {
     public partial class MainWindow : Form
     {
         private readonly Database database = Database.Instance;
-        private readonly LogWindow logWindow = new();
-
-        private bool isSaved = false;
-        private string saveFilePath = string.Empty;
+        private readonly LogWindow logWindow = LogWindow.Instance;
 
         public MainWindow()
         {
             InitializeComponent();
             Program.SetDoubleBuffer(dataGridView1, true);
+
+            InitDatabase();
         }
 
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
 
-            InitDatabase();
             logWindow.Show(); // TODO
         }
 
@@ -36,7 +35,8 @@ namespace turisticky_zavod.Forms
         {
             if (HandleClosing())
             {
-                base.OnClosing(e);
+                if (toolStripProgressBar1.Value < 100)
+                    base.OnClosing(e);
 
                 database.Dispose();
                 StopAdvertisement();
@@ -58,8 +58,8 @@ namespace turisticky_zavod.Forms
                 try
                 {
                     // TODO
-                    //database.Database.EnsureDeleted();
-                    //Log("[DATABASE] Deleting database");
+                    database.Database.EnsureDeleted();
+                    Log("[DATABASE] Deleting database");
                     database.Database.EnsureCreated();
                     Log("[DATABASE] Loading/creating database");
 
@@ -75,10 +75,11 @@ namespace turisticky_zavod.Forms
                         database.Checkpoint.Load();
                         toolStripProgressBar1.Value += 15;
                         database.Referee.Load();
-                        toolStripProgressBar1.Value += 10;
+                        toolStripProgressBar1.Value += 5;
                         database.Team.Load();
                         toolStripProgressBar1.Value += 10;
                         database.CheckpointAgeCategoryParticipation.Load();
+                        toolStripProgressBar1.Value += 5;
 
                         dataGridView1.DataSource = database.Runner.Local.ToBindingList();
                     });
@@ -130,59 +131,45 @@ namespace turisticky_zavod.Forms
             }
             catch
             {
+                Log("[FILES] Failed loading csv");
                 MessageBox.Show("Nepodaøilo se naèíst data z CSV souboru", "Chyba", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
         private void AddRunnersJSON(string filepath)
         {
-            try
+            var timer = Stopwatch.StartNew();
+
+            var runners = FileHelper.LoadRunnersFromJSON(filepath);
+
+            var jsonPickerWindow = new JsonPicker(runners);
+            if (jsonPickerWindow.ShowDialog() == DialogResult.OK)
             {
-                var timer = Stopwatch.StartNew();
-
-                var runners = FileHelper.LoadFromJSON(filepath);
-
-                var jsonPickerWindow = new JsonPicker(runners);
-                if (jsonPickerWindow.ShowDialog() == DialogResult.OK)
+                var updatedRunners = new List<Runner>();
+                foreach (Runner runner in runners)
                 {
-                    var updatedRunners = new List<Runner>();
-                    foreach (Runner runner in runners)
+                    var current = database.Runner.Where(r => r.StartNumber == runner.StartNumber).FirstOrDefault();
+                    if (current != default)
                     {
-                        var current = database.Runner.Where(r => r.StartNumber == runner.StartNumber).FirstOrDefault();
-                        if (current != default)
+                        current.Disqualified = runner.Disqualified;
+                        current.FinishTime = runner.FinishTime;
+                        current.StartTime = runner.StartTime;
+                        foreach (var ci in runner.CheckpointInfo)
                         {
-                            current.Disqualified = runner.Disqualified;
-                            current.FinishTime = runner.FinishTime;
-                            current.StartTime = runner.StartTime;
-                            foreach (var ci in runner.CheckpointInfo)
-                            {
-                                if (current.CheckpointInfo.FirstOrDefault(c => c.Checkpoint.ID == ci.Checkpoint.ID, null) == null)
-                                    current.CheckpointInfo.Add(ci);
-                            }
-                            updatedRunners.Add(current);
-                            continue;
+                            if (current.CheckpointInfo.FirstOrDefault(c => c.Checkpoint.ID == ci.Checkpoint.ID, null) == null)
+                                current.CheckpointInfo.Add(ci);
                         }
+                        updatedRunners.Add(current);
+                        continue;
                     }
-
-                    timer.Stop();
-                    Log($"[FILES] Loaded from json in {timer.ElapsedMilliseconds}ms");
-                    timer.Restart();
-
-                    database.Runner.UpdateRange(updatedRunners);
-
-                    timer.Stop();
-                    Log($"[FILES] Updated database in {timer.ElapsedMilliseconds}ms");
-                    timer.Restart();
-
-                    database.SaveChanges();
-
-                    timer.Stop();
-                    Log($"[FILES] Saved in database in {timer.ElapsedMilliseconds}ms");
                 }
-            }
-            catch
-            {
-                MessageBox.Show("Nepodaøilo se naèíst data z JSON souboru", "Chyba", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                database.Runner.UpdateRange(updatedRunners);
+
+                database.SaveChanges();
+
+                timer.Stop();
+                Log($"[FILES] Json loaded and saved to database in {timer.ElapsedMilliseconds}ms");
             }
         }
 
@@ -199,25 +186,18 @@ namespace turisticky_zavod.Forms
 
         private bool HandleClosing()
         {
-            if (!isSaved)
+            if (!database.IsSaved)
             {
-                switch (MessageBox.Show("Chcete svou práci pøed ukonèením uložit?",
+                return MessageBox.Show("Chcete svou práci pøed ukonèením uložit?",
                                         "Uložit pøed ukonèením",
                                         MessageBoxButtons.YesNoCancel,
-                                        MessageBoxIcon.Question))
+                                        MessageBoxIcon.Question) switch
                 {
-                    case DialogResult.Yes:
-                        return HandleSaving();
-
-                    case DialogResult.No:
-                        return true;
-
-                    case DialogResult.Cancel:
-                        return false;
-
-                    default:
-                        return false;
-                }
+                    DialogResult.Yes => HandleSaving(),
+                    DialogResult.No => true,
+                    DialogResult.Cancel => false,
+                    _ => false,
+                };
             }
             else
             {
@@ -231,10 +211,64 @@ namespace turisticky_zavod.Forms
             }
         }
 
-        private bool HandleSaving()
+        private bool HandleSaving(bool forceNewFile = false)
         {
-            // TODO
-            return true;
+            if (database.SavedFilePath == null || forceNewFile)
+            {
+                var fileDialog = new SaveFileDialog()
+                {
+                    Filter = "Soubory DB (*.db)|*.db",
+                    FileName = $"TZ_{DateTime.Now:yyyy-MM-dd}.db",
+                    ValidateNames = true
+                };
+                if (fileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    if (database.SaveToFile(fileDialog.FileName))
+                    {
+                        Log("[FILES] Database successfully saved to file");
+                        toolStripStatusLabel1.Text = $"{DateTime.Now:HH:mm:ss} Soubor úspìšnì uložen";
+
+                        return true;
+                    }
+                    else
+                    {
+                        Log("[FILES] Database saving failed");
+                        toolStripStatusLabel1.Text = $"{DateTime.Now:HH:mm:ss} Ukládání souboru se nepodaøilo";
+
+                        return false;
+                    }
+                }
+            }
+            else
+            {
+                if (database.SaveToFile())
+                {
+                    Log("[FILES] Database successfully saved to file");
+                    toolStripStatusLabel1.Text = $"{DateTime.Now:HH:mm:ss} Soubor úspìšnì uložen";
+
+                    return true;
+                }
+                else
+                {
+                    Log("[FILES] Database saving failed");
+                    toolStripStatusLabel1.Text = $"{DateTime.Now:HH:mm:ss} Ukládání souboru se nepodaøilo";
+
+                    return false;
+                }
+            }
+
+            return false;
+        }
+
+        private static void HandleLoading(string filePath)
+        {
+            if (MessageBox.Show("Opravdu chcete naèíst tento soubor? Pøijdete o veškeré provedené zmìny",
+                "Naèíst soubor",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question) == DialogResult.Yes)
+            {
+                Database.LoadFromFile(filePath);
+            }
         }
 
 
@@ -380,24 +414,38 @@ namespace turisticky_zavod.Forms
 
         private void CSVImportToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            OpenFileDialog fileDialog = new()
+            var fileDialog = new OpenFileDialog()
             {
                 Filter = "Soubory CSV (*.csv)|*.csv",
                 Multiselect = false
             };
-            fileDialog.FileOk += (_, _) => AddRunnersCSV(fileDialog.FileName);
-            fileDialog.ShowDialog();
+            if (fileDialog.ShowDialog() == DialogResult.OK)
+                AddRunnersCSV(fileDialog.FileName);
         }
 
         private void JSONImportToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            OpenFileDialog fileDialog = new()
+            var fileDialog = new OpenFileDialog()
             {
                 Filter = "Soubory JSON (*.json)|*.json",
                 Multiselect = false
             };
-            fileDialog.FileOk += (_, _) => AddRunnersJSON(fileDialog.FileName);
-            fileDialog.ShowDialog();
+            if (fileDialog.ShowDialog() == DialogResult.OK)
+            {
+                try
+                {
+                    AddRunnersJSON(fileDialog.FileName);
+                }
+                catch (JsonException)
+                {
+                    HandleLoading(fileDialog.FileName);
+                }
+                catch (Exception)
+                {
+                    Log("[FILES] Failed loading json");
+                    MessageBox.Show("Nepodaøilo se naèíst data z JSON souboru", "Chyba", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
         }
 
         private void NFCImportToolStripMenuItem_Click(object sender, EventArgs e)
@@ -430,6 +478,8 @@ namespace turisticky_zavod.Forms
         private void CloseToolStripMenuItem_Click(object sender, EventArgs e) => Close();
 
         private void SaveToolStripMenuItem_Click(object sender, EventArgs e) => HandleSaving();
+
+        private void SaveAsToolStripMenuItem_Click(object sender, EventArgs e) => HandleSaving(true);
 
         #endregion
 
@@ -497,13 +547,7 @@ namespace turisticky_zavod.Forms
         public void Log(string text)
         {
             if (!logWindow.IsDisposed)
-            {
-                Invoke(() =>
-                {
-                    logWindow.ListBox.Items.Add(text);
-                    logWindow.ListBox.Update();
-                });
-            }
+                logWindow.Log(text);
         }
     }
 }

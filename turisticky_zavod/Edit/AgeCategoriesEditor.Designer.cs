@@ -95,8 +95,7 @@
             dataGridView_categories.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dataGridView_categories.Size = new Size(718, 251);
             dataGridView_categories.TabIndex = 0;
-            dataGridView_categories.CurrentCellChanged += DataGridView_AgeCategories_CurrentCellChanged;
-            dataGridView_categories.DataBindingComplete += dataGridView_categories_DataBindingComplete;
+            dataGridView_categories.CellClick += DataGridView_Categories_CellClick;
             dataGridView_categories.RowsAdded += DataGridView_AgeCategories_RowsAdded;
             dataGridView_categories.UserDeletedRow += DataGridView_AgeCategories_UserDeletedRow;
             dataGridView_categories.UserDeletingRow += DataGridView_AgeCategories_UserDeletingRow;
@@ -183,7 +182,7 @@
             groupBox_categories.Size = new Size(730, 279);
             groupBox_categories.TabIndex = 8;
             groupBox_categories.TabStop = false;
-            groupBox_categories.Text = "Všechny věkové kategorie";
+            groupBox_categories.Text = "Věkové kategorie";
             // 
             // groupBox_edit
             // 
@@ -214,6 +213,7 @@
             textBox_color.Name = "textBox_color";
             textBox_color.Size = new Size(68, 23);
             textBox_color.TabIndex = 4;
+            textBox_color.KeyPress += TextBox_Color_KeyPress;
             textBox_color.Validating += TextBox_Color_Validating;
             // 
             // label5
@@ -252,6 +252,7 @@
             textBox_ageMax.Size = new Size(54, 23);
             textBox_ageMax.TabIndex = 3;
             textBox_ageMax.KeyDown += TextBox_AgeMax_KeyDown;
+            textBox_ageMax.KeyPress += TextBox_AgeMax_KeyPress;
             textBox_ageMax.Validating += TextBox_AgeMax_Validating;
             // 
             // label3
@@ -280,6 +281,7 @@
             textBox_ageMin.Size = new Size(54, 23);
             textBox_ageMin.TabIndex = 2;
             textBox_ageMin.KeyDown += TextBox_AgeMin_KeyDown;
+            textBox_ageMin.KeyPress += TextBox_AgeMin_KeyPress;
             textBox_ageMin.Validating += TextBox_AgeMin_Validating;
             // 
             // textBox_code
@@ -289,6 +291,7 @@
             textBox_code.Name = "textBox_code";
             textBox_code.Size = new Size(93, 23);
             textBox_code.TabIndex = 1;
+            textBox_code.KeyPress += TextBox_Code_KeyPress;
             textBox_code.Validating += TextBox_Code_Validating;
             // 
             // label1
@@ -307,6 +310,7 @@
             textBox_name.Name = "textBox_name";
             textBox_name.Size = new Size(152, 23);
             textBox_name.TabIndex = 0;
+            textBox_name.KeyPress += TextBox_Name_KeyPress;
             textBox_name.Validating += TextBox_Name_Validating;
             // 
             // button_save
@@ -353,6 +357,7 @@
             dataGridView_checkpoints.Size = new Size(718, 271);
             dataGridView_checkpoints.TabIndex = 0;
             dataGridView_checkpoints.CellEndEdit += DataGridView_Checkpoints_CellEndEdit;
+            dataGridView_checkpoints.RowsAdded += DataGridView_Checkpoints_RowsAdded;
             dataGridView_checkpoints.KeyDown += DataGridView_Checkpoints_KeyDown;
             // 
             // dataGridViewTextBoxColumn11
@@ -399,6 +404,7 @@
             Controls.Add(groupBox_checkpoints);
             Controls.Add(groupBox_edit);
             Controls.Add(groupBox_categories);
+            HelpButton = true;
             MinimumSize = new Size(770, 300);
             Name = "AgeCategoriesEditor";
             StartPosition = FormStartPosition.CenterScreen;

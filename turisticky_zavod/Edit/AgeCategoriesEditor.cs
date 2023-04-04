@@ -10,11 +10,13 @@ namespace turisticky_zavod.Forms
         {
             InitializeComponent();
             Program.SetDoubleBuffer(dataGridView_categories, true);
+            Program.SetDoubleBuffer(dataGridView_checkpoints, true);
         }
 
         private void AgeCategoriesEditor_Load(object sender, EventArgs e)
         {
             dataGridView_categories.DataSource = database.AgeCategory.Local.ToBindingList();
+            ClearInputs();
         }
 
 
@@ -26,6 +28,7 @@ namespace turisticky_zavod.Forms
             {
                 var name = textBox_name.Text.Trim();
                 var code = textBox_code.Text.Trim();
+                var color = textBox_color.Text.Trim();
                 var ageMin = textBox_ageMin.Text;
                 var ageMax = textBox_ageMax.Text;
                 var duo = checkBox_duo.Checked;
@@ -39,6 +42,7 @@ namespace turisticky_zavod.Forms
                     category.AgeMin = int.Parse(ageMin);
                     category.AgeMax = !string.IsNullOrEmpty(ageMax) ? int.Parse(ageMax) : null;
                     category.Duo = duo;
+                    category.Color = color;
                     database.AgeCategory.Update(category);
                     if (database.SaveChanges() > 0)
                         Log($"Kategorie \"{category.Name}\" úspěšně změněna");
@@ -53,7 +57,8 @@ namespace turisticky_zavod.Forms
                         Code = code,
                         AgeMin = int.Parse(ageMin),
                         AgeMax = !string.IsNullOrEmpty(ageMax) ? int.Parse(ageMax) : null,
-                        Duo = duo
+                        Duo = duo,
+                        Color = color
                     };
                     database.AgeCategory.Add(category);
                     database.SaveChanges();
@@ -68,6 +73,13 @@ namespace turisticky_zavod.Forms
                     else
                         Log("Nastala chyba při ukládání změn");
                 }
+                var row = dataGridView_categories.Rows[^1];
+                var rowCategory = (AgeCategory)row.DataBoundItem;
+                row.Cells[0].Selected = true;
+                dataGridView_checkpoints.DataSource = database.CheckpointAgeCategoryParticipation
+                                                              .Local
+                                                              .Where(x => x.AgeCategoryID == rowCategory.ID && x.CheckpointID != 1)
+                                                              .ToList();
                 ClearInputs();
             }
         }
@@ -79,13 +91,17 @@ namespace turisticky_zavod.Forms
 
         private void TextBox_AgeMin_KeyDown(object sender, KeyEventArgs e)
         {
-            if (HandleNumberOnlyField(e))
+            if (e.KeyCode == Keys.Enter)
+                e.SuppressKeyPress = false;
+            else if (HandleNumberOnlyField(e))
                 e.SuppressKeyPress = true;
         }
 
         private void TextBox_AgeMax_KeyDown(object sender, KeyEventArgs e)
         {
-            if (HandleNumberOnlyField(e))
+            if (e.KeyCode == Keys.Enter)
+                e.SuppressKeyPress = false;
+            else if (HandleNumberOnlyField(e))
                 e.SuppressKeyPress = true;
         }
 
@@ -155,6 +171,36 @@ namespace turisticky_zavod.Forms
                 errorProvider.SetError(sender as TextBox, "");
         }
 
+        private void TextBox_Name_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar == (char)Keys.Enter)
+                button_save.PerformClick();
+        }
+
+        private void TextBox_Code_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar == (char)Keys.Enter)
+                button_save.PerformClick();
+        }
+
+        private void TextBox_AgeMin_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar == (char)Keys.Enter)
+                button_save.PerformClick();
+        }
+
+        private void TextBox_AgeMax_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar == (char)Keys.Enter)
+                button_save.PerformClick();
+        }
+
+        private void TextBox_Color_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar == (char)Keys.Enter)
+                button_save.PerformClick();
+        }
+
         #endregion
 
 
@@ -186,9 +232,9 @@ namespace turisticky_zavod.Forms
                 Log("Nastala chyba při ukládání změn");
         }
 
-        private void DataGridView_AgeCategories_CurrentCellChanged(object sender, EventArgs e)
+        private void DataGridView_Categories_CellClick(object sender, DataGridViewCellEventArgs e)
         {
-            if (dataGridView_categories.CurrentRow != null)
+            if (e.RowIndex > -1)
             {
                 var category = (AgeCategory)dataGridView_categories.CurrentRow.DataBoundItem;
                 textBox_name.Text = category.Name;
@@ -196,6 +242,7 @@ namespace turisticky_zavod.Forms
                 textBox_ageMin.Text = category.AgeMin.ToString();
                 textBox_ageMax.Text = category.AgeMax.HasValue ? category.AgeMax.Value.ToString() : string.Empty;
                 textBox_color.Text = category.Color;
+                checkBox_duo.Checked = category.Duo;
                 button_save.Text = "Uložit";
 
                 dataGridView_checkpoints.DataSource = database.CheckpointAgeCategoryParticipation
@@ -212,18 +259,10 @@ namespace turisticky_zavod.Forms
             if (e.KeyCode == Keys.Escape)
             {
                 dataGridView_categories.ClearSelection();
-                dataGridView_checkpoints.ClearSelection();
                 dataGridView_categories.CurrentCell = null;
-                dataGridView_checkpoints.CurrentCell = null;
                 ClearInputs();
+                dataGridView_checkpoints.DataSource = null;
             }
-        }
-
-        private void dataGridView_categories_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
-        {
-            dataGridView_categories.ClearSelection();
-            dataGridView_checkpoints.ClearSelection();
-            ClearInputs();
         }
 
         #endregion
@@ -231,6 +270,14 @@ namespace turisticky_zavod.Forms
 
         #region DataGridView_Checkpoints events
 
+
+        private void DataGridView_Checkpoints_RowsAdded(object sender, DataGridViewRowsAddedEventArgs e)
+        {
+            foreach (DataGridViewRow row in dataGridView_checkpoints.Rows)
+            {
+                row.HeaderCell.Value = (row.Index + 1).ToString();
+            }
+        }
 
         private void DataGridView_Checkpoints_CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {
@@ -246,10 +293,9 @@ namespace turisticky_zavod.Forms
             if (e.KeyCode == Keys.Escape)
             {
                 dataGridView_categories.ClearSelection();
-                dataGridView_checkpoints.ClearSelection();
                 dataGridView_categories.CurrentCell = null;
-                dataGridView_checkpoints.CurrentCell = null;
                 ClearInputs();
+                dataGridView_checkpoints.DataSource = null;
             }
         }
 
