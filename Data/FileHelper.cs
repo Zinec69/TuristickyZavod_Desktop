@@ -113,7 +113,13 @@ namespace turisticky_zavod.Data
     internal class RefereeJsonConverter : JsonConverter<Referee>
     {
         public override Referee Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-            => new() { Name = reader.GetString() };
+        {
+            var name = reader.GetString();
+            var referee = Database.Instance.ChangeTracker.Entries<Referee>().FirstOrDefault(x => x.Entity.Name == name, null)?.Entity;
+            referee ??= Database.Instance.Referee.ToList().FirstOrDefault(x => x.Name == name, null) ?? new() { Name = reader.GetString() };
+
+            return referee;
+        }
 
         public override void Write(Utf8JsonWriter writer, Referee value, JsonSerializerOptions options)
             => writer.WriteStringValue(value.Name);
