@@ -7,7 +7,7 @@ namespace turisticky_zavod.Data
     {
         public int ID { get; set; }
 
-        [JsonPropertyName("checkpointID")]
+        [JsonPropertyName("checkpointId")]
         public virtual Checkpoint Checkpoint { get; set; }
 
         public DateTime TimeArrived { get; set; }
@@ -18,5 +18,8 @@ namespace turisticky_zavod.Data
 
         [JsonPropertyName("penaltySeconds")]
         public TimeSpan Penalty { get; set; }
+
+        [JsonPropertyName("refereeName")]
+        public Referee RefereeJsonDeserializing { set => Checkpoint.Referee =  value; }
     }
 }

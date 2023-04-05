@@ -10,7 +10,6 @@ namespace turisticky_zavod.Data
         public DbSet<AgeCategory> AgeCategory { get; set; }
         public DbSet<Checkpoint> Checkpoint { get; set; }
         public DbSet<CheckpointAgeCategoryParticipation> CheckpointAgeCategoryParticipation { get; set; }
-
         public DbSet<Team> Team { get; set; }
 
         private Database() { }

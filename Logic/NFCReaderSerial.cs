@@ -175,7 +175,7 @@ namespace turisticky_zavod.Logic
             if (!DetectResult(buffer, expectedResponseLength))
                 throw new Exception();
 
-            return Encoding.GetEncoding("ISO-8859-2")
+            return Encoding.GetEncoding("Windows-1250")
                     .GetString(buffer.Take(16).TakeWhile(b => b != 0x00).ToArray());
         }
 

@@ -25,11 +25,11 @@ namespace turisticky_zavod.Logic
                 }
                 else
                 {
-                    bytesList.Add(Encoding.GetEncoding("ISO-8859-2").GetBytes(runnersStr));
+                    bytesList.Add(Encoding.GetEncoding("Windows-1250").GetBytes(runnersStr));
                     runnersStr = tmp;
                 }
             }
-            bytesList.Add(Encoding.GetEncoding("ISO-8859-2").GetBytes(runnersStr));
+            bytesList.Add(Encoding.GetEncoding("Windows-1250").GetBytes(runnersStr));
 
             var qrGenerator = new QRCodeGenerator();
             foreach (var bytes in bytesList)

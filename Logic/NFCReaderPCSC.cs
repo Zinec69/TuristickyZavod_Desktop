@@ -225,7 +225,7 @@ namespace turisticky_zavod.Logic
             if (!(buffer[16] == 0x90 && buffer[17] == 0x00))
                 throw new NFCException("Nastala chyba při čtení dat");
 
-            return Encoding.GetEncoding("ISO-8859-2")
+            return Encoding.GetEncoding("Windows-1250")
                 .GetString(buffer.Take(16).TakeWhile(b => b != 0x00).ToArray());
         }
 

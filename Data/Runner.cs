@@ -12,7 +12,6 @@ namespace turisticky_zavod.Data
         public int TeamID { get; set; }
 
         [ForeignKey(nameof(TeamID))]
-        [JsonIgnore]
         public virtual Team Team { get; set; }
 
         public DateTime? StartTime { get; set; }
@@ -28,7 +27,6 @@ namespace turisticky_zavod.Data
         [DeleteBehavior(DeleteBehavior.SetNull)]
         [JsonIgnore]
         public virtual Partner? Partner { get; set; }
-
 
         public List<CheckpointRunnerInfo> CheckpointInfo { get; set; } = new();
 

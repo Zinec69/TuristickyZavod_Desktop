@@ -8,6 +8,7 @@ using Windows.Devices.Enumeration;
 using Windows.Foundation;
 using Forms;
 using System.Text.Json;
+using System.Windows.Forms;
 
 namespace turisticky_zavod.Forms
 {
@@ -35,8 +36,7 @@ namespace turisticky_zavod.Forms
         {
             if (HandleClosing())
             {
-                if (toolStripProgressBar1.Value < 100)
-                    base.OnClosing(e);
+                base.OnClosing(e);
 
                 database.Dispose();
                 StopAdvertisement();
@@ -97,7 +97,7 @@ namespace turisticky_zavod.Forms
                     });
                 }
                 catch (ObjectDisposedException ex) { }
-                //catch (InvalidOperationException ex) { }
+                catch (InvalidOperationException ex) { }
             })).Start();
         }
 
@@ -148,7 +148,7 @@ namespace turisticky_zavod.Forms
                 var updatedRunners = new List<Runner>();
                 foreach (Runner runner in runners)
                 {
-                    var current = database.Runner.Where(r => r.StartNumber == runner.StartNumber).FirstOrDefault();
+                    var current = database.Runner.Local.Where(r => r.StartNumber == runner.StartNumber).FirstOrDefault();
                     if (current != default)
                     {
                         current.Disqualified = runner.Disqualified;
@@ -156,7 +156,7 @@ namespace turisticky_zavod.Forms
                         current.StartTime = runner.StartTime;
                         foreach (var ci in runner.CheckpointInfo)
                         {
-                            if (current.CheckpointInfo.FirstOrDefault(c => c.Checkpoint.ID == ci.Checkpoint.ID, null) == null)
+                            if (!current.CheckpointInfo.Any(c => c.Checkpoint.ID == ci.Checkpoint.ID))
                                 current.CheckpointInfo.Add(ci);
                         }
                         updatedRunners.Add(current);
@@ -176,7 +176,7 @@ namespace turisticky_zavod.Forms
         private void OnNFCScanned(object? sender, Runner runner)
         {
             var dialog = MessageBox.Show("Tento bìžec není v seznamu, chcete jej i pøesto pøidat? Nebude mít vyplnìna všechna data.",
-                                         "Varování", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                                         "Bìžec bez záznamu", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             if (dialog == DialogResult.Yes)
             {
                 database.Runner.Add(runner);
@@ -217,8 +217,8 @@ namespace turisticky_zavod.Forms
             {
                 var fileDialog = new SaveFileDialog()
                 {
-                    Filter = "Soubory DB (*.db)|*.db",
-                    FileName = $"TZ_{DateTime.Now:yyyy-MM-dd}.db",
+                    Filter = "Soubory JSON (*.json)|*.json",
+                    FileName = $"TZ_{DateTime.Now:yyyy-MM-dd}.json",
                     ValidateNames = true
                 };
                 if (fileDialog.ShowDialog() == DialogResult.OK)
@@ -268,6 +268,23 @@ namespace turisticky_zavod.Forms
                 MessageBoxIcon.Question) == DialogResult.Yes)
             {
                 Database.LoadFromFile(filePath);
+            }
+        }
+
+        private void DetermineJsonLoadingWay(string filePath)
+        {
+            try
+            {
+                AddRunnersJSON(filePath);
+            }
+            catch (JsonException)
+            {
+                HandleLoading(filePath);
+            }
+            catch (Exception)
+            {
+                Log("[FILES] Failed loading json");
+                MessageBox.Show("Nepodaøilo se naèíst data z JSON souboru", "Chyba", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -431,21 +448,7 @@ namespace turisticky_zavod.Forms
                 Multiselect = false
             };
             if (fileDialog.ShowDialog() == DialogResult.OK)
-            {
-                try
-                {
-                    AddRunnersJSON(fileDialog.FileName);
-                }
-                catch (JsonException)
-                {
-                    HandleLoading(fileDialog.FileName);
-                }
-                catch (Exception)
-                {
-                    Log("[FILES] Failed loading json");
-                    MessageBox.Show("Nepodaøilo se naèíst data z JSON souboru", "Chyba", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-            }
+                DetermineJsonLoadingWay(fileDialog.FileName);
         }
 
         private void NFCImportToolStripMenuItem_Click(object sender, EventArgs e)
@@ -525,7 +528,7 @@ namespace turisticky_zavod.Forms
                     case "json":
                         var dialog = MessageBox.Show("Chcete naèíst data z JSON souboru?", "Naèíst data", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                         if (dialog == DialogResult.Yes)
-                            AddRunnersJSON(filepath);
+                            DetermineJsonLoadingWay(filepath);
                         break;
 
                     case "csv":

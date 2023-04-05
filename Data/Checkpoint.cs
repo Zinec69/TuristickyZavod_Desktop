@@ -15,7 +15,6 @@ namespace turisticky_zavod.Data
         [JsonPropertyName("refereeName")]
         [ForeignKey(nameof(RefereeID))]
         [DeleteBehavior(DeleteBehavior.SetNull)]
-        [JsonIgnore]
         public virtual Referee? Referee { get; set; }
     }
 }

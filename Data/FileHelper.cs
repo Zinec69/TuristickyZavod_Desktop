@@ -25,7 +25,9 @@ namespace turisticky_zavod.Data
                             LastName = line[1].Trim(),
                             FirstName = line[2].Trim(),
                             BirthYear = int.TryParse(line[3].Trim(), out int result) ? result : null,
-                            Team = database.ChangeTracker.Entries<Team>().FirstOrDefault(x => x.Entity.Name == line[4].Trim(), null)?.Entity ?? new() { Name = line[4].Trim() }
+                            Team = database.ChangeTracker.Entries<Team>()
+                                                         .FirstOrDefault(x => x.Entity.Name == line[4].Trim(), null)?.Entity
+                                                          ?? new() { Name = line[4].Trim() }
                         };
 
                         if (line.Length >= 8)
@@ -62,7 +64,7 @@ namespace turisticky_zavod.Data
         {
             var runners = new List<Runner>();
 
-            using (var reader = new StreamReader(filepath, Encoding.GetEncoding("ISO-8859-2")))
+            using (var reader = new StreamReader(filepath, Encoding.GetEncoding("Windows-1250")))
             {
                 var options = new JsonSerializerOptions
                 {
@@ -84,7 +86,8 @@ namespace turisticky_zavod.Data
 
         public static AllData LoadEverythingFromJSON(string filepath)
         {
-            using var reader = new StreamReader(filepath, Encoding.GetEncoding("Windows-1250"));
+            using var fs = new FileStream(filepath, FileMode.Open, FileAccess.Read);
+            using var reader = new StreamReader(fs, Encoding.GetEncoding("Windows-1250"));
 
             return JsonSerializer.Deserialize<AllData>(reader.ReadToEnd())!;
         }
@@ -98,7 +101,8 @@ namespace turisticky_zavod.Data
                     var options = new JsonSerializerOptions
                     {
                         Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-                        WriteIndented = true
+                        WriteIndented = true,
+                        Converters = { new RunnerJsonConverter() }
                     };
                     writer.Write(JsonSerializer.Serialize(allData, options));
                 }
@@ -123,8 +127,7 @@ namespace turisticky_zavod.Data
             return Database.Instance.Checkpoint.Single(c => c.ID == id);
         }
 
-        public override void Write(Utf8JsonWriter writer, Checkpoint value, JsonSerializerOptions options)
-            => writer.WriteNumberValue(value.ID);
+        public override void Write(Utf8JsonWriter writer, Checkpoint value, JsonSerializerOptions options) { }
     }
 
     internal class TeamJsonConverter : JsonConverter<Team>
@@ -132,11 +135,14 @@ namespace turisticky_zavod.Data
         public override Team Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             var name = reader.GetString();
-            return Database.Instance.Team.ToList().FirstOrDefault(x => x.Name == name, null) ?? new() { Name = name };
+            var team = Database.Instance.ChangeTracker.Entries<Team>().FirstOrDefault(x => x.Entity.Name == name, null)?.Entity;
+            team ??= Database.Instance.Team.ToList().FirstOrDefault(x => x.Name == name, null) ?? new() { Name = name };
+
+            return team;
         }
 
         public override void Write(Utf8JsonWriter writer, Team value, JsonSerializerOptions options)
-            => writer.WriteStringValue(value.Name);
+            => writer.Flush();// .WriteStringValue(value.Name);
     }
 
     internal class DateTimeJsonConverter : JsonConverter<DateTime>
@@ -155,5 +161,79 @@ namespace turisticky_zavod.Data
 
         public override void Write(Utf8JsonWriter writer, TimeSpan value, JsonSerializerOptions options)
             => writer.WriteNumberValue(value.TotalSeconds);
+    }
+
+    internal class RunnerJsonConverter : JsonConverter<Runner>
+    {
+        public override Runner Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+            => new();
+
+        public override void Write(Utf8JsonWriter writer, Runner value, JsonSerializerOptions options)
+        {
+            writer.WriteStartObject();
+
+            writer.WriteNumber(nameof(value.ID), value.ID);
+
+            if (value.StartNumber.HasValue)
+                writer.WriteNumber(nameof(value.StartNumber), value.StartNumber.Value);
+            else
+                writer.WriteNull(nameof(value.StartNumber));
+
+            writer.WriteString(nameof(value.Name), value.Name);
+
+            if (value.BirthYear.HasValue)
+                writer.WriteNumber(nameof(value.BirthYear), value.BirthYear.Value);
+            else
+                writer.WriteNull(nameof(value.BirthYear));
+
+            if (value.StartTime.HasValue)
+                writer.WriteString(nameof(value.StartTime), value.StartTime.Value);
+            else
+                writer.WriteNull(nameof(value.StartTime));
+
+            if (value.FinishTime.HasValue)
+                writer.WriteString(nameof(value.FinishTime), value.FinishTime.Value);
+            else
+                writer.WriteNull(nameof(value.FinishTime));
+
+            writer.WriteNumber(nameof(value.TeamID), value.TeamID);
+
+            if (value.PartnerID.HasValue)
+                writer.WriteNumber(nameof(value.PartnerID), value.PartnerID.Value);
+            else
+                writer.WriteNull(nameof(value.PartnerID));
+
+            writer.WriteBoolean(nameof(value.Disqualified), value.Disqualified);
+
+            if (value.AgeCategoryID.HasValue)
+                writer.WriteNumber(nameof(value.AgeCategoryID), value.AgeCategoryID.Value);
+            else
+                writer.WriteNull(nameof(value.AgeCategoryID));
+
+            writer.WriteStartArray(nameof(value.CheckpointInfo));
+
+            foreach (var item in value.CheckpointInfo)
+            {
+                writer.WriteStartObject();
+
+                writer.WriteNumber(nameof(item.ID), item.ID);
+                writer.WriteNumber(nameof(item.Checkpoint.ID), item.Checkpoint.ID);
+                writer.WriteString(nameof(item.TimeArrived), item.TimeArrived);
+
+                if (item.TimeDeparted.HasValue)
+                    writer.WriteString(nameof(item.TimeDeparted), item.TimeDeparted.Value);
+                else
+                    writer.WriteNull(nameof(item.TimeDeparted));
+
+                writer.WriteString(nameof(item.TimeWaited), item.TimeWaited.ToString());
+                writer.WriteString(nameof(item.Penalty), item.Penalty.ToString());
+
+                writer.WriteEndObject();
+            }
+
+            writer.WriteEndArray();
+
+            writer.WriteEndObject();
+        }
     }
 }
