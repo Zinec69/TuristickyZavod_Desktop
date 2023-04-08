@@ -50,5 +50,82 @@ namespace turisticky_zavod.Data
         [NotMapped]
         [JsonIgnore]
         public string PartnerBirthYear { get { return (Partner != null && Partner.BirthYear.HasValue) ? Partner.BirthYear.Value.ToString() : "-"; } }
+
+        [NotMapped]
+        [JsonIgnore]
+        public TimeSpan? FinalRunTime
+        {
+            get
+            {
+                if (!StartTime.HasValue || !FinishTime.HasValue)
+                    return null;
+                else
+                {
+                    var finalTime = FinishTime.Value - StartTime.Value;
+
+                    foreach (var c in CheckpointInfo)
+                    {
+                        finalTime += c.Penalty;
+                        finalTime -= c.TimeWaited;
+                    }
+
+                    return finalTime;
+                }
+            }
+        }
+
+        [NotMapped]
+        [JsonIgnore]
+        public TimeSpan TotalWaitTime
+        {
+            get
+            {
+                var totalWaitTime = new TimeSpan();
+
+                foreach (var c in CheckpointInfo)
+                    totalWaitTime += c.TimeWaited;
+
+                return totalWaitTime;
+            }
+        }
+
+        [NotMapped]
+        [JsonIgnore]
+        public TimeSpan TotalPenaltyTime
+        {
+            get
+            {
+                var totalPenaltyTime = new TimeSpan();
+
+                foreach (var c in CheckpointInfo)
+                    totalPenaltyTime += c.Penalty;
+
+                return totalPenaltyTime;
+            }
+        }
+
+        [NotMapped]
+        [JsonIgnore]
+        public TimeSpan AverageTimeBetweenCheckpoints
+        {
+            get
+            {
+                var time = new TimeSpan();
+
+                var checkpoints = CheckpointInfo.SkipWhile(x => x.ID == 1);
+                if (checkpoints.Any())
+                {
+                    foreach (var c in checkpoints)
+                    {
+                        time += c.TimeDeparted!.Value - c.TimeArrived;
+                    }
+                    
+                    if (time.TotalSeconds > 0)
+                        time /= checkpoints.Count();
+                }
+
+                return time;
+            }
+        }
     }
 }

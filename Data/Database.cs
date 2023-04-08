@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using ClosedXML.Excel;
+using Microsoft.EntityFrameworkCore;
 
 namespace turisticky_zavod.Data
 {
@@ -30,7 +31,7 @@ namespace turisticky_zavod.Data
             }
         }
 
-        public bool IsSaved { get; private set; } = false;
+        public bool IsSaved { get; private set; } = true;
         public string? SavedFilePath { get; private set; } = null;
 
 
@@ -40,35 +41,50 @@ namespace turisticky_zavod.Data
             return base.SaveChanges();
         }
 
-        public bool SaveToFile(string? filePath = null)
+        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
-            try
-            {
-                var allData = new AllData()
-                {
-                    Runners = instance.Runner.ToList(),
-                    Teams = instance.Team.ToList(),
-                    Referees = instance.Referee.ToList(),
-                    Partners = instance.Partner.ToList(),
-                    Checkpoints = instance.Checkpoint.ToList(),
-                    CheckpointAgeCategoryParticipations = instance.CheckpointAgeCategoryParticipation.ToList(),
-                    AgeCategories = instance.AgeCategory.ToList()
-                };
-
-                FileHelper.ExportEverythingToJSON(allData, filePath ?? SavedFilePath!);
-
-                IsSaved = true;
-                SavedFilePath = filePath;
-
-                return true;
-            }
-            catch (Exception)
-            {
-                return false;
-            }
+            IsSaved = false;
+            return base.SaveChangesAsync(cancellationToken);
         }
 
-        public async static void LoadFromFile(string filePath)
+        public void SaveToFile(string? filePath = null)
+        {
+            var path = filePath ?? SavedFilePath!;
+
+            if (path.Split('.')[^1] == "json")
+                ExportToJson(path);
+            else
+                ExportToExcel(path);
+        }
+
+        private void ExportToExcel(string filePath)
+        {
+            FileHelper.ExportToExcel(instance.Runner.Local.ToList(), filePath);
+
+            IsSaved = true;
+            SavedFilePath = filePath;
+        }
+
+        private void ExportToJson(string filePath)
+        {
+            var allData = new AllData()
+            {
+                Runners = instance.Runner.Local.ToList(),
+                Teams = instance.Team.Local.ToList(),
+                Referees = instance.Referee.Local.ToList(),
+                Partners = instance.Partner.Local.ToList(),
+                Checkpoints = instance.Checkpoint.Local.ToList(),
+                CheckpointAgeCategoryParticipations = instance.CheckpointAgeCategoryParticipation.Local.ToList(),
+                AgeCategories = instance.AgeCategory.Local.ToList()
+            };
+
+            FileHelper.ExportEverythingToJSON(allData, filePath);
+
+            IsSaved = true;
+            SavedFilePath = filePath;
+        }
+
+        public async static void LoadFromJson(string filePath)
         {
             var allData = FileHelper.LoadEverythingFromJSON(filePath);
 

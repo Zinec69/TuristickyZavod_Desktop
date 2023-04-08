@@ -1,5 +1,6 @@
 ﻿using PCSC;
 using PCSC.Monitoring;
+using System.Reflection.PortableExecutable;
 using System.Text;
 using turisticky_zavod.Data;
 using Usb.Events;
@@ -57,18 +58,15 @@ namespace turisticky_zavod.Logic
                 ReaderName = readers.FirstOrDefault(s => s.Contains("PICC"), readers[0]);
                 Monitor.Start(ReaderName);
 
-                using (var context = ContextFactory.Instance.Establish(SCardScope.System))
+                using var context = ContextFactory.Instance.Establish(SCardScope.System);
+                using var reader = context.ConnectReader(ReaderName, SCardShareMode.Direct, SCardProtocol.Unset);
+
+                var buffer = new byte[6];
+                try
                 {
-                    using (var reader = context.ConnectReader(ReaderName, SCardShareMode.Direct, SCardProtocol.Unset))
-                    {
-                        var buffer = new byte[6];
-                        try
-                        {
-                            reader.Control(controlCode, new byte[] { 0xE0, 0x00, 0x00, 0x21, 0x01, 0B_0110_1111 }, buffer);
-                        }
-                        catch { }
-                    }
+                    reader.Control(controlCode, new byte[] { 0xE0, 0x00, 0x00, 0x21, 0x01, 0B_0110_1111 }, buffer);
                 }
+                catch { }
 
                 return true;
             }
@@ -145,30 +143,47 @@ namespace turisticky_zavod.Logic
             {
                 for (int j = 6; j < runner_split.Length; j += 6)
                 {
-                    var referee = new Referee() { Name = runner_split[j + 1] };
-                    referee = Database.Instance.Referee.ToList().FirstOrDefault(r => r.Name == referee.Name, referee);
+                    var checkpointID = int.Parse(runner_split[j]);
 
-                    var checkpoint = Database.Instance.Checkpoint.First(ch => ch.ID == int.Parse(runner_split[j]));
-                    checkpoint.Referee ??= referee;
-
-                    checkpointInfos.Add(new CheckpointRunnerInfo()
+                    if (!checkpointInfos.Any(x => x.ID == checkpointID))
                     {
-                        Checkpoint = checkpoint,
-                        TimeArrived = DateTimeOffset.FromUnixTimeSeconds(long.Parse(runner_split[j + 2])).DateTime.ToLocalTime(),
-                        TimeDeparted = runner_split[j + 3] == "0" ? null : DateTimeOffset.FromUnixTimeSeconds(long.Parse(runner_split[j + 3])).DateTime.ToLocalTime(),
-                        TimeWaited = new TimeSpan(0, 0, int.Parse(runner_split[j + 4])),
-                        Penalty = new TimeSpan(0, 0, int.Parse(runner_split[j + 5]))
-                    });
+                        var refereeName = runner_split[j + 1];
+                        var referee = Database.Instance.Referee.ToList()
+                                                               .FirstOrDefault(r => r.Name == refereeName, null)
+                                                                ?? new() { Name = refereeName };
+
+                        var checkpoint = Database.Instance.Checkpoint.Single(ch => ch.ID == checkpointID);
+                        checkpoint.Referee ??= referee;
+
+                        checkpointInfos.Add(new CheckpointRunnerInfo()
+                        {
+                            Checkpoint = checkpoint,
+                            TimeArrived = DateTimeOffset.FromUnixTimeSeconds(long.Parse(runner_split[j + 2]))
+                                                        .DateTime.ToLocalTime(),
+                            TimeDeparted = runner_split[j + 3] == "0" ? null : DateTimeOffset.FromUnixTimeSeconds(long.Parse(runner_split[j + 3]))
+                                                                                             .DateTime.ToLocalTime(),
+                            TimeWaited = new TimeSpan(0, 0, int.Parse(runner_split[j + 4])),
+                            Penalty = new TimeSpan(0, 0, int.Parse(runner_split[j + 5]))
+                        });
+                    }
                 }
             }
+
+            var teamName = runner_split[2];
+            var team = Database.Instance.Team.ToList().FirstOrDefault(x => x.Name == teamName, null);
+            team ??= Database.Instance.ChangeTracker.Entries<Team>()
+                                                    .FirstOrDefault(x => x.Entity.Name == teamName, null)?.Entity
+                                                     ?? new() { Name = teamName };
 
             return new Runner()
             {
                 StartNumber = int.Parse(runner_split[0]),
                 Name = runner_split[1],
-                Team = new() { Name = runner_split[2] },
-                StartTime = DateTimeOffset.FromUnixTimeSeconds(long.Parse(runner_split[3])).DateTime.ToLocalTime(),
-                FinishTime = runner_split[4] == "0" ? null : DateTimeOffset.FromUnixTimeSeconds(long.Parse(runner_split[4])).DateTime.ToLocalTime(),
+                Team = team,
+                StartTime = DateTimeOffset.FromUnixTimeSeconds(long.Parse(runner_split[3]))
+                                          .DateTime.ToLocalTime(),
+                FinishTime = runner_split[4] == "0" ? null : DateTimeOffset.FromUnixTimeSeconds(long.Parse(runner_split[4]))
+                                                                           .DateTime.ToLocalTime(),
                 Disqualified = runner_split[5] == "1",
                 CheckpointInfo = checkpointInfos
             };
@@ -274,12 +289,16 @@ namespace turisticky_zavod.Logic
         {
             Monitor.Cancel();
             Monitor.Dispose();
-            foreach (var del in OnCardDetected.GetInvocationList())
-                OnCardDetected -= (EventHandler<CardStatusEventArgs>)del;
-            foreach (var del in OnReaderDisconnected.GetInvocationList())
-                OnReaderDisconnected -= (EventHandler)del;
-            foreach (var del in OnReaderReconnected.GetInvocationList())
-                OnReaderReconnected -= (EventHandler)del;
+            try
+            {
+                foreach (var del in OnCardDetected.GetInvocationList())
+                    OnCardDetected -= (EventHandler<CardStatusEventArgs>)del;
+                foreach (var del in OnReaderDisconnected.GetInvocationList())
+                    OnReaderDisconnected -= (EventHandler)del;
+                foreach (var del in OnReaderReconnected.GetInvocationList())
+                    OnReaderReconnected -= (EventHandler)del;
+            }
+            catch (Exception) { }
         }
     }
 

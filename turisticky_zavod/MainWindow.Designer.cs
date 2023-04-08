@@ -44,9 +44,6 @@
             toolStripMenuItem_csvImport = new ToolStripMenuItem();
             toolStripMenuItem_jsonImport = new ToolStripMenuItem();
             toolStripMenuItem_nfcImport = new ToolStripMenuItem();
-            toolStripMenuItem_export = new ToolStripMenuItem();
-            toolStripMenuItem_csvExport = new ToolStripMenuItem();
-            toolStripMenuItem_jsonExport = new ToolStripMenuItem();
             toolStripMenuItem_edit = new ToolStripMenuItem();
             toolStripMenuItem_ageCategories = new ToolStripMenuItem();
             toolStripSeparator1 = new ToolStripSeparator();
@@ -107,7 +104,7 @@
             // 
             // souborToolStripMenuItem
             // 
-            souborToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { toolStripMenuItem_close, toolStripMenuItem_save, toolStripMenuItem_saveAs, toolStripMenuItem_import, toolStripMenuItem_export });
+            souborToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { toolStripMenuItem_close, toolStripMenuItem_save, toolStripMenuItem_saveAs, toolStripMenuItem_import });
             souborToolStripMenuItem.Name = "souborToolStripMenuItem";
             souborToolStripMenuItem.Size = new Size(57, 20);
             souborToolStripMenuItem.Text = "Soubor";
@@ -115,21 +112,21 @@
             // toolStripMenuItem_close
             // 
             toolStripMenuItem_close.Name = "toolStripMenuItem_close";
-            toolStripMenuItem_close.Size = new Size(180, 22);
+            toolStripMenuItem_close.Size = new Size(129, 22);
             toolStripMenuItem_close.Text = "Zavřít";
             toolStripMenuItem_close.Click += CloseToolStripMenuItem_Click;
             // 
             // toolStripMenuItem_save
             // 
             toolStripMenuItem_save.Name = "toolStripMenuItem_save";
-            toolStripMenuItem_save.Size = new Size(180, 22);
+            toolStripMenuItem_save.Size = new Size(129, 22);
             toolStripMenuItem_save.Text = "Uložit";
             toolStripMenuItem_save.Click += SaveToolStripMenuItem_Click;
             // 
             // toolStripMenuItem_saveAs
             // 
             toolStripMenuItem_saveAs.Name = "toolStripMenuItem_saveAs";
-            toolStripMenuItem_saveAs.Size = new Size(180, 22);
+            toolStripMenuItem_saveAs.Size = new Size(129, 22);
             toolStripMenuItem_saveAs.Text = "Uložit jako";
             toolStripMenuItem_saveAs.Click += SaveAsToolStripMenuItem_Click;
             // 
@@ -137,48 +134,29 @@
             // 
             toolStripMenuItem_import.DropDownItems.AddRange(new ToolStripItem[] { toolStripMenuItem_csvImport, toolStripMenuItem_jsonImport, toolStripMenuItem_nfcImport });
             toolStripMenuItem_import.Name = "toolStripMenuItem_import";
-            toolStripMenuItem_import.Size = new Size(180, 22);
-            toolStripMenuItem_import.Text = "Import";
+            toolStripMenuItem_import.Size = new Size(129, 22);
+            toolStripMenuItem_import.Text = "Načíst";
             // 
             // toolStripMenuItem_csvImport
             // 
             toolStripMenuItem_csvImport.Name = "toolStripMenuItem_csvImport";
-            toolStripMenuItem_csvImport.Size = new Size(180, 22);
-            toolStripMenuItem_csvImport.Text = "CSV";
+            toolStripMenuItem_csvImport.Size = new Size(182, 22);
+            toolStripMenuItem_csvImport.Text = "CSV (data závodu)";
             toolStripMenuItem_csvImport.Click += CSVImportToolStripMenuItem_Click;
             // 
             // toolStripMenuItem_jsonImport
             // 
             toolStripMenuItem_jsonImport.Name = "toolStripMenuItem_jsonImport";
-            toolStripMenuItem_jsonImport.Size = new Size(180, 22);
-            toolStripMenuItem_jsonImport.Text = "JSON";
+            toolStripMenuItem_jsonImport.Size = new Size(182, 22);
+            toolStripMenuItem_jsonImport.Text = "JSON (data aplikace)";
             toolStripMenuItem_jsonImport.Click += JSONImportToolStripMenuItem_Click;
             // 
             // toolStripMenuItem_nfcImport
             // 
             toolStripMenuItem_nfcImport.Name = "toolStripMenuItem_nfcImport";
-            toolStripMenuItem_nfcImport.Size = new Size(180, 22);
-            toolStripMenuItem_nfcImport.Text = "NFC";
+            toolStripMenuItem_nfcImport.Size = new Size(182, 22);
+            toolStripMenuItem_nfcImport.Text = "NFC čipy";
             toolStripMenuItem_nfcImport.Click += NFCImportToolStripMenuItem_Click;
-            // 
-            // toolStripMenuItem_export
-            // 
-            toolStripMenuItem_export.DropDownItems.AddRange(new ToolStripItem[] { toolStripMenuItem_csvExport, toolStripMenuItem_jsonExport });
-            toolStripMenuItem_export.Name = "toolStripMenuItem_export";
-            toolStripMenuItem_export.Size = new Size(180, 22);
-            toolStripMenuItem_export.Text = "Export";
-            // 
-            // toolStripMenuItem_csvExport
-            // 
-            toolStripMenuItem_csvExport.Name = "toolStripMenuItem_csvExport";
-            toolStripMenuItem_csvExport.Size = new Size(102, 22);
-            toolStripMenuItem_csvExport.Text = "CSV";
-            // 
-            // toolStripMenuItem_jsonExport
-            // 
-            toolStripMenuItem_jsonExport.Name = "toolStripMenuItem_jsonExport";
-            toolStripMenuItem_jsonExport.Size = new Size(102, 22);
-            toolStripMenuItem_jsonExport.Text = "JSON";
             // 
             // toolStripMenuItem_edit
             // 
@@ -405,10 +383,7 @@
         private ToolStripMenuItem toolStripMenuItem_csvImport;
         private ToolStripMenuItem toolStripMenuItem_jsonImport;
         private ToolStripMenuItem toolStripMenuItem_nfcImport;
-        private ToolStripMenuItem toolStripMenuItem_export;
         private ToolStripSeparator toolStripSeparator1;
-        private ToolStripMenuItem toolStripMenuItem_csvExport;
-        private ToolStripMenuItem toolStripMenuItem_jsonExport;
         private ToolStripMenuItem toolStripMenuItem_saveAs;
         private DataGridViewTextBoxColumn StartNumber;
         private DataGridViewTextBoxColumn FirstName;

@@ -63,9 +63,9 @@ namespace Forms.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap nfc_icon {
+        internal static System.Drawing.Bitmap nfc_off {
             get {
-                object obj = ResourceManager.GetObject("nfc_icon", resourceCulture);
+                object obj = ResourceManager.GetObject("nfc_off", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -73,9 +73,9 @@ namespace Forms.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap nfc_off_icon {
+        internal static System.Drawing.Bitmap nfc_on {
             get {
-                object obj = ResourceManager.GetObject("nfc_off_icon", resourceCulture);
+                object obj = ResourceManager.GetObject("nfc_on", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

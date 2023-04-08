@@ -5,10 +5,8 @@ using Microsoft.EntityFrameworkCore;
 using Windows.Devices.WiFiDirect;
 using System.Diagnostics;
 using Windows.Devices.Enumeration;
-using Windows.Foundation;
 using Forms;
 using System.Text.Json;
-using System.Windows.Forms;
 
 namespace turisticky_zavod.Forms
 {
@@ -111,8 +109,9 @@ namespace turisticky_zavod.Forms
 
                 if (runners.Find(r => r.StartNumber != null) == null)
                 {
-                    var prompt = MessageBox.Show("Tato data nemají vyplnìna startovní èísla, chcete je pøiøadit automaticky?", "Pøiøadit startovní èísla", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-                    if (prompt == DialogResult.Yes)
+                    if (MessageBox.Show("Tato data nemají vyplnìna startovní èísla, chcete je pøiøadit automaticky?",
+                        "Pøiøadit startovní èísla", MessageBoxButtons.YesNo, MessageBoxIcon.Question
+                        ) == DialogResult.Yes)
                     {
                         var ids = database.Runner.Local.Where(r => r.StartNumber.HasValue);
                         int i = ids.Any() ? ids.Max(r => r.StartNumber!.Value) : 0;
@@ -129,10 +128,11 @@ namespace turisticky_zavod.Forms
                 timer.Stop();
                 Log($"[FILES] Csv loaded and saved to database in {timer.ElapsedMilliseconds}ms");
             }
-            catch
+            catch (Exception e)
             {
-                Log("[FILES] Failed loading csv");
-                MessageBox.Show("Nepodaøilo se naèíst data z CSV souboru", "Chyba", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Log($"[FILES] Failed loading csv: {e.Message}");
+                MessageBox.Show("Nepodaøilo se naèíst data z CSV souboru",
+                    "Chyba", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -175,9 +175,9 @@ namespace turisticky_zavod.Forms
 
         private void OnNFCScanned(object? sender, Runner runner)
         {
-            var dialog = MessageBox.Show("Tento bìžec není v seznamu, chcete jej i pøesto pøidat? Nebude mít vyplnìna všechna data.",
-                                         "Bìžec bez záznamu", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-            if (dialog == DialogResult.Yes)
+            if (MessageBox.Show("Tento bìžec není v seznamu, chcete jej i pøesto pøidat? Nebude mít vyplnìna všechna data.",
+                "Bìžec bez záznamu", MessageBoxButtons.YesNo, MessageBoxIcon.Question
+                ) == DialogResult.Yes)
             {
                 database.Runner.Add(runner);
                 database.SaveChanges();
@@ -189,9 +189,8 @@ namespace turisticky_zavod.Forms
             if (!database.IsSaved)
             {
                 return MessageBox.Show("Chcete svou práci pøed ukonèením uložit?",
-                                        "Uložit pøed ukonèením",
-                                        MessageBoxButtons.YesNoCancel,
-                                        MessageBoxIcon.Question) switch
+                    "Uložit pøed ukonèením", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question
+                    ) switch
                 {
                     DialogResult.Yes => HandleSaving(),
                     DialogResult.No => true,
@@ -202,9 +201,8 @@ namespace turisticky_zavod.Forms
             else
             {
                 if (MessageBox.Show("Opravdu chcete aplikaci ukonèit?",
-                                    "Ukonèit aplikaci",
-                                    MessageBoxButtons.YesNo,
-                                    MessageBoxIcon.Question) == DialogResult.Yes)
+                    "Ukonèit aplikaci", MessageBoxButtons.YesNo, MessageBoxIcon.Question
+                    ) == DialogResult.Yes)
                     return true;
                 else
                     return false;
@@ -213,61 +211,38 @@ namespace turisticky_zavod.Forms
 
         private bool HandleSaving(bool forceNewFile = false)
         {
+            string? filePath = null;
+
             if (database.SavedFilePath == null || forceNewFile)
             {
                 var fileDialog = new SaveFileDialog()
                 {
-                    Filter = "Soubory JSON (*.json)|*.json",
+                    Filter = "Soubory JSON (*.json)|*.json|Soubory Excelu (*.xlsx)|*.xlsx",
                     FileName = $"TZ_{DateTime.Now:yyyy-MM-dd}.json",
-                    ValidateNames = true
+                    ValidateNames = true,
+                    AddExtension = true
                 };
                 if (fileDialog.ShowDialog() == DialogResult.OK)
-                {
-                    if (database.SaveToFile(fileDialog.FileName))
-                    {
-                        Log("[FILES] Database successfully saved to file");
-                        toolStripStatusLabel1.Text = $"{DateTime.Now:HH:mm:ss} Soubor úspìšnì uložen";
-
-                        return true;
-                    }
-                    else
-                    {
-                        Log("[FILES] Database saving failed");
-                        toolStripStatusLabel1.Text = $"{DateTime.Now:HH:mm:ss} Ukládání souboru se nepodaøilo";
-
-                        return false;
-                    }
-                }
-            }
-            else
-            {
-                if (database.SaveToFile())
-                {
-                    Log("[FILES] Database successfully saved to file");
-                    toolStripStatusLabel1.Text = $"{DateTime.Now:HH:mm:ss} Soubor úspìšnì uložen";
-
-                    return true;
-                }
+                    filePath = fileDialog.FileName;
                 else
-                {
-                    Log("[FILES] Database saving failed");
-                    toolStripStatusLabel1.Text = $"{DateTime.Now:HH:mm:ss} Ukládání souboru se nepodaøilo";
-
                     return false;
-                }
             }
 
-            return false;
-        }
-
-        private static void HandleLoading(string filePath)
-        {
-            if (MessageBox.Show("Opravdu chcete naèíst tento soubor? Pøijdete o veškeré provedené zmìny",
-                "Naèíst soubor",
-                MessageBoxButtons.YesNo,
-                MessageBoxIcon.Question) == DialogResult.Yes)
+            try
             {
-                Database.LoadFromFile(filePath);
+                database.SaveToFile(filePath);
+
+                Log("[FILES] Database successfully saved to file");
+                toolStripStatusLabel1.Text = $"{DateTime.Now:HH:mm:ss} Soubor úspìšnì uložen";
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                Log($"[FILES] Saving database to file failed: {e.Message}");
+                toolStripStatusLabel1.Text = $"{DateTime.Now:HH:mm:ss} Ukládání souboru se nepodaøilo";
+
+                return false;
             }
         }
 
@@ -279,12 +254,18 @@ namespace turisticky_zavod.Forms
             }
             catch (JsonException)
             {
-                HandleLoading(filePath);
+                if (MessageBox.Show("Opravdu chcete naèíst tento soubor? Pøijdete o veškeré provedené zmìny",
+                    "Naèíst soubor", MessageBoxButtons.YesNo, MessageBoxIcon.Question
+                    ) == DialogResult.Yes)
+                {
+                    Database.LoadFromJson(filePath);
+                }
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                Log("[FILES] Failed loading json");
-                MessageBox.Show("Nepodaøilo se naèíst data z JSON souboru", "Chyba", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Log($"[FILES] Failed loading json: {e.Message}");
+                MessageBox.Show("Nepodaøilo se naèíst data z JSON souboru",
+                    "Chyba", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -323,7 +304,8 @@ namespace turisticky_zavod.Forms
             }
         }
 
-        private async void OnConnectionRequested(WiFiDirectConnectionListener sender, WiFiDirectConnectionRequestedEventArgs connectionEventArgs)
+        private async void OnConnectionRequested(WiFiDirectConnectionListener sender,
+                            WiFiDirectConnectionRequestedEventArgs connectionEventArgs)
         {
             var request = connectionEventArgs.GetConnectionRequest();
             Log($"[WIFI DIRECT] New Wifi connection request:");
@@ -361,7 +343,8 @@ namespace turisticky_zavod.Forms
                 Log("[WIFI DIRECT] Device is already paired");
         }
 
-        private void OnStatusChanged(WiFiDirectAdvertisementPublisher sender, WiFiDirectAdvertisementPublisherStatusChangedEventArgs args)
+        private void OnStatusChanged(WiFiDirectAdvertisementPublisher sender,
+                        WiFiDirectAdvertisementPublisherStatusChangedEventArgs args)
         {
             Log($"[WIFI DIRECT] Wifi status changed: {args.Status}");
             if (args.Status == WiFiDirectAdvertisementPublisherStatus.Aborted)
@@ -370,57 +353,57 @@ namespace turisticky_zavod.Forms
                 if (args.Error == WiFiDirectError.Success)
                     _publisher?.Start();
                 else
-                    MessageBox.Show("Nìco se nepodaøilo, zkuste to prosím znovu", "Chyba", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("Nìco se nepodaøilo, zkuste to prosím znovu",
+                        "Chyba", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
         private static void HandlePairing(DevicePairingRequestedEventArgs args, MainWindow window)
         {
-            using (Deferral deferral = args.GetDeferral())
+            using var deferral = args.GetDeferral();
+
+            window.Log($"[WIFI DIRECT] Pairing kind: {args.PairingKind}");
+            window.Log($"[WIFI DIRECT] PIN: {args.Pin}");
+            switch (args.PairingKind)
             {
-                window.Log($"[WIFI DIRECT] Pairing kind: {args.PairingKind}");
-                window.Log($"[WIFI DIRECT] PIN: {args.Pin}");
-                switch (args.PairingKind)
-                {
-                    case DevicePairingKinds.DisplayPin:
-                        var pinDialog = new PINDialog(args.Pin);
-                        if (pinDialog.ShowDialog() == DialogResult.OK)
+                case DevicePairingKinds.DisplayPin:
+                    var pinDialog = new PINDialog(args.Pin);
+                    if (pinDialog.ShowDialog() == DialogResult.OK)
+                    {
+                        args.Accept();
+                        window.Log("[WIFI DIRECT] Pairing accepted");
+                    }
+                    else
+                    {
+                        window.Log("[WIFI DIRECT] Pairing canceled by user");
+                    }
+                    break;
+
+                case DevicePairingKinds.ConfirmOnly:
+                    args.Accept();
+                    window.Log("[WIFI DIRECT] Pairing accepted");
+                    break;
+
+                case DevicePairingKinds.ProvidePin:
+                    pinDialog = new PINDialog();
+                    if (pinDialog.ShowDialog() == DialogResult.OK)
+                    {
+                        string pin = pinDialog.GetPin();
+                        if (!string.IsNullOrEmpty(pin))
                         {
-                            args.Accept();
+                            args.Accept(pin);
                             window.Log("[WIFI DIRECT] Pairing accepted");
                         }
                         else
                         {
-                            window.Log("[WIFI DIRECT] Pairing canceled by user");
+                            window.Log("[WIFI DIRECT] Wrong pin entered");
                         }
-                        break;
-
-                    case DevicePairingKinds.ConfirmOnly:
-                        args.Accept();
-                        window.Log("[WIFI DIRECT] Pairing accepted");
-                        break;
-
-                    case DevicePairingKinds.ProvidePin:
-                        pinDialog = new PINDialog();
-                        if (pinDialog.ShowDialog() == DialogResult.OK)
-                        {
-                            string pin = pinDialog.GetPin();
-                            if (!string.IsNullOrEmpty(pin))
-                            {
-                                args.Accept(pin);
-                                window.Log("[WIFI DIRECT] Pairing accepted");
-                            }
-                            else
-                            {
-                                window.Log("[WIFI DIRECT] Wrong pin entered");
-                            }
-                        }
-                        else
-                        {
-                            window.Log("[WIFI DIRECT] Pairing canceled by user");
-                        }
-                        break;
-                }
+                    }
+                    else
+                    {
+                        window.Log("[WIFI DIRECT] Pairing canceled by user");
+                    }
+                    break;
             }
         }
 
@@ -482,7 +465,7 @@ namespace turisticky_zavod.Forms
 
         private void SaveToolStripMenuItem_Click(object sender, EventArgs e) => HandleSaving();
 
-        private void SaveAsToolStripMenuItem_Click(object sender, EventArgs e) => HandleSaving(true);
+        private void SaveAsToolStripMenuItem_Click(object sender, EventArgs e) => HandleSaving(forceNewFile: true);
 
         #endregion
 
@@ -526,19 +509,23 @@ namespace turisticky_zavod.Forms
                 switch (filepath.Split('.').Last().ToLower())
                 {
                     case "json":
-                        var dialog = MessageBox.Show("Chcete naèíst data z JSON souboru?", "Naèíst data", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-                        if (dialog == DialogResult.Yes)
+                        if (MessageBox.Show("Chcete naèíst data z JSON souboru?",
+                            "Naèíst data", MessageBoxButtons.YesNo, MessageBoxIcon.Question
+                            ) == DialogResult.Yes)
                             DetermineJsonLoadingWay(filepath);
                         break;
 
                     case "csv":
-                        dialog = MessageBox.Show("Chcete naèíst data z CSV souboru?", "Naèíst data", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-                        if (dialog == DialogResult.Yes)
+                        if (MessageBox.Show("Chcete naèíst data z CSV souboru?",
+                            "Naèíst data", MessageBoxButtons.YesNo, MessageBoxIcon.Question
+                            ) == DialogResult.Yes)
                             AddRunnersCSV(filepath);
                         break;
 
                     default:
-                        MessageBox.Show("Nepodporovaný typ souboru", "Chyba", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show("Nepodporovaný typ souboru",
+                            "Chyba", MessageBoxButtons.OK, MessageBoxIcon.Error
+                            );
                         break;
                 }
             }

@@ -216,7 +216,9 @@ namespace turisticky_zavod.Forms
 
         private void DataGridView_AgeCategories_UserDeletingRow(object sender, DataGridViewRowCancelEventArgs e)
         {
-            if (MessageBox.Show("Opravdu chcete smazat zvolenou kategorii?", "Smazat kategorii", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.No)
+            if (MessageBox.Show("Opravdu chcete smazat zvolenou kategorii?",
+                "Smazat kategorii", MessageBoxButtons.YesNo, MessageBoxIcon.Question
+                ) == DialogResult.No)
                 e.Cancel = true;
         }
 

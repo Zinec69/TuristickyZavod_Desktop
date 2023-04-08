@@ -56,9 +56,9 @@ namespace turisticky_zavod.Data
             set
             {
                 name = value;
-                var split_name = value.Split(' ');
-                FirstName = split_name[0];
-                LastName = split_name[1];
+                var lastSpaceIndex = name.LastIndexOf(' ');
+                FirstName = lastSpaceIndex >= 0 ? name[..lastSpaceIndex] : name;
+                LastName = lastSpaceIndex >= 0 ? name[(lastSpaceIndex + 1)..] : name;
             }
         }
     }

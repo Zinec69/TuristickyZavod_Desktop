@@ -1,4 +1,5 @@
-﻿using PCSC.Monitoring;
+﻿using Forms.Properties;
+using PCSC.Monitoring;
 using System.Diagnostics;
 using turisticky_zavod.Data;
 using turisticky_zavod.Logic;
@@ -14,8 +15,8 @@ namespace turisticky_zavod.Forms
 
         private readonly Database database;
 
-        private readonly Image nfcOn = Image.FromFile(Path.GetFullPath("../../../Resources/nfc_icon.png")); // TODO
-        private readonly Image nfcOff = Image.FromFile(Path.GetFullPath("../../../Resources/nfc_off_icon.png")); // TODO
+        private readonly Image nfcOn = Resources.nfc_on;
+        private readonly Image nfcOff = Resources.nfc_off;
 
         public NFCScanning()
         {
@@ -56,10 +57,12 @@ namespace turisticky_zavod.Forms
             }
             catch (Exception e)
             {
-                MessageBox.Show($"Nepodařila se spustit služba pro komunikaci s chytrými čtečkami. Podrobnosti:\n\n{e}", "Chyba", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Nepodařila se spustit služba pro komunikaci s chytrými čtečkami. Podrobnosti:\n\n{e}",
+                    "Chyba", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 Close();
             }
 
+            // TODO
             if (ReaderSerial.Connect())
                 button_scanSerialPort.Enabled = true;
 
@@ -70,7 +73,8 @@ namespace turisticky_zavod.Forms
         {
             if (!NFCReaderPCSC.CheckTagCompatibility(args.Atr))
             {
-                MessageBox.Show("Nepodporovaný typ čipu", "Chyba", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Nepodporovaný typ čipu",
+                    "Chyba", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
@@ -83,7 +87,7 @@ namespace turisticky_zavod.Forms
                 var runner = Reader.ReadRunnerFromTag();
                 timer.Stop();
                 SaveRunner(runner);
-                toolStripStatusLabel.Text = $"Běžec č. {runner.StartNumber} úspěšně načten [{timer.ElapsedMilliseconds}ms]";
+                toolStripStatusLabel.Text = $"Běžec č. {runner.StartNumber} úspěšně načten [{timer.ElapsedMilliseconds}ms]"; // TODO odebrat ms
             }
             catch (NFCException ex)
             {
@@ -105,12 +109,12 @@ namespace turisticky_zavod.Forms
                     OnRunnerNotInDB?.Invoke(null, runner);
                 else
                 {
-                    dbRunner.StartTime = runner.StartTime;
-                    dbRunner.FinishTime = runner.FinishTime;
+                    dbRunner.StartTime ??= runner.StartTime;
+                    dbRunner.FinishTime ??= runner.FinishTime;
                     dbRunner.Disqualified = runner.Disqualified;
                     foreach (var ci in runner.CheckpointInfo)
                     {
-                        if (dbRunner.CheckpointInfo.FirstOrDefault(c => c.Checkpoint.ID == ci.Checkpoint.ID, null) == null)
+                        if (!dbRunner.CheckpointInfo.Any(c => c.Checkpoint.ID == ci.Checkpoint.ID))
                         {
                             dbRunner.CheckpointInfo.Add(ci);
                         }
@@ -127,7 +131,7 @@ namespace turisticky_zavod.Forms
             ReaderSerial?.Dispose();
         }
 
-        private void button_scanSerialPort_Click(object sender, EventArgs e)
+        private void Button_ScanSerialPort_Click(object sender, EventArgs e)
         {
             var timer = Stopwatch.StartNew();
 
