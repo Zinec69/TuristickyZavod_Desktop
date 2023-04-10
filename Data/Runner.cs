@@ -12,6 +12,7 @@ namespace turisticky_zavod.Data
         public int TeamID { get; set; }
 
         [ForeignKey(nameof(TeamID))]
+        [DeleteBehavior(DeleteBehavior.Cascade)]
         public virtual Team Team { get; set; }
 
         public DateTime? StartTime { get; set; }
@@ -33,6 +34,7 @@ namespace turisticky_zavod.Data
         public int? AgeCategoryID { get; set; }
 
         [ForeignKey(nameof(AgeCategoryID))]
+        [DeleteBehavior(DeleteBehavior.SetNull)]
         [JsonIgnore]
         public virtual AgeCategory? AgeCategory { get; set; }
 

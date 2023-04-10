@@ -1,4 +1,6 @@
-﻿using System.Text.Json.Serialization;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace turisticky_zavod.Data
 {
@@ -7,6 +9,10 @@ namespace turisticky_zavod.Data
     {
         public int ID { get; set; }
 
+        public int CheckpointID { get; set; }
+
+        [ForeignKey(nameof(CheckpointID))]
+        [DeleteBehavior(DeleteBehavior.Cascade)]
         [JsonPropertyName("checkpointId")]
         public virtual Checkpoint Checkpoint { get; set; }
 
@@ -20,6 +26,8 @@ namespace turisticky_zavod.Data
         public TimeSpan Penalty { get; set; }
 
         [JsonPropertyName("refereeName")]
-        public Referee RefereeJsonDeserializing { set => Checkpoint.Referee =  value; }
+        public Referee RefereeJsonDeserializing { set => Checkpoint.Referee = value; }
+
+        public bool Disqualified { get; set; }
     }
 }

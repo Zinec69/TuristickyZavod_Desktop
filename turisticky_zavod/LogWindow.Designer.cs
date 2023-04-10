@@ -1,4 +1,4 @@
-﻿namespace Forms
+﻿namespace turisticky_zavod.Forms
 {
     partial class LogWindow
     {

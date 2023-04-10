@@ -12,6 +12,7 @@ namespace turisticky_zavod.Data
         public DbSet<Checkpoint> Checkpoint { get; set; }
         public DbSet<CheckpointAgeCategoryParticipation> CheckpointAgeCategoryParticipation { get; set; }
         public DbSet<Team> Team { get; set; }
+        public DbSet<Log> Log { get; set; }
 
         private Database() { }
 
@@ -110,6 +111,24 @@ namespace turisticky_zavod.Data
                     instance.AgeCategory.Add(newDataItem);
                 }
 
+                foreach (var entity in instance.Referee)
+                {
+                    var newDataItem = allData.Referees.FirstOrDefault(x => x.ID == entity.ID);
+                    if (newDataItem != null)
+                    {
+                        instance.Entry(entity).CurrentValues.SetValues(newDataItem);
+                    }
+                    else
+                    {
+                        instance.Referee.Remove(entity);
+                    }
+                }
+
+                foreach (var newDataItem in allData.Referees.Where(x => !instance.Referee.Any(y => y.ID == x.ID)))
+                {
+                    instance.Referee.Add(newDataItem);
+                }
+
                 foreach (var entity in instance.Checkpoint)
                 {
                     var newDataItem = allData.Checkpoints.FirstOrDefault(x => x.ID == entity.ID);
@@ -149,6 +168,24 @@ namespace turisticky_zavod.Data
                     instance.CheckpointAgeCategoryParticipation.Add(newDataItem);
                 }
 
+                foreach (var entity in instance.Team)
+                {
+                    var newDataItem = allData.Teams.FirstOrDefault(x => x.ID == entity.ID);
+                    if (newDataItem != null)
+                    {
+                        instance.Entry(entity).CurrentValues.SetValues(newDataItem);
+                    }
+                    else
+                    {
+                        instance.Team.Remove(entity);
+                    }
+                }
+
+                foreach (var newDataItem in allData.Teams.Where(x => !instance.Team.Any(y => y.ID == x.ID)))
+                {
+                    instance.Team.Add(newDataItem);
+                }
+
                 foreach (var entity in instance.Partner)
                 {
                     var newDataItem = allData.Partners.FirstOrDefault(x => x.ID == entity.ID);
@@ -183,42 +220,8 @@ namespace turisticky_zavod.Data
                 foreach (var newDataItem in allData.Runners.Where(x => !instance.Runner.Any(y => y.ID == x.ID)))
                 {
                     instance.Runner.Add(newDataItem);
-                }
 
-                foreach (var entity in instance.Team)
-                {
-                    var newDataItem = allData.Teams.FirstOrDefault(x => x.ID == entity.ID);
-                    if (newDataItem != null)
-                    {
-                        instance.Entry(entity).CurrentValues.SetValues(newDataItem);
-                    }
-                    else
-                    {
-                        instance.Team.Remove(entity);
-                    }
-                }
-
-                foreach (var newDataItem in allData.Teams.Where(x => !instance.Team.Any(y => y.ID == x.ID)))
-                {
-                    instance.Team.Add(newDataItem);
-                }
-
-                foreach (var entity in instance.Referee)
-                {
-                    var newDataItem = allData.Referees.FirstOrDefault(x => x.ID == entity.ID);
-                    if (newDataItem != null)
-                    {
-                        instance.Entry(entity).CurrentValues.SetValues(newDataItem);
-                    }
-                    else
-                    {
-                        instance.Referee.Remove(entity);
-                    }
-                }
-
-                foreach (var newDataItem in allData.Referees.Where(x => !instance.Referee.Any(y => y.ID == x.ID)))
-                {
-                    instance.Referee.Add(newDataItem);
+                    await instance.SaveChangesAsync();
                 }
 
                 await instance.SaveChangesAsync();
@@ -283,6 +286,7 @@ namespace turisticky_zavod.Data
             modelBuilder.Entity<Runner>().HasIndex(x => x.StartNumber).IsUnique();
             modelBuilder.Entity<Partner>();
             modelBuilder.Entity<Team>().HasIndex(x => x.Name).IsUnique();
+            modelBuilder.Entity<Log>();
 
             modelBuilder.Entity<Referee>().HasKey("ID");
             modelBuilder.Entity<Referee>().HasIndex(r => new { r.FirstName, r.LastName }).IsUnique();

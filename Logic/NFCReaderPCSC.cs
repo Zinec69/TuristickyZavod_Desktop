@@ -141,7 +141,7 @@ namespace turisticky_zavod.Logic
             var checkpointInfos = new List<CheckpointRunnerInfo>();
             if (runner_split.Length > 6)
             {
-                for (int j = 6; j < runner_split.Length; j += 6)
+                for (int j = 6; j < runner_split.Length; j += 7)
                 {
                     var checkpointID = int.Parse(runner_split[j]);
 
@@ -163,7 +163,8 @@ namespace turisticky_zavod.Logic
                             TimeDeparted = runner_split[j + 3] == "0" ? null : DateTimeOffset.FromUnixTimeSeconds(long.Parse(runner_split[j + 3]))
                                                                                              .DateTime.ToLocalTime(),
                             TimeWaited = new TimeSpan(0, 0, int.Parse(runner_split[j + 4])),
-                            Penalty = new TimeSpan(0, 0, int.Parse(runner_split[j + 5]))
+                            Penalty = new TimeSpan(0, 0, int.Parse(runner_split[j + 5])),
+                            Disqualified = runner_split[j + 6] == "1"
                         });
                     }
                 }

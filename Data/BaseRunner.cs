@@ -3,10 +3,22 @@ namespace turisticky_zavod.Data
 {
     public class BaseRunner : Person
     {
-        //[Display(AutoGenerateField = false)]
         public int ID { get; set; }
 
-        //[Display(AutoGenerateField = true, Name = "Ročník", Order = 4)]
-        public int? BirthYear { get; set; }
+        private int? birthYear;
+        public int? BirthYear
+        {
+            get => birthYear;
+            set
+            {
+                if (value.HasValue && value.Value < 1000)
+                {
+                    var currentYear = DateTime.Now.Year;
+
+                    value += value.Value > (currentYear - 2000) ? 1900 : 2000;
+                }
+                birthYear = value;
+            }
+        }
     }
 }

@@ -95,8 +95,9 @@
             dataGridView_categories.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dataGridView_categories.Size = new Size(718, 251);
             dataGridView_categories.TabIndex = 0;
-            dataGridView_categories.CellClick += DataGridView_Categories_CellClick;
+            dataGridView_categories.CurrentCellChanged += DataGridView_AgeCategories_CurrentCellChanged;
             dataGridView_categories.RowsAdded += DataGridView_AgeCategories_RowsAdded;
+            dataGridView_categories.Sorted += DataGridView_AgeCategories_Sorted;
             dataGridView_categories.UserDeletedRow += DataGridView_AgeCategories_UserDeletedRow;
             dataGridView_categories.UserDeletingRow += DataGridView_AgeCategories_UserDeletingRow;
             dataGridView_categories.KeyDown += DataGridView_AgeCategories_KeyDown;
@@ -204,7 +205,7 @@
             groupBox_edit.Size = new Size(730, 93);
             groupBox_edit.TabIndex = 9;
             groupBox_edit.TabStop = false;
-            groupBox_edit.Text = "Přidat novou kategorii";
+            groupBox_edit.Text = "Přidat/upravit kategorii";
             // 
             // textBox_color
             // 

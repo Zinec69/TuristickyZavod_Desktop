@@ -86,7 +86,6 @@ namespace turisticky_zavod.Forms
 
         #endregion
 
-
         #region TextBox events
 
         private void TextBox_AgeMin_KeyDown(object sender, KeyEventArgs e)
@@ -115,7 +114,7 @@ namespace turisticky_zavod.Forms
                 errorProvider.SetError(sender as TextBox, "Název kategorie je povinná položka");
             }
             else
-                errorProvider.SetError(sender as TextBox, "");
+                errorProvider.SetError(sender as TextBox, string.Empty);
         }
 
         private void TextBox_Code_Validating(object sender, System.ComponentModel.CancelEventArgs e)
@@ -128,7 +127,7 @@ namespace turisticky_zavod.Forms
                 errorProvider.SetError(sender as TextBox, "Zkratka kategorie je povinná položka");
             }
             else
-                errorProvider.SetError(sender as TextBox, "");
+                errorProvider.SetError(sender as TextBox, string.Empty);
         }
 
         private void TextBox_AgeMin_Validating(object sender, System.ComponentModel.CancelEventArgs e)
@@ -141,7 +140,7 @@ namespace turisticky_zavod.Forms
                 errorProvider.SetError(sender as TextBox, "Minimální věk je povinná položka");
             }
             else
-                errorProvider.SetError(sender as TextBox, "");
+                errorProvider.SetError(sender as TextBox, string.Empty);
         }
 
         private void TextBox_AgeMax_Validating(object sender, System.ComponentModel.CancelEventArgs e)
@@ -155,7 +154,7 @@ namespace turisticky_zavod.Forms
                 errorProvider.SetError(sender as TextBox, "Maximální věk musí být větší než minimální");
             }
             else
-                errorProvider.SetError(sender as TextBox, "");
+                errorProvider.SetError(sender as TextBox, string.Empty);
         }
 
         private void TextBox_Color_Validating(object sender, System.ComponentModel.CancelEventArgs e)
@@ -168,7 +167,7 @@ namespace turisticky_zavod.Forms
                 errorProvider.SetError(sender as TextBox, "Barva je povinná položka");
             }
             else
-                errorProvider.SetError(sender as TextBox, "");
+                errorProvider.SetError(sender as TextBox, string.Empty);
         }
 
         private void TextBox_Name_KeyPress(object sender, KeyPressEventArgs e)
@@ -203,7 +202,6 @@ namespace turisticky_zavod.Forms
 
         #endregion
 
-
         #region DataGridView_AgeCategories events
 
         private void DataGridView_AgeCategories_RowsAdded(object sender, DataGridViewRowsAddedEventArgs e)
@@ -234,9 +232,9 @@ namespace turisticky_zavod.Forms
                 Log("Nastala chyba při ukládání změn");
         }
 
-        private void DataGridView_Categories_CellClick(object sender, DataGridViewCellEventArgs e)
+        private void DataGridView_AgeCategories_CurrentCellChanged(object sender, EventArgs e)
         {
-            if (e.RowIndex > -1)
+            if (dataGridView_categories.CurrentRow != null)
             {
                 var category = (AgeCategory)dataGridView_categories.CurrentRow.DataBoundItem;
                 textBox_name.Text = category.Name;
@@ -256,6 +254,9 @@ namespace turisticky_zavod.Forms
             }
         }
 
+        private void DataGridView_AgeCategories_Sorted(object sender, EventArgs e)
+            => ClearInputs();
+
         private void DataGridView_AgeCategories_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Escape)
@@ -268,7 +269,6 @@ namespace turisticky_zavod.Forms
         }
 
         #endregion
-
 
         #region DataGridView_Checkpoints events
 
@@ -322,11 +322,11 @@ namespace turisticky_zavod.Forms
 
         private void ClearAllErrors()
         {
-            errorProvider.SetError(textBox_name, "");
-            errorProvider.SetError(textBox_code, "");
-            errorProvider.SetError(textBox_ageMin, "");
-            errorProvider.SetError(textBox_ageMax, "");
-            errorProvider.SetError(textBox_color, "");
+            errorProvider.SetError(textBox_name, string.Empty);
+            errorProvider.SetError(textBox_code, string.Empty);
+            errorProvider.SetError(textBox_ageMin, string.Empty);
+            errorProvider.SetError(textBox_ageMax, string.Empty);
+            errorProvider.SetError(textBox_color, string.Empty);
         }
 
         private static bool HandleNumberOnlyField(KeyEventArgs e)

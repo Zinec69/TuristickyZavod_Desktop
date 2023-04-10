@@ -11,12 +11,14 @@ namespace turisticky_zavod.Data
         public int CheckpointID { get; set; }
 
         [ForeignKey(nameof(CheckpointID))]
+        [DeleteBehavior(DeleteBehavior.Cascade)]
         [JsonIgnore]
         public virtual Checkpoint Checkpoint { get; set; }
 
         public int AgeCategoryID { get; set; }
 
         [ForeignKey(nameof(AgeCategoryID))]
+        [DeleteBehavior(DeleteBehavior.Cascade)]
         [JsonIgnore]
         public virtual AgeCategory AgeCategory { get; set; }
 

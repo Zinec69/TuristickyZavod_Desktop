@@ -7,18 +7,19 @@ using System.Diagnostics;
 using Windows.Devices.Enumeration;
 using Forms;
 using System.Text.Json;
+using DocumentFormat.OpenXml.Wordprocessing;
 
 namespace turisticky_zavod.Forms
 {
     public partial class MainWindow : Form
     {
         private readonly Database database = Database.Instance;
-        private readonly LogWindow logWindow = LogWindow.Instance;
+        private LogWindow logWindow;
 
         public MainWindow()
         {
             InitializeComponent();
-            Program.SetDoubleBuffer(dataGridView1, true);
+            Program.SetDoubleBuffer(dataGridView_runners, true);
 
             InitDatabase();
         }
@@ -26,8 +27,6 @@ namespace turisticky_zavod.Forms
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
-
-            logWindow.Show(); // TODO
         }
 
         protected override void OnClosing(CancelEventArgs e)
@@ -56,10 +55,8 @@ namespace turisticky_zavod.Forms
                 try
                 {
                     // TODO
-                    database.Database.EnsureDeleted();
-                    Log("[DATABASE] Deleting database");
+                    //database.Database.EnsureDeleted();
                     database.Database.EnsureCreated();
-                    Log("[DATABASE] Loading/creating database");
 
                     Invoke(() =>
                     {
@@ -75,15 +72,22 @@ namespace turisticky_zavod.Forms
                         database.Referee.Load();
                         toolStripProgressBar1.Value += 5;
                         database.Team.Load();
-                        toolStripProgressBar1.Value += 10;
-                        database.CheckpointAgeCategoryParticipation.Load();
                         toolStripProgressBar1.Value += 5;
+                        database.CheckpointAgeCategoryParticipation.Load();
+                        toolStripProgressBar1.Value += 10;
+                        database.Log.Load();
 
-                        dataGridView1.DataSource = database.Runner.Local.ToBindingList();
+                        logWindow = new LogWindow();
+                        logWindow.Show(); // TODO
+                        Activate();
+
+                        dataGridView_runners.DataSource = database.Runner.Local.ToBindingList();
+                        comboBox_team.DataSource = database.Team.Local.ToBindingList();
+                        comboBox_ageCategory.DataSource = database.AgeCategory.Local.ToBindingList();
                     });
 
                     timer.Stop();
-                    Log($"[DATABASE] Done loading database in {timer.ElapsedMilliseconds}ms");
+                    Log($"Database loaded in {timer.ElapsedMilliseconds}ms", "Database");
 
                     Thread.Sleep(500);
 
@@ -119,18 +123,18 @@ namespace turisticky_zavod.Forms
                         {
                             runner.StartNumber = ++i;
                         }
-                        dataGridView1.Refresh();
+                        dataGridView_runners.Refresh();
                     }
                 }
 
                 database.SaveChanges();
 
                 timer.Stop();
-                Log($"[FILES] Csv loaded and saved to database in {timer.ElapsedMilliseconds}ms");
+                Log($"Csv loaded and saved to database in {timer.ElapsedMilliseconds}ms", "Files");
             }
             catch (Exception e)
             {
-                Log($"[FILES] Failed loading csv: {e.Message}");
+                Log($"Failed loading csv: {e.Message}", "Files");
                 MessageBox.Show("Nepodaøilo se naèíst data z CSV souboru",
                     "Chyba", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
@@ -169,7 +173,7 @@ namespace turisticky_zavod.Forms
                 database.SaveChanges();
 
                 timer.Stop();
-                Log($"[FILES] Json loaded and saved to database in {timer.ElapsedMilliseconds}ms");
+                Log($"Json loaded and saved to database in {timer.ElapsedMilliseconds}ms", "Files");
             }
         }
 
@@ -232,14 +236,14 @@ namespace turisticky_zavod.Forms
             {
                 database.SaveToFile(filePath);
 
-                Log("[FILES] Database successfully saved to file");
+                Log("Database successfully saved to file", "Files");
                 toolStripStatusLabel1.Text = $"{DateTime.Now:HH:mm:ss} Soubor úspìšnì uložen";
 
                 return true;
             }
             catch (Exception e)
             {
-                Log($"[FILES] Saving database to file failed: {e.Message}");
+                Log($"Saving database to file failed: {e.Message}", "Files");
                 toolStripStatusLabel1.Text = $"{DateTime.Now:HH:mm:ss} Ukládání souboru se nepodaøilo";
 
                 return false;
@@ -263,7 +267,7 @@ namespace turisticky_zavod.Forms
             }
             catch (Exception e)
             {
-                Log($"[FILES] Failed loading json: {e.Message}");
+                Log($"Failed loading json: {e.Message}", "Files");
                 MessageBox.Show("Nepodaøilo se naèíst data z JSON souboru",
                     "Chyba", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
@@ -308,9 +312,9 @@ namespace turisticky_zavod.Forms
                             WiFiDirectConnectionRequestedEventArgs connectionEventArgs)
         {
             var request = connectionEventArgs.GetConnectionRequest();
-            Log($"[WIFI DIRECT] New Wifi connection request:");
-            Log($"[WIFI DIRECT]   Device name: {request.DeviceInformation.Name}");
-            Log($"[WIFI DIRECT]   Device kind: {request.DeviceInformation.Kind}");
+            Log($"New Wifi connection request:", "Wifi Direct");
+            Log($"  Device name: {request.DeviceInformation.Name}", "Wifi Direct");
+            Log($"  Device kind: {request.DeviceInformation.Kind}", "Wifi Direct");
 
             var connectionParams = new WiFiDirectConnectionParameters();
             var devicePairingKinds = DevicePairingKinds.None;
@@ -336,20 +340,20 @@ namespace turisticky_zavod.Forms
             if (!request.DeviceInformation.Pairing.IsPaired)
             {
                 var pairResult = await customPairing.PairAsync(devicePairingKinds, DevicePairingProtectionLevel.Default, connectionParams);
-                Log($"[WIFI DIRECT] Pairing status: {pairResult.Status}");
-                Log($"[WIFI DIRECT] Protection level: {pairResult.ProtectionLevelUsed}");
+                Log($"Pairing status: {pairResult.Status}", "Wifi Direct");
+                Log($"Protection level: {pairResult.ProtectionLevelUsed}", "Wifi Direct");
             }
             else
-                Log("[WIFI DIRECT] Device is already paired");
+                Log("Device is already paired", "Wifi Direct");
         }
 
         private void OnStatusChanged(WiFiDirectAdvertisementPublisher sender,
                         WiFiDirectAdvertisementPublisherStatusChangedEventArgs args)
         {
-            Log($"[WIFI DIRECT] Wifi status changed: {args.Status}");
+            Log($"Wifi status changed: {args.Status}", "Wifi Direct");
             if (args.Status == WiFiDirectAdvertisementPublisherStatus.Aborted)
             {
-                Log($"[WIFI DIRECT]   Error: {args.Error}");
+                Log($"  Error: {args.Error}", "Wifi Direct");
                 if (args.Error == WiFiDirectError.Success)
                     _publisher?.Start();
                 else
@@ -362,8 +366,8 @@ namespace turisticky_zavod.Forms
         {
             using var deferral = args.GetDeferral();
 
-            window.Log($"[WIFI DIRECT] Pairing kind: {args.PairingKind}");
-            window.Log($"[WIFI DIRECT] PIN: {args.Pin}");
+            window.Log($"Pairing kind: {args.PairingKind}", "Wifi Direct");
+            window.Log($"PIN: {args.Pin}", "Wifi Direct");
             switch (args.PairingKind)
             {
                 case DevicePairingKinds.DisplayPin:
@@ -371,17 +375,17 @@ namespace turisticky_zavod.Forms
                     if (pinDialog.ShowDialog() == DialogResult.OK)
                     {
                         args.Accept();
-                        window.Log("[WIFI DIRECT] Pairing accepted");
+                        window.Log("Pairing accepted", "Wifi Direct");
                     }
                     else
                     {
-                        window.Log("[WIFI DIRECT] Pairing canceled by user");
+                        window.Log("Pairing canceled by user", "Wifi Direct");
                     }
                     break;
 
                 case DevicePairingKinds.ConfirmOnly:
                     args.Accept();
-                    window.Log("[WIFI DIRECT] Pairing accepted");
+                    window.Log("Pairing accepted", "Wifi Direct");
                     break;
 
                 case DevicePairingKinds.ProvidePin:
@@ -392,16 +396,16 @@ namespace turisticky_zavod.Forms
                         if (!string.IsNullOrEmpty(pin))
                         {
                             args.Accept(pin);
-                            window.Log("[WIFI DIRECT] Pairing accepted");
+                            window.Log("Pairing accepted", "Wifi Direct");
                         }
                         else
                         {
-                            window.Log("[WIFI DIRECT] Wrong pin entered");
+                            window.Log("Wrong pin entered", "Wifi Direct");
                         }
                     }
                     else
                     {
-                        window.Log("[WIFI DIRECT] Pairing canceled by user");
+                        window.Log("Pairing canceled by user", "Wifi Direct");
                     }
                     break;
             }
@@ -409,29 +413,22 @@ namespace turisticky_zavod.Forms
 
         #endregion
 
-
         #region ToolStripMenu events
 
-        private void CSVImportToolStripMenuItem_Click(object sender, EventArgs e)
+        private void FileImportToolStripMenuItem_Click(object sender, EventArgs e)
         {
             var fileDialog = new OpenFileDialog()
             {
-                Filter = "Soubory CSV (*.csv)|*.csv",
+                Filter = "Soubory CSV nebo JSON (*.csv, *.json)|*.csv;*.json",
                 Multiselect = false
             };
             if (fileDialog.ShowDialog() == DialogResult.OK)
-                AddRunnersCSV(fileDialog.FileName);
-        }
-
-        private void JSONImportToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            var fileDialog = new OpenFileDialog()
             {
-                Filter = "Soubory JSON (*.json)|*.json",
-                Multiselect = false
-            };
-            if (fileDialog.ShowDialog() == DialogResult.OK)
-                DetermineJsonLoadingWay(fileDialog.FileName);
+                if (fileDialog.FileName[(fileDialog.FileName.LastIndexOf('.') + 1)..].ToLower() == "csv")
+                    DetermineJsonLoadingWay(fileDialog.FileName);
+                else
+                    AddRunnersCSV(fileDialog.FileName);
+            }
         }
 
         private void NFCImportToolStripMenuItem_Click(object sender, EventArgs e)
@@ -445,7 +442,11 @@ namespace turisticky_zavod.Forms
             }
         }
 
-        private void AgeCategoriesToolStripMenuItem_Click(object sender, EventArgs e) => new AgeCategoriesEditor().ShowDialog();
+        private void AgeCategoriesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            new AgeCategoriesEditor().ShowDialog();
+            dataGridView_runners.Refresh();
+        }
 
         private void TestWifiToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -469,28 +470,114 @@ namespace turisticky_zavod.Forms
 
         #endregion
 
+        #region Button events
 
-        #region DataGridView events
-
-        private void DataGridView_KeyDown(object sender, KeyEventArgs e)
+        private void Button_Save_Click(object sender, EventArgs e)
         {
-            if (e.KeyCode == Keys.Escape)
+            if (ValidateChildren(ValidationConstraints.Enabled))
             {
-                dataGridView1.ClearSelection();
-                dataGridView1.CurrentCell = null;
+                var ids = database.Runner.Local.Where(r => r.StartNumber.HasValue);
+
+                var edit = button_save.Text == "Upravit";
+
+                var startNumber = !string.IsNullOrEmpty(textBox_startNumber.Text)
+                                   ? int.Parse(textBox_startNumber.Text)
+                                   : (ids.Any() ? ids.Max(r => r.StartNumber!.Value) : 1);
+                var name = textBox_name.Text.Trim();
+                var birthYear = int.Parse(textBox_birthYear.Text);
+                var team = (Team)comboBox_team.SelectedItem ?? new Team() { Name = comboBox_team.Text };
+                var ageCategory = (AgeCategory)comboBox_ageCategory.SelectedItem;
+                var partnerName = textBox_name_partner.Text.Trim();
+
+                if (!edit && database.Runner.Local.Any(x => x.StartNumber.HasValue && x.StartNumber.Value == startNumber))
+                {
+                    MessageBox.Show($"Bìžec se startovním èíslem {startNumber} již existuje",
+                        "Chyba", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                Runner runner;
+
+                if (edit)
+                    runner = (Runner)dataGridView_runners.CurrentRow.DataBoundItem;
+                else
+                    runner = new Runner();
+
+                runner.StartNumber = startNumber;
+                runner.Name = name;
+                runner.BirthYear = birthYear;
+                runner.Team = team;
+                runner.AgeCategory = ageCategory;
+
+                if (!string.IsNullOrEmpty(partnerName))
+                {
+                    runner.Partner = database.Partner.ToList()
+                                             .FirstOrDefault(x => x.Name == partnerName, null)
+                                              ?? new()
+                                              {
+                                                  Name = partnerName,
+                                                  BirthYear = int.Parse(textBox_birthYear_partner.Text)
+                                              };
+                }
+                else
+                    runner.Partner = null;
+
+                if (edit)
+                    database.Runner.Update(runner);
+                else
+                    database.Runner.Add(runner);
+
+                database.SaveChanges();
+
+                ClearInputs();
+                dataGridView_runners.Refresh();
             }
         }
 
-        private void DataGridView_RowsAdded(object sender, DataGridViewRowsAddedEventArgs e)
+        #endregion
+
+        #region DataGridView events
+
+        private void DataGridView_Runners_CurrentCellChanged(object sender, EventArgs e)
         {
-            foreach (DataGridViewRow row in dataGridView1.Rows)
+            if (dataGridView_runners.CurrentRow != null)
+            {
+                var runner = (Runner)dataGridView_runners.CurrentRow.DataBoundItem;
+
+                textBox_startNumber.Text = runner.StartNumber?.ToString() ?? string.Empty;
+                textBox_name.Text = runner.Name;
+                textBox_birthYear.Text = runner.BirthYear?.ToString() ?? string.Empty;
+                comboBox_team.SelectedItem = runner.Team;
+                comboBox_ageCategory.SelectedItem = runner.AgeCategory;
+                textBox_name_partner.Text = runner.Partner?.Name ?? string.Empty;
+                textBox_birthYear_partner.Text = runner.Partner?.BirthYear?.ToString() ?? string.Empty;
+
+                button_save.Text = "Upravit";
+            }
+        }
+
+        private void DataGridView_Runners_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Escape)
+            {
+                dataGridView_runners.ClearSelection();
+                dataGridView_runners.CurrentCell = null;
+                ClearInputs();
+                ClearAllErrors();
+            }
+        }
+
+        private void DataGridView_Runners_RowsAdded(object sender, DataGridViewRowsAddedEventArgs e)
+        {
+            foreach (DataGridViewRow row in dataGridView_runners.Rows)
             {
                 row.HeaderCell.Value = (row.Index + 1).ToString();
                 //row.HeaderCell.Value = ((BindingList<Runner>)dataGridView1.DataSource)[row.Index].ID.ToString();
             }
+            ClearInputs();
         }
 
-        private void DataGridView_DragEnter(object sender, DragEventArgs e)
+        private void DataGridView_Runners_DragEnter(object sender, DragEventArgs e)
         {
             Activate();
 
@@ -500,13 +587,13 @@ namespace turisticky_zavod.Forms
                 e.Effect = DragDropEffects.None;
         }
 
-        private void DataGridView_DragDrop(object sender, DragEventArgs e)
+        private void DataGridView_Runners_DragDrop(object sender, DragEventArgs e)
         {
             if (e.Data != null)
             {
                 var filepath = ((string[])e.Data.GetData(DataFormats.FileDrop))[0];
 
-                switch (filepath.Split('.').Last().ToLower())
+                switch (filepath[(filepath.LastIndexOf('.') + 1)..].ToLower())
                 {
                     case "json":
                         if (MessageBox.Show("Chcete naèíst data z JSON souboru?",
@@ -533,11 +620,202 @@ namespace turisticky_zavod.Forms
 
         #endregion
 
+        #region TextBox events
 
-        public void Log(string text)
+        private void TextBox_Name_Validating(object sender, CancelEventArgs e)
         {
-            if (!logWindow.IsDisposed)
-                logWindow.Log(text);
+            var name = textBox_name.Text.Trim();
+
+            if (string.IsNullOrEmpty(name))
+            {
+                e.Cancel = true;
+                errorProvider.SetError((TextBox)sender, "Jméno je povinná položka");
+            }
+            else if (name.Split(' ').Length < 2)
+            {
+                e.Cancel = true;
+                errorProvider.SetError((TextBox)sender, "Vyplòte jméno i pøíjmení, oddìlené mezerou");
+            }
+            else
+                errorProvider.SetError((TextBox)sender, string.Empty);
+        }
+
+        private void TextBox_BirthYear_Validating(object sender, CancelEventArgs e)
+        {
+            if (string.IsNullOrEmpty(textBox_birthYear.Text))
+            {
+                e.Cancel = true;
+                errorProvider.SetError((TextBox)sender, "Roèník je povinná položka");
+            }
+            else
+            {
+                var year = int.Parse(textBox_birthYear.Text);
+                if ((year >= 100 && year <= 1900) || year > DateTime.Now.Year)
+                {
+                    e.Cancel = true;
+                    errorProvider.SetError((TextBox)sender, "Roèník je ve špatném formátu, podporované jsou celé roky nebo poslední dvojèíslí");
+                }
+                else
+                    errorProvider.SetError((TextBox)sender, string.Empty);
+            }
+        }
+
+        private void ComboBox_Team_Validating(object sender, CancelEventArgs e)
+        {
+            if (!(!string.IsNullOrEmpty(comboBox_team.Text) || comboBox_team.SelectedIndex > -1))
+            {
+                e.Cancel = true;
+                errorProvider.SetError((ComboBox)sender, "Oddíl je povinná položka");
+            }
+            else
+                errorProvider.SetError((ComboBox)sender, string.Empty);
+        }
+
+        private void ComboBox_AgeCategory_Validating(object sender, CancelEventArgs e)
+        {
+            if (comboBox_ageCategory.SelectedIndex == -1)
+            {
+                e.Cancel = true;
+                errorProvider.SetError((ComboBox)sender, "Vìková kategorie je povinná položka");
+            }
+            else
+                errorProvider.SetError((ComboBox)sender, string.Empty);
+        }
+
+        private void TextBox_Name_Partner_Validating(object sender, CancelEventArgs e)
+        {
+            var name = textBox_name_partner.Text.Trim();
+
+            if (!string.IsNullOrEmpty(name) && name.Split(' ').Length < 2)
+            {
+                e.Cancel = true;
+                errorProvider.SetError((TextBox)sender, "Vyplòte jméno i pøíjmení, oddìlené mezerou");
+            }
+            else if (string.IsNullOrEmpty(name) && !string.IsNullOrEmpty(textBox_birthYear_partner.Text))
+            {
+                e.Cancel = true;
+                errorProvider.SetError((TextBox)sender, "Povinné je jméno i roèník");
+            }
+            else
+                errorProvider.SetError((TextBox)sender, string.Empty);
+        }
+
+        private void TextBox_BirthYear_Partner_Validating(object sender, CancelEventArgs e)
+        {
+            if (!string.IsNullOrEmpty(textBox_birthYear_partner.Text))
+            {
+                var year = int.Parse(textBox_birthYear_partner.Text);
+                if ((year >= 100 && year <= 1900) || year > DateTime.Now.Year)
+                {
+                    e.Cancel = true;
+                    errorProvider.SetError((TextBox)sender, "Roèník je ve špatném formátu, podporované jsou celé roky nebo poslední dvojèíslí");
+                }
+                else
+                    errorProvider.SetError((TextBox)sender, string.Empty);
+            }
+            else if (!string.IsNullOrEmpty(textBox_name_partner.Text))
+            {
+                e.Cancel = true;
+                errorProvider.SetError((TextBox)sender, "Povinné je jméno i roèník");
+            }
+            else
+                errorProvider.SetError((TextBox)sender, string.Empty);
+        }
+
+        private void TextBox_StartNumber_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+                e.SuppressKeyPress = false;
+            else if (HandleNumberOnlyField(e))
+                e.SuppressKeyPress = true;
+        }
+
+        private void TextBox_BirthYear_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+                e.SuppressKeyPress = false;
+            else if (HandleNumberOnlyField(e))
+                e.SuppressKeyPress = true;
+        }
+
+        private void TextBox_BirthYear_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (int.TryParse(textBox_birthYear.Text, out int year))
+            {
+                var duo = !string.IsNullOrEmpty(textBox_name_partner.Text);
+                var category = Data.AgeCategory.GetByBirthYear(year, duo);
+                comboBox_ageCategory.SelectedItem = category;
+            }
+        }
+
+        private void TextBox_BirthYear_Partner_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+                e.SuppressKeyPress = false;
+            else if (HandleNumberOnlyField(e))
+                e.SuppressKeyPress = true;
+        }
+
+        private void TextBox_Name_Partner_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (textBox_name_partner.Text.Length <= 1 && !string.IsNullOrEmpty(textBox_birthYear.Text))
+            {
+                if (int.TryParse(textBox_birthYear.Text, out int year))
+                {
+                    var duo = !string.IsNullOrEmpty(textBox_name_partner.Text);
+                    var category = Data.AgeCategory.GetByBirthYear(year, duo);
+                    comboBox_ageCategory.SelectedItem = category;
+                }
+            }
+        }
+
+        #endregion
+
+        private void ClearInputs()
+        {
+            textBox_startNumber.Clear();
+            textBox_name.Clear();
+            textBox_birthYear.Clear();
+            comboBox_team.SelectedIndex = -1;
+            comboBox_ageCategory.SelectedIndex = -1;
+            textBox_name_partner.Clear();
+            textBox_birthYear_partner.Clear();
+
+            button_save.Text = "Pøidat";
+        }
+
+        private void ClearAllErrors()
+        {
+            errorProvider.SetError(textBox_name, string.Empty);
+            errorProvider.SetError(textBox_name, string.Empty);
+            errorProvider.SetError(textBox_birthYear, string.Empty);
+            errorProvider.SetError(comboBox_team, string.Empty);
+            errorProvider.SetError(comboBox_ageCategory, string.Empty);
+            errorProvider.SetError(textBox_name_partner, string.Empty);
+            errorProvider.SetError(textBox_birthYear_partner, string.Empty);
+        }
+
+        private static bool HandleNumberOnlyField(KeyEventArgs e)
+            => !((e.KeyCode >= Keys.NumPad0 && e.KeyCode <= Keys.NumPad9)
+                || (e.Shift && e.KeyCode >= Keys.D0 && e.KeyCode <= Keys.D9)
+                || e.KeyCode == Keys.Back || e.KeyCode == Keys.Delete
+                || e.KeyCode == Keys.Left || e.KeyCode == Keys.Right);
+
+        public void Log(string message, string type)
+        {
+            try
+            {
+                Invoke(() =>
+                {
+                    database.Log.Add(new Log
+                    {
+                        Message = message,
+                        Type = type
+                    });
+                    database.SaveChanges();
+                });
+            }
+            catch (ObjectDisposedException) { }
         }
     }
 }
