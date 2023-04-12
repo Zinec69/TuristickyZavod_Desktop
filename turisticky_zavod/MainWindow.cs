@@ -946,13 +946,20 @@ namespace turisticky_zavod.Forms
 
         }
 
-        private void DataGridView_RunnerCheckpoints_CellEndEdit(object sender, DataGridViewCellEventArgs e)
+        private void DataGridView_RunnerCheckpoints_CellBeginEdit(object sender, DataGridViewCellCancelEventArgs e)
         {
             var checkpointID = ((CheckpointRunnerInfo)dataGridView_runnerCheckpoints.Rows[e.RowIndex].DataBoundItem).CheckpointID;
-            if (checkpointID is not 3 and not 5 and not 6 and not 2 and not 8 and not 13)
+            if (checkpointID is not 2 and not 3 and not 5 and not 6 and not 8 and not 13)
             {
-
+                e.Cancel = true;
+                MessageBox.Show("V tomto stanovišti nelze diskvalifikovat",
+                    "Chyba", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        private void DataGridView_RunnerCheckpoints_CellEndEdit(object sender, DataGridViewCellEventArgs e)
+        {
+            
         }
 
         private void DataGridView_RunnerCheckpoints_RowsAdded(object sender, DataGridViewRowsAddedEventArgs e)
@@ -961,11 +968,6 @@ namespace turisticky_zavod.Forms
             {
                 row.HeaderCell.Value = (row.Index + 1).ToString();
             }
-        }
-
-        private void DataGridView_RunnerCheckpoints_CellBeginEdit(object sender, DataGridViewCellCancelEventArgs e)
-        {
-
         }
     }
 }
