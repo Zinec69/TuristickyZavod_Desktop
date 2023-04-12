@@ -48,7 +48,12 @@ namespace turisticky_zavod.Data
                     }
                     else
                     {
-                        runner.AgeCategory = runner.BirthYear.HasValue ? AgeCategory.GetByBirthYear(runner.BirthYear.Value, runner.Partner != null) : null;
+                        runner.AgeCategory = runner.BirthYear.HasValue
+                            ? (runner.Partner == null
+                                    ? AgeCategory.GetByBirthYear(runner.BirthYear.Value)
+                                    : AgeCategory.GetByBirthYear(runner.BirthYear.Value, CategoryType.DUOS,
+                                        runner.Partner!.BirthYear.HasValue ? runner.Partner?.BirthYear.Value : null))
+                            : null;
                     }
 
                     runners.Add(runner);

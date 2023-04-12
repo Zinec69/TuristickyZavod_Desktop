@@ -16,5 +16,7 @@ namespace turisticky_zavod.Data
         [ForeignKey(nameof(RefereeID))]
         [DeleteBehavior(DeleteBehavior.SetNull)]
         public virtual Referee? Referee { get; set; }
+
+        public override string ToString() => Name;
     }
 }

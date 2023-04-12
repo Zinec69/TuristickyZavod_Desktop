@@ -23,10 +23,5 @@ namespace turisticky_zavod.Data
         public virtual AgeCategory AgeCategory { get; set; }
 
         public bool IsParticipating { get; set; }
-
-
-        [NotMapped]
-        [JsonIgnore]
-        public string CheckpointName { get => Checkpoint.Name; }
     }
 }

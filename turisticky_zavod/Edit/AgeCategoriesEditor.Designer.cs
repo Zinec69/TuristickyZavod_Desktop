@@ -29,13 +29,14 @@
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
+            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
             dataGridView_categories = new DataGridView();
             dataGridViewTextBoxColumn6 = new DataGridViewTextBoxColumn();
             dataGridViewTextBoxColumn7 = new DataGridViewTextBoxColumn();
             dataGridViewTextBoxColumn8 = new DataGridViewTextBoxColumn();
             dataGridViewTextBoxColumn9 = new DataGridViewTextBoxColumn();
+            TypeString = new DataGridViewTextBoxColumn();
             dataGridViewTextBoxColumn10 = new DataGridViewTextBoxColumn();
-            dataGridViewCheckBoxColumn2 = new DataGridViewCheckBoxColumn();
             ageCategoryBindingSource = new BindingSource(components);
             dataGridViewTextBoxColumn1 = new DataGridViewTextBoxColumn();
             dataGridViewTextBoxColumn2 = new DataGridViewTextBoxColumn();
@@ -44,36 +45,44 @@
             dataGridViewTextBoxColumn5 = new DataGridViewTextBoxColumn();
             dataGridViewCheckBoxColumn1 = new DataGridViewCheckBoxColumn();
             groupBox_categories = new GroupBox();
-            groupBox_edit = new GroupBox();
+            groupBox_edit_category = new GroupBox();
+            label_type = new Label();
+            comboBox_type = new ComboBox();
             textBox_color = new TextBox();
-            label5 = new Label();
-            checkBox_duo = new CheckBox();
-            label4 = new Label();
+            label_color = new Label();
+            label_ageMax = new Label();
             textBox_ageMax = new TextBox();
-            label3 = new Label();
-            label2 = new Label();
+            label_ageMin = new Label();
+            label_code = new Label();
             textBox_ageMin = new TextBox();
             textBox_code = new TextBox();
-            label1 = new Label();
-            textBox_name = new TextBox();
-            button_save = new Button();
-            errorProvider = new ErrorProvider(components);
+            label_name_category = new Label();
+            textBox_name_category = new TextBox();
+            button_save_category = new Button();
+            errorProvider_category = new ErrorProvider(components);
+            textBox_name_checkpoint = new TextBox();
             groupBox_checkpoints = new GroupBox();
             dataGridView_checkpoints = new DataGridView();
-            dataGridViewTextBoxColumn11 = new DataGridViewTextBoxColumn();
+            Checkpoint = new DataGridViewTextBoxColumn();
             dataGridViewCheckBoxColumn3 = new DataGridViewCheckBoxColumn();
             checkpointAgeCategoryParticipationBindingSource = new BindingSource(components);
             statusStrip1 = new StatusStrip();
             toolStripStatusLabel = new ToolStripStatusLabel();
+            groupBox_edit_checkpoint = new GroupBox();
+            label_name_checkpoint = new Label();
+            button_save_checkpoint = new Button();
+            errorProvider_checkpoint = new ErrorProvider(components);
             ((System.ComponentModel.ISupportInitialize)dataGridView_categories).BeginInit();
             ((System.ComponentModel.ISupportInitialize)ageCategoryBindingSource).BeginInit();
             groupBox_categories.SuspendLayout();
-            groupBox_edit.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)errorProvider).BeginInit();
+            groupBox_edit_category.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)errorProvider_category).BeginInit();
             groupBox_checkpoints.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dataGridView_checkpoints).BeginInit();
             ((System.ComponentModel.ISupportInitialize)checkpointAgeCategoryParticipationBindingSource).BeginInit();
             statusStrip1.SuspendLayout();
+            groupBox_edit_checkpoint.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)errorProvider_checkpoint).BeginInit();
             SuspendLayout();
             // 
             // dataGridView_categories
@@ -84,7 +93,7 @@
             dataGridView_categories.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             dataGridView_categories.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.DisplayedCells;
             dataGridView_categories.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridView_categories.Columns.AddRange(new DataGridViewColumn[] { dataGridViewTextBoxColumn6, dataGridViewTextBoxColumn7, dataGridViewTextBoxColumn8, dataGridViewTextBoxColumn9, dataGridViewTextBoxColumn10, dataGridViewCheckBoxColumn2 });
+            dataGridView_categories.Columns.AddRange(new DataGridViewColumn[] { dataGridViewTextBoxColumn6, dataGridViewTextBoxColumn7, dataGridViewTextBoxColumn8, dataGridViewTextBoxColumn9, TypeString, dataGridViewTextBoxColumn10 });
             dataGridView_categories.DataSource = ageCategoryBindingSource;
             dataGridView_categories.Location = new Point(6, 22);
             dataGridView_categories.MultiSelect = false;
@@ -93,7 +102,7 @@
             dataGridView_categories.RowHeadersWidth = 50;
             dataGridView_categories.RowTemplate.Height = 25;
             dataGridView_categories.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dataGridView_categories.Size = new Size(718, 251);
+            dataGridView_categories.Size = new Size(779, 327);
             dataGridView_categories.TabIndex = 0;
             dataGridView_categories.CurrentCellChanged += DataGridView_AgeCategories_CurrentCellChanged;
             dataGridView_categories.RowsAdded += DataGridView_AgeCategories_RowsAdded;
@@ -128,9 +137,18 @@
             // dataGridViewTextBoxColumn9
             // 
             dataGridViewTextBoxColumn9.DataPropertyName = "AgeMax";
+            dataGridViewCellStyle1.NullValue = "-";
+            dataGridViewTextBoxColumn9.DefaultCellStyle = dataGridViewCellStyle1;
             dataGridViewTextBoxColumn9.HeaderText = "Věk do";
             dataGridViewTextBoxColumn9.Name = "dataGridViewTextBoxColumn9";
             dataGridViewTextBoxColumn9.ReadOnly = true;
+            // 
+            // TypeString
+            // 
+            TypeString.DataPropertyName = "TypeString";
+            TypeString.HeaderText = "Typ";
+            TypeString.Name = "TypeString";
+            TypeString.ReadOnly = true;
             // 
             // dataGridViewTextBoxColumn10
             // 
@@ -138,13 +156,6 @@
             dataGridViewTextBoxColumn10.HeaderText = "Barva";
             dataGridViewTextBoxColumn10.Name = "dataGridViewTextBoxColumn10";
             dataGridViewTextBoxColumn10.ReadOnly = true;
-            // 
-            // dataGridViewCheckBoxColumn2
-            // 
-            dataGridViewCheckBoxColumn2.DataPropertyName = "Duo";
-            dataGridViewCheckBoxColumn2.HeaderText = "Dvojice";
-            dataGridViewCheckBoxColumn2.Name = "dataGridViewCheckBoxColumn2";
-            dataGridViewCheckBoxColumn2.ReadOnly = true;
             // 
             // ageCategoryBindingSource
             // 
@@ -180,162 +191,184 @@
             groupBox_categories.Controls.Add(dataGridView_categories);
             groupBox_categories.Location = new Point(12, 111);
             groupBox_categories.Name = "groupBox_categories";
-            groupBox_categories.Size = new Size(730, 279);
+            groupBox_categories.Size = new Size(791, 355);
             groupBox_categories.TabIndex = 8;
             groupBox_categories.TabStop = false;
             groupBox_categories.Text = "Věkové kategorie";
             // 
-            // groupBox_edit
+            // groupBox_edit_category
             // 
-            groupBox_edit.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            groupBox_edit.Controls.Add(textBox_color);
-            groupBox_edit.Controls.Add(label5);
-            groupBox_edit.Controls.Add(checkBox_duo);
-            groupBox_edit.Controls.Add(label4);
-            groupBox_edit.Controls.Add(textBox_ageMax);
-            groupBox_edit.Controls.Add(label3);
-            groupBox_edit.Controls.Add(label2);
-            groupBox_edit.Controls.Add(textBox_ageMin);
-            groupBox_edit.Controls.Add(textBox_code);
-            groupBox_edit.Controls.Add(label1);
-            groupBox_edit.Controls.Add(textBox_name);
-            groupBox_edit.Controls.Add(button_save);
-            groupBox_edit.Location = new Point(12, 12);
-            groupBox_edit.Name = "groupBox_edit";
-            groupBox_edit.Size = new Size(730, 93);
-            groupBox_edit.TabIndex = 9;
-            groupBox_edit.TabStop = false;
-            groupBox_edit.Text = "Přidat/upravit kategorii";
+            groupBox_edit_category.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            groupBox_edit_category.Controls.Add(label_type);
+            groupBox_edit_category.Controls.Add(comboBox_type);
+            groupBox_edit_category.Controls.Add(textBox_color);
+            groupBox_edit_category.Controls.Add(label_color);
+            groupBox_edit_category.Controls.Add(label_ageMax);
+            groupBox_edit_category.Controls.Add(textBox_ageMax);
+            groupBox_edit_category.Controls.Add(label_ageMin);
+            groupBox_edit_category.Controls.Add(label_code);
+            groupBox_edit_category.Controls.Add(textBox_ageMin);
+            groupBox_edit_category.Controls.Add(textBox_code);
+            groupBox_edit_category.Controls.Add(label_name_category);
+            groupBox_edit_category.Controls.Add(textBox_name_category);
+            groupBox_edit_category.Controls.Add(button_save_category);
+            groupBox_edit_category.Location = new Point(12, 12);
+            groupBox_edit_category.Name = "groupBox_edit_category";
+            groupBox_edit_category.Size = new Size(791, 93);
+            groupBox_edit_category.TabIndex = 9;
+            groupBox_edit_category.TabStop = false;
+            groupBox_edit_category.Text = "Přidat/upravit kategorii";
+            // 
+            // label_type
+            // 
+            label_type.AutoSize = true;
+            label_type.Location = new Point(536, 26);
+            label_type.Name = "label_type";
+            label_type.Size = new Size(30, 15);
+            label_type.TabIndex = 18;
+            label_type.Text = "Typ*";
+            // 
+            // comboBox_type
+            // 
+            comboBox_type.DropDownStyle = ComboBoxStyle.DropDownList;
+            comboBox_type.FormattingEnabled = true;
+            comboBox_type.Items.AddRange(new object[] { "Klasický", "Dvojice", "Štafety" });
+            comboBox_type.Location = new Point(536, 44);
+            comboBox_type.Name = "comboBox_type";
+            comboBox_type.Size = new Size(114, 23);
+            comboBox_type.TabIndex = 5;
             // 
             // textBox_color
             // 
-            errorProvider.SetIconAlignment(textBox_color, ErrorIconAlignment.MiddleLeft);
-            textBox_color.Location = new Point(434, 44);
+            errorProvider_category.SetIconAlignment(textBox_color, ErrorIconAlignment.MiddleLeft);
+            textBox_color.Location = new Point(449, 44);
+            textBox_color.Margin = new Padding(3, 3, 16, 3);
             textBox_color.Name = "textBox_color";
             textBox_color.Size = new Size(68, 23);
             textBox_color.TabIndex = 4;
-            textBox_color.KeyPress += TextBox_Color_KeyPress;
-            textBox_color.Validating += TextBox_Color_Validating;
+            textBox_color.KeyPress += TextBox_AgeCategory_Color_KeyPress;
             // 
-            // label5
+            // label_color
             // 
-            label5.AutoSize = true;
-            label5.Location = new Point(434, 26);
-            label5.Name = "label5";
-            label5.Size = new Size(41, 15);
-            label5.TabIndex = 16;
-            label5.Text = "Barva*";
+            label_color.AutoSize = true;
+            label_color.Location = new Point(449, 26);
+            label_color.Name = "label_color";
+            label_color.Size = new Size(41, 15);
+            label_color.TabIndex = 16;
+            label_color.Text = "Barva*";
             // 
-            // checkBox_duo
+            // label_ageMax
             // 
-            checkBox_duo.AutoSize = true;
-            checkBox_duo.Location = new Point(521, 40);
-            checkBox_duo.Name = "checkBox_duo";
-            checkBox_duo.Size = new Size(65, 19);
-            checkBox_duo.TabIndex = 5;
-            checkBox_duo.Text = "Dvojice";
-            checkBox_duo.UseVisualStyleBackColor = true;
-            // 
-            // label4
-            // 
-            label4.AutoSize = true;
-            label4.Location = new Point(365, 26);
-            label4.Name = "label4";
-            label4.Size = new Size(42, 15);
-            label4.TabIndex = 13;
-            label4.Text = "Věk do";
+            label_ageMax.AutoSize = true;
+            label_ageMax.Location = new Point(376, 26);
+            label_ageMax.Name = "label_ageMax";
+            label_ageMax.Size = new Size(42, 15);
+            label_ageMax.TabIndex = 13;
+            label_ageMax.Text = "Věk do";
             // 
             // textBox_ageMax
             // 
-            errorProvider.SetIconAlignment(textBox_ageMax, ErrorIconAlignment.MiddleLeft);
-            textBox_ageMax.Location = new Point(365, 44);
+            errorProvider_category.SetIconAlignment(textBox_ageMax, ErrorIconAlignment.MiddleLeft);
+            textBox_ageMax.Location = new Point(376, 44);
+            textBox_ageMax.Margin = new Padding(3, 3, 16, 3);
             textBox_ageMax.Name = "textBox_ageMax";
             textBox_ageMax.Size = new Size(54, 23);
             textBox_ageMax.TabIndex = 3;
-            textBox_ageMax.KeyDown += TextBox_AgeMax_KeyDown;
-            textBox_ageMax.KeyPress += TextBox_AgeMax_KeyPress;
-            textBox_ageMax.Validating += TextBox_AgeMax_Validating;
+            textBox_ageMax.KeyDown += TextBox_AgeCategory_AgeMax_KeyDown;
+            textBox_ageMax.KeyPress += TextBox_AgeCategory_AgeMax_KeyPress;
             // 
-            // label3
+            // label_ageMin
             // 
-            label3.AutoSize = true;
-            label3.Location = new Point(296, 26);
-            label3.Name = "label3";
-            label3.Size = new Size(47, 15);
-            label3.TabIndex = 11;
-            label3.Text = "Věk od*";
+            label_ageMin.AutoSize = true;
+            label_ageMin.Location = new Point(303, 26);
+            label_ageMin.Name = "label_ageMin";
+            label_ageMin.Size = new Size(47, 15);
+            label_ageMin.TabIndex = 11;
+            label_ageMin.Text = "Věk od*";
             // 
-            // label2
+            // label_code
             // 
-            label2.AutoSize = true;
-            label2.Location = new Point(188, 26);
-            label2.Name = "label2";
-            label2.Size = new Size(51, 15);
-            label2.TabIndex = 4;
-            label2.Text = "Zkratka*";
+            label_code.AutoSize = true;
+            label_code.Location = new Point(191, 26);
+            label_code.Name = "label_code";
+            label_code.Size = new Size(51, 15);
+            label_code.TabIndex = 4;
+            label_code.Text = "Zkratka*";
             // 
             // textBox_ageMin
             // 
-            errorProvider.SetIconAlignment(textBox_ageMin, ErrorIconAlignment.MiddleLeft);
-            textBox_ageMin.Location = new Point(296, 44);
+            errorProvider_category.SetIconAlignment(textBox_ageMin, ErrorIconAlignment.MiddleLeft);
+            textBox_ageMin.Location = new Point(303, 44);
+            textBox_ageMin.Margin = new Padding(3, 3, 16, 3);
             textBox_ageMin.Name = "textBox_ageMin";
             textBox_ageMin.Size = new Size(54, 23);
             textBox_ageMin.TabIndex = 2;
-            textBox_ageMin.KeyDown += TextBox_AgeMin_KeyDown;
-            textBox_ageMin.KeyPress += TextBox_AgeMin_KeyPress;
-            textBox_ageMin.Validating += TextBox_AgeMin_Validating;
+            textBox_ageMin.KeyDown += TextBox_AgeCategory_AgeMin_KeyDown;
+            textBox_ageMin.KeyPress += TextBox_AgeCategory_AgeMin_KeyPress;
             // 
             // textBox_code
             // 
-            errorProvider.SetIconAlignment(textBox_code, ErrorIconAlignment.MiddleLeft);
-            textBox_code.Location = new Point(188, 44);
+            errorProvider_category.SetIconAlignment(textBox_code, ErrorIconAlignment.MiddleLeft);
+            textBox_code.Location = new Point(191, 44);
+            textBox_code.Margin = new Padding(3, 3, 16, 3);
             textBox_code.Name = "textBox_code";
             textBox_code.Size = new Size(93, 23);
             textBox_code.TabIndex = 1;
-            textBox_code.KeyPress += TextBox_Code_KeyPress;
-            textBox_code.Validating += TextBox_Code_Validating;
+            textBox_code.KeyPress += TextBox_AgeCategory_Code_KeyPress;
             // 
-            // label1
+            // label_name_category
             // 
-            label1.AutoSize = true;
-            label1.Location = new Point(20, 26);
-            label1.Name = "label1";
-            label1.Size = new Size(44, 15);
-            label1.TabIndex = 2;
-            label1.Text = "Název*";
+            label_name_category.AutoSize = true;
+            label_name_category.Location = new Point(20, 26);
+            label_name_category.Name = "label_name_category";
+            label_name_category.Size = new Size(44, 15);
+            label_name_category.TabIndex = 2;
+            label_name_category.Text = "Název*";
             // 
-            // textBox_name
+            // textBox_name_category
             // 
-            errorProvider.SetIconAlignment(textBox_name, ErrorIconAlignment.MiddleLeft);
-            textBox_name.Location = new Point(20, 44);
-            textBox_name.Name = "textBox_name";
-            textBox_name.Size = new Size(152, 23);
-            textBox_name.TabIndex = 0;
-            textBox_name.KeyPress += TextBox_Name_KeyPress;
-            textBox_name.Validating += TextBox_Name_Validating;
+            errorProvider_category.SetIconAlignment(textBox_name_category, ErrorIconAlignment.MiddleLeft);
+            textBox_name_category.Location = new Point(20, 44);
+            textBox_name_category.Margin = new Padding(3, 3, 16, 3);
+            textBox_name_category.Name = "textBox_name_category";
+            textBox_name_category.Size = new Size(152, 23);
+            textBox_name_category.TabIndex = 0;
+            textBox_name_category.KeyPress += TextBox_AgeCategory_Name_KeyPress;
             // 
-            // button_save
+            // button_save_category
             // 
-            button_save.Location = new Point(622, 34);
-            button_save.Name = "button_save";
-            button_save.Size = new Size(90, 33);
-            button_save.TabIndex = 6;
-            button_save.Text = "Přidat";
-            button_save.UseVisualStyleBackColor = true;
-            button_save.Click += Button_Save_Click;
+            button_save_category.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            button_save_category.Location = new Point(683, 34);
+            button_save_category.Margin = new Padding(3, 3, 15, 3);
+            button_save_category.Name = "button_save_category";
+            button_save_category.Size = new Size(90, 33);
+            button_save_category.TabIndex = 6;
+            button_save_category.Text = "Přidat";
+            button_save_category.UseVisualStyleBackColor = true;
+            button_save_category.Click += Button_AgeCategory_Save_Click;
             // 
-            // errorProvider
+            // errorProvider_category
             // 
-            errorProvider.BlinkStyle = ErrorBlinkStyle.NeverBlink;
-            errorProvider.ContainerControl = this;
+            errorProvider_category.BlinkStyle = ErrorBlinkStyle.NeverBlink;
+            errorProvider_category.ContainerControl = this;
+            // 
+            // textBox_name_checkpoint
+            // 
+            errorProvider_category.SetIconAlignment(textBox_name_checkpoint, ErrorIconAlignment.MiddleLeft);
+            textBox_name_checkpoint.Location = new Point(23, 44);
+            textBox_name_checkpoint.Margin = new Padding(3, 3, 16, 3);
+            textBox_name_checkpoint.Name = "textBox_name_checkpoint";
+            textBox_name_checkpoint.Size = new Size(187, 23);
+            textBox_name_checkpoint.TabIndex = 7;
+            textBox_name_checkpoint.KeyPress += TextBox_Name_Checkpoint_KeyPress;
             // 
             // groupBox_checkpoints
             // 
-            groupBox_checkpoints.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            groupBox_checkpoints.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
             groupBox_checkpoints.Controls.Add(dataGridView_checkpoints);
-            groupBox_checkpoints.Location = new Point(12, 396);
+            groupBox_checkpoints.Location = new Point(809, 111);
             groupBox_checkpoints.Name = "groupBox_checkpoints";
-            groupBox_checkpoints.Size = new Size(730, 299);
+            groupBox_checkpoints.Size = new Size(368, 355);
             groupBox_checkpoints.TabIndex = 11;
             groupBox_checkpoints.TabStop = false;
             groupBox_checkpoints.Text = "Stanoviště";
@@ -343,31 +376,33 @@
             // dataGridView_checkpoints
             // 
             dataGridView_checkpoints.AllowUserToAddRows = false;
-            dataGridView_checkpoints.AllowUserToDeleteRows = false;
             dataGridView_checkpoints.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             dataGridView_checkpoints.AutoGenerateColumns = false;
             dataGridView_checkpoints.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.DisplayedCells;
             dataGridView_checkpoints.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridView_checkpoints.Columns.AddRange(new DataGridViewColumn[] { dataGridViewTextBoxColumn11, dataGridViewCheckBoxColumn3 });
+            dataGridView_checkpoints.Columns.AddRange(new DataGridViewColumn[] { Checkpoint, dataGridViewCheckBoxColumn3 });
             dataGridView_checkpoints.DataSource = checkpointAgeCategoryParticipationBindingSource;
             dataGridView_checkpoints.Location = new Point(6, 22);
+            dataGridView_checkpoints.MultiSelect = false;
             dataGridView_checkpoints.Name = "dataGridView_checkpoints";
             dataGridView_checkpoints.RowHeadersWidth = 50;
             dataGridView_checkpoints.RowTemplate.Height = 25;
             dataGridView_checkpoints.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dataGridView_checkpoints.Size = new Size(718, 271);
+            dataGridView_checkpoints.Size = new Size(356, 327);
             dataGridView_checkpoints.TabIndex = 0;
             dataGridView_checkpoints.CellEndEdit += DataGridView_Checkpoints_CellEndEdit;
+            dataGridView_checkpoints.CurrentCellChanged += DataGridView_Checkpoints_CurrentCellChanged;
             dataGridView_checkpoints.RowsAdded += DataGridView_Checkpoints_RowsAdded;
+            dataGridView_checkpoints.UserDeletingRow += DataGridView_Checkpoints_UserDeletingRow;
             dataGridView_checkpoints.KeyDown += DataGridView_Checkpoints_KeyDown;
             // 
-            // dataGridViewTextBoxColumn11
+            // Checkpoint
             // 
-            dataGridViewTextBoxColumn11.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            dataGridViewTextBoxColumn11.DataPropertyName = "CheckpointName";
-            dataGridViewTextBoxColumn11.HeaderText = "Název";
-            dataGridViewTextBoxColumn11.Name = "dataGridViewTextBoxColumn11";
-            dataGridViewTextBoxColumn11.ReadOnly = true;
+            Checkpoint.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            Checkpoint.DataPropertyName = "Checkpoint";
+            Checkpoint.HeaderText = "Název";
+            Checkpoint.Name = "Checkpoint";
+            Checkpoint.ReadOnly = true;
             // 
             // dataGridViewCheckBoxColumn3
             // 
@@ -384,9 +419,9 @@
             // statusStrip1
             // 
             statusStrip1.Items.AddRange(new ToolStripItem[] { toolStripStatusLabel });
-            statusStrip1.Location = new Point(0, 698);
+            statusStrip1.Location = new Point(0, 469);
             statusStrip1.Name = "statusStrip1";
-            statusStrip1.Size = new Size(754, 22);
+            statusStrip1.Size = new Size(1189, 22);
             statusStrip1.TabIndex = 12;
             statusStrip1.Text = "statusStrip";
             // 
@@ -395,18 +430,57 @@
             toolStripStatusLabel.Name = "toolStripStatusLabel";
             toolStripStatusLabel.Size = new Size(0, 17);
             // 
+            // groupBox_edit_checkpoint
+            // 
+            groupBox_edit_checkpoint.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            groupBox_edit_checkpoint.Controls.Add(label_name_checkpoint);
+            groupBox_edit_checkpoint.Controls.Add(textBox_name_checkpoint);
+            groupBox_edit_checkpoint.Controls.Add(button_save_checkpoint);
+            groupBox_edit_checkpoint.Location = new Point(809, 12);
+            groupBox_edit_checkpoint.Name = "groupBox_edit_checkpoint";
+            groupBox_edit_checkpoint.Size = new Size(368, 93);
+            groupBox_edit_checkpoint.TabIndex = 13;
+            groupBox_edit_checkpoint.TabStop = false;
+            groupBox_edit_checkpoint.Text = "Přidat/upravit stanoviště";
+            // 
+            // label_name_checkpoint
+            // 
+            label_name_checkpoint.AutoSize = true;
+            label_name_checkpoint.Location = new Point(23, 26);
+            label_name_checkpoint.Name = "label_name_checkpoint";
+            label_name_checkpoint.Size = new Size(44, 15);
+            label_name_checkpoint.TabIndex = 9;
+            label_name_checkpoint.Text = "Název*";
+            // 
+            // button_save_checkpoint
+            // 
+            button_save_checkpoint.Location = new Point(260, 34);
+            button_save_checkpoint.Margin = new Padding(3, 3, 15, 3);
+            button_save_checkpoint.Name = "button_save_checkpoint";
+            button_save_checkpoint.Size = new Size(90, 33);
+            button_save_checkpoint.TabIndex = 8;
+            button_save_checkpoint.Text = "Přidat";
+            button_save_checkpoint.UseVisualStyleBackColor = true;
+            button_save_checkpoint.Click += Button_Checkpoint_Save_Click;
+            // 
+            // errorProvider_checkpoint
+            // 
+            errorProvider_checkpoint.BlinkStyle = ErrorBlinkStyle.NeverBlink;
+            errorProvider_checkpoint.ContainerControl = this;
+            // 
             // AgeCategoriesEditor
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             AutoValidate = AutoValidate.EnableAllowFocusChange;
-            ClientSize = new Size(754, 720);
+            ClientSize = new Size(1189, 491);
+            Controls.Add(groupBox_edit_checkpoint);
             Controls.Add(statusStrip1);
             Controls.Add(groupBox_checkpoints);
-            Controls.Add(groupBox_edit);
+            Controls.Add(groupBox_edit_category);
             Controls.Add(groupBox_categories);
             HelpButton = true;
-            MinimumSize = new Size(770, 300);
+            MinimumSize = new Size(1205, 530);
             Name = "AgeCategoriesEditor";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Nastavení věkových kategorií";
@@ -414,14 +488,17 @@
             ((System.ComponentModel.ISupportInitialize)dataGridView_categories).EndInit();
             ((System.ComponentModel.ISupportInitialize)ageCategoryBindingSource).EndInit();
             groupBox_categories.ResumeLayout(false);
-            groupBox_edit.ResumeLayout(false);
-            groupBox_edit.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)errorProvider).EndInit();
+            groupBox_edit_category.ResumeLayout(false);
+            groupBox_edit_category.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)errorProvider_category).EndInit();
             groupBox_checkpoints.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)dataGridView_checkpoints).EndInit();
             ((System.ComponentModel.ISupportInitialize)checkpointAgeCategoryParticipationBindingSource).EndInit();
             statusStrip1.ResumeLayout(false);
             statusStrip1.PerformLayout();
+            groupBox_edit_checkpoint.ResumeLayout(false);
+            groupBox_edit_checkpoint.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)errorProvider_checkpoint).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -429,20 +506,19 @@
         #endregion
         private DataGridView dataGridView_categories;
         private GroupBox groupBox_categories;
-        private GroupBox groupBox_edit;
-        private Label label2;
+        private GroupBox groupBox_edit_category;
+        private Label label_code;
         private TextBox textBox_code;
-        private Label label1;
-        private TextBox textBox_name;
-        private Button button_save;
-        private Label label5;
-        private CheckBox checkBox_duo;
-        private Label label4;
+        private Label label_name_category;
+        private TextBox textBox_name_category;
+        private Button button_save_category;
+        private Label label_color;
+        private Label label_ageMax;
         private TextBox textBox_ageMax;
-        private Label label3;
+        private Label label_ageMin;
         private TextBox textBox_ageMin;
         private TextBox textBox_color;
-        private ErrorProvider errorProvider;
+        private ErrorProvider errorProvider_category;
         private DataGridViewTextBoxColumn nameDataGridViewTextBoxColumn;
         private DataGridViewTextBoxColumn codeDataGridViewTextBoxColumn;
         private DataGridViewTextBoxColumn ageMinDataGridViewTextBoxColumn;
@@ -459,17 +535,25 @@
         private DataGridViewTextBoxColumn dataGridViewTextBoxColumn4;
         private DataGridViewTextBoxColumn dataGridViewTextBoxColumn5;
         private DataGridViewCheckBoxColumn dataGridViewCheckBoxColumn1;
+        private DataGridViewCheckBoxColumn dataGridViewCheckBoxColumn2;
+        private BindingSource ageCategoryBindingSource;
+        private BindingSource checkpointAgeCategoryParticipationBindingSource;
+        private StatusStrip statusStrip1;
+        private ToolStripStatusLabel toolStripStatusLabel;
+        private Label label_type;
+        private ComboBox comboBox_type;
         private DataGridViewTextBoxColumn dataGridViewTextBoxColumn6;
         private DataGridViewTextBoxColumn dataGridViewTextBoxColumn7;
         private DataGridViewTextBoxColumn dataGridViewTextBoxColumn8;
         private DataGridViewTextBoxColumn dataGridViewTextBoxColumn9;
+        private DataGridViewTextBoxColumn TypeString;
         private DataGridViewTextBoxColumn dataGridViewTextBoxColumn10;
-        private DataGridViewCheckBoxColumn dataGridViewCheckBoxColumn2;
-        private BindingSource ageCategoryBindingSource;
-        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn11;
+        private GroupBox groupBox_edit_checkpoint;
+        private Button button_save_checkpoint;
+        private Label label_name_checkpoint;
+        private TextBox textBox_name_checkpoint;
+        private ErrorProvider errorProvider_checkpoint;
+        private DataGridViewTextBoxColumn Checkpoint;
         private DataGridViewCheckBoxColumn dataGridViewCheckBoxColumn3;
-        private BindingSource checkpointAgeCategoryParticipationBindingSource;
-        private StatusStrip statusStrip1;
-        private ToolStripStatusLabel toolStripStatusLabel;
     }
 }

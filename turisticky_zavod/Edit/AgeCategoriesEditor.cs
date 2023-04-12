@@ -1,4 +1,5 @@
-﻿using turisticky_zavod.Data;
+﻿using System.ComponentModel;
+using turisticky_zavod.Data;
 
 namespace turisticky_zavod.Forms
 {
@@ -20,18 +21,23 @@ namespace turisticky_zavod.Forms
         }
 
 
-        #region Button events
+        #region Button AgeCategory events
 
-        private void Button_Save_Click(object sender, EventArgs e)
+        private void Button_AgeCategory_Save_Click(object sender, EventArgs e)
         {
-            if (ValidateChildren(ValidationConstraints.Enabled))
+            if (Validate_AgeCategory_TextBoxes())
             {
-                var name = textBox_name.Text.Trim();
+                var name = textBox_name_category.Text.Trim();
                 var code = textBox_code.Text.Trim();
                 var color = textBox_color.Text.Trim();
                 var ageMin = textBox_ageMin.Text;
                 var ageMax = textBox_ageMax.Text;
-                var duo = checkBox_duo.Checked;
+                var type = comboBox_type.SelectedIndex switch
+                {
+                    0 => CategoryType.DEFAULT,
+                    1 => CategoryType.DUOS,
+                    2 => CategoryType.RELAY
+                };
 
                 var category = database.AgeCategory.Local.FirstOrDefault(x => x.Name == name || x.Code == code, null);
 
@@ -41,13 +47,19 @@ namespace turisticky_zavod.Forms
                     category.Code = code;
                     category.AgeMin = int.Parse(ageMin);
                     category.AgeMax = !string.IsNullOrEmpty(ageMax) ? int.Parse(ageMax) : null;
-                    category.Duo = duo;
+                    category.Type = type;
                     category.Color = color;
                     database.AgeCategory.Update(category);
                     if (database.SaveChanges() > 0)
-                        Log($"Kategorie \"{category.Name}\" úspěšně změněna");
+                    {
+                        Log($"Age category \"{category.Name}\" edited successfully", "Data");
+                        LogToUser($"Kategorie \"{category.Name}\" úspěšně změněna");
+                    }
                     else
-                        Log("Nastala chyba při ukládání změn");
+                    {
+                        Log("Failed editing Age category", "Data");
+                        LogToUser("Nastala chyba při ukládání změn");
+                    }
                 }
                 else
                 {
@@ -57,7 +69,7 @@ namespace turisticky_zavod.Forms
                         Code = code,
                         AgeMin = int.Parse(ageMin),
                         AgeMax = !string.IsNullOrEmpty(ageMax) ? int.Parse(ageMax) : null,
-                        Duo = duo,
+                        Type = type,
                         Color = color
                     };
                     database.AgeCategory.Add(category);
@@ -69,135 +81,216 @@ namespace turisticky_zavod.Forms
                         database.CheckpointAgeCategoryParticipation.Add(new() { AgeCategoryID = id, CheckpointID = i, IsParticipating = true });
                     }
                     if (database.SaveChanges() > 0)
-                        Log($"Kategorie \"{category.Name}\" úspěšně přidána");
+                    {
+                        Log($"Age category {category.Name} added successfully", "Data");
+                        LogToUser($"Kategorie \"{category.Name}\" úspěšně přidána");
+                    }
                     else
-                        Log("Nastala chyba při ukládání změn");
+                    {
+                        Log("Failed adding new Age category", "Data");
+                        LogToUser("Nastala chyba při ukládání změn");
+                    }
                 }
-                var row = dataGridView_categories.Rows[^1];
+                var row = dataGridView_categories.Rows[0];
                 var rowCategory = (AgeCategory)row.DataBoundItem;
                 row.Cells[0].Selected = true;
-                dataGridView_checkpoints.DataSource = database.CheckpointAgeCategoryParticipation
+                dataGridView_checkpoints.DataSource = new BindingList<CheckpointAgeCategoryParticipation>(database.CheckpointAgeCategoryParticipation
                                                               .Local
                                                               .Where(x => x.AgeCategoryID == rowCategory.ID && x.CheckpointID != 1)
-                                                              .ToList();
+                                                              .ToList());
                 ClearInputs();
             }
         }
 
         #endregion
 
-        #region TextBox events
+        #region Button Checkpoint events
 
-        private void TextBox_AgeMin_KeyDown(object sender, KeyEventArgs e)
+        private void Button_Checkpoint_Save_Click(object sender, EventArgs e)
         {
-            if (e.KeyCode == Keys.Enter)
-                e.SuppressKeyPress = false;
-            else if (HandleNumberOnlyField(e))
-                e.SuppressKeyPress = true;
+            if (Validate_Checkpoint_TextBoxes())
+            {
+                var edit = button_save_checkpoint.Text == "Upravit";
+                var name = textBox_name_checkpoint.Text.Trim();
+
+                if (edit)
+                {
+                    var checkpoint = ((CheckpointAgeCategoryParticipation)dataGridView_checkpoints.CurrentRow!.DataBoundItem).Checkpoint;
+                    checkpoint.Name = name;
+
+                    database.Checkpoint.Update(checkpoint);
+                }
+                else
+                {
+                    var checkpoint = new Checkpoint { Name = name };
+                    database.Checkpoint.Add(checkpoint);
+
+                    var categories = database.AgeCategory.Local.ToList();
+                    foreach (var category in categories)
+                        database.CheckpointAgeCategoryParticipation.Add(new() { AgeCategoryID = category.ID, Checkpoint = checkpoint, IsParticipating = true });
+                }
+
+                var currentCategory = (AgeCategory)dataGridView_categories.CurrentRow.DataBoundItem;
+
+                database.SaveChanges();
+
+                dataGridView_checkpoints.DataSource = new BindingList<CheckpointAgeCategoryParticipation>(database.CheckpointAgeCategoryParticipation
+                                                              .Local
+                                                              .Where(x => x.AgeCategoryID == currentCategory.ID && x.CheckpointID != 1)
+                                                              .ToList());
+                ClearInputs();
+            }
         }
 
-        private void TextBox_AgeMax_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.KeyCode == Keys.Enter)
-                e.SuppressKeyPress = false;
-            else if (HandleNumberOnlyField(e))
-                e.SuppressKeyPress = true;
-        }
+        #endregion
 
-        private void TextBox_Name_Validating(object sender, System.ComponentModel.CancelEventArgs e)
+        #region TextBox AgeCategory events
+
+        private bool Validate_AgeCategory_TextBoxes()
         {
-            var name = textBox_name.Text.Trim();
+            var isValidated = true;
+
+            var name = textBox_name_category.Text.Trim();
+            var code = textBox_code.Text.Trim();
+            var ageMin = textBox_ageMin.Text;
+            var ageMax = textBox_ageMax.Text;
+            var color = textBox_color.Text.Trim();
 
             if (string.IsNullOrEmpty(name))
             {
-                e.Cancel = true;
-                errorProvider.SetError(sender as TextBox, "Název kategorie je povinná položka");
+                isValidated = false;
+                errorProvider_category.SetError(textBox_name_category, "Název kategorie je povinná položka");
+            }
+            else if (button_save_category.Text == "Přidat" && database.AgeCategory.Local.Any(x => x.Name == name))
+            {
+                isValidated = false;
+                errorProvider_category.SetError(textBox_name_category, "Kategorie s tímto názvem již existuje");
             }
             else
-                errorProvider.SetError(sender as TextBox, string.Empty);
-        }
-
-        private void TextBox_Code_Validating(object sender, System.ComponentModel.CancelEventArgs e)
-        {
-            var code = textBox_code.Text.Trim();
+                errorProvider_category.SetError(textBox_name_category, string.Empty);
 
             if (string.IsNullOrEmpty(code))
             {
-                e.Cancel = true;
-                errorProvider.SetError(sender as TextBox, "Zkratka kategorie je povinná položka");
+                isValidated = false;
+                errorProvider_category.SetError(textBox_code, "Zkratka kategorie je povinná položka");
+            }
+            else if (button_save_category.Text == "Přidat" && database.AgeCategory.Local.Any(x => x.Name == code))
+            {
+                isValidated = false;
+                errorProvider_category.SetError(textBox_code, "Kategorie s touto zkratkou již existuje");
             }
             else
-                errorProvider.SetError(sender as TextBox, string.Empty);
-        }
-
-        private void TextBox_AgeMin_Validating(object sender, System.ComponentModel.CancelEventArgs e)
-        {
-            var ageMin = textBox_ageMin.Text;
+                errorProvider_category.SetError(textBox_code, string.Empty);
 
             if (string.IsNullOrEmpty(ageMin))
             {
-                e.Cancel = true;
-                errorProvider.SetError(sender as TextBox, "Minimální věk je povinná položka");
+                isValidated = false;
+                errorProvider_category.SetError(textBox_ageMin, "Minimální věk je povinná položka");
             }
             else
-                errorProvider.SetError(sender as TextBox, string.Empty);
-        }
-
-        private void TextBox_AgeMax_Validating(object sender, System.ComponentModel.CancelEventArgs e)
-        {
-            var ageMin = textBox_ageMin.Text;
-            var ageMax = textBox_ageMax.Text;
+                errorProvider_category.SetError(textBox_ageMin, string.Empty);
 
             if (!string.IsNullOrEmpty(ageMax) && !string.IsNullOrEmpty(ageMin) && int.Parse(ageMin) > int.Parse(ageMax))
             {
-                e.Cancel = true;
-                errorProvider.SetError(sender as TextBox, "Maximální věk musí být větší než minimální");
+                isValidated = false;
+                errorProvider_category.SetError(textBox_ageMax, "Maximální věk musí být větší než minimální");
             }
             else
-                errorProvider.SetError(sender as TextBox, string.Empty);
-        }
-
-        private void TextBox_Color_Validating(object sender, System.ComponentModel.CancelEventArgs e)
-        {
-            var color = textBox_color.Text.Trim();
+                errorProvider_category.SetError(textBox_ageMax, string.Empty);
 
             if (string.IsNullOrEmpty(color))
             {
-                e.Cancel = true;
-                errorProvider.SetError(sender as TextBox, "Barva je povinná položka");
+                isValidated = false;
+                errorProvider_category.SetError(textBox_color, "Barva je povinná položka");
             }
             else
-                errorProvider.SetError(sender as TextBox, string.Empty);
+                errorProvider_category.SetError(textBox_color, string.Empty);
+
+            if (comboBox_type.SelectedIndex == -1)
+            {
+                isValidated = false;
+                errorProvider_category.SetError(comboBox_type, "Typ je povinnná položka");
+            }
+            else
+                errorProvider_category.SetError(comboBox_type, string.Empty);
+
+            return isValidated;
         }
 
-        private void TextBox_Name_KeyPress(object sender, KeyPressEventArgs e)
+        private void TextBox_AgeCategory_AgeMin_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.KeyChar == (char)Keys.Enter)
-                button_save.PerformClick();
+            if (e.KeyCode == Keys.Enter)
+                e.SuppressKeyPress = false;
+            else if (HandleNumberOnlyField(e))
+                e.SuppressKeyPress = true;
         }
 
-        private void TextBox_Code_KeyPress(object sender, KeyPressEventArgs e)
+        private void TextBox_AgeCategory_AgeMax_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.KeyChar == (char)Keys.Enter)
-                button_save.PerformClick();
+            if (e.KeyCode == Keys.Enter)
+                e.SuppressKeyPress = false;
+            else if (HandleNumberOnlyField(e))
+                e.SuppressKeyPress = true;
         }
 
-        private void TextBox_AgeMin_KeyPress(object sender, KeyPressEventArgs e)
+        private void TextBox_AgeCategory_Name_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (e.KeyChar == (char)Keys.Enter)
-                button_save.PerformClick();
+                button_save_category.PerformClick();
         }
 
-        private void TextBox_AgeMax_KeyPress(object sender, KeyPressEventArgs e)
+        private void TextBox_AgeCategory_Code_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (e.KeyChar == (char)Keys.Enter)
-                button_save.PerformClick();
+                button_save_category.PerformClick();
         }
 
-        private void TextBox_Color_KeyPress(object sender, KeyPressEventArgs e)
+        private void TextBox_AgeCategory_AgeMin_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (e.KeyChar == (char)Keys.Enter)
-                button_save.PerformClick();
+                button_save_category.PerformClick();
+        }
+
+        private void TextBox_AgeCategory_AgeMax_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar == (char)Keys.Enter)
+                button_save_category.PerformClick();
+        }
+
+        private void TextBox_AgeCategory_Color_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar == (char)Keys.Enter)
+                button_save_category.PerformClick();
+        }
+
+        #endregion
+
+        #region TextBox Checkpoint events
+
+        private bool Validate_Checkpoint_TextBoxes()
+        {
+            var isValidated = true;
+
+            if (string.IsNullOrEmpty(textBox_name_checkpoint.Text))
+            {
+                isValidated = false;
+                errorProvider_checkpoint.SetError(textBox_name_checkpoint, "Název stanoviště je povinná položka");
+            }
+            else if (button_save_checkpoint.Text == "Přidat" && database.Checkpoint.Local.Any(x => x.Name == textBox_name_checkpoint.Text.Trim()))
+            {
+                isValidated = false;
+                errorProvider_checkpoint.SetError(textBox_name_checkpoint, "Stanoviště s tímto názvem již existuje");
+            }
+            else
+                errorProvider_checkpoint.SetError(textBox_name_checkpoint, string.Empty);
+
+            return isValidated;
+        }
+
+        private void TextBox_Name_Checkpoint_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar == (char)Keys.Enter)
+                button_save_checkpoint.PerformClick();
         }
 
         #endregion
@@ -225,11 +318,15 @@ namespace turisticky_zavod.Forms
             var category = database.ChangeTracker.Entries<AgeCategory>().First(x => x.State == Microsoft.EntityFrameworkCore.EntityState.Deleted).Entity;
             if (database.SaveChanges() > 0)
             {
-                Log($"Kategorie \"{category.Name}\" úspěšně smazána");
+                Log($"Age category {category.Name} deleted successfully", "Data");
+                LogToUser($"Kategorie \"{category.Name}\" úspěšně smazána");
                 ClearInputs();
             }
             else
-                Log("Nastala chyba při ukládání změn");
+            {
+                Log("Failed deleting Age category", "Data");
+                LogToUser("Nastala chyba při ukládání změn");
+            }
         }
 
         private void DataGridView_AgeCategories_CurrentCellChanged(object sender, EventArgs e)
@@ -237,18 +334,24 @@ namespace turisticky_zavod.Forms
             if (dataGridView_categories.CurrentRow != null)
             {
                 var category = (AgeCategory)dataGridView_categories.CurrentRow.DataBoundItem;
-                textBox_name.Text = category.Name;
+                textBox_name_category.Text = category.Name;
                 textBox_code.Text = category.Code;
                 textBox_ageMin.Text = category.AgeMin.ToString();
                 textBox_ageMax.Text = category.AgeMax.HasValue ? category.AgeMax.Value.ToString() : string.Empty;
                 textBox_color.Text = category.Color;
-                checkBox_duo.Checked = category.Duo;
-                button_save.Text = "Uložit";
+                comboBox_type.SelectedIndex = category.Type switch
+                {
+                    CategoryType.DEFAULT => 0,
+                    CategoryType.DUOS => 1,
+                    CategoryType.RELAY => 2,
+                    _ => -1
+                };
+                button_save_category.Text = "Uložit";
 
-                dataGridView_checkpoints.DataSource = database.CheckpointAgeCategoryParticipation
+                dataGridView_checkpoints.DataSource = new BindingList<CheckpointAgeCategoryParticipation>(database.CheckpointAgeCategoryParticipation
                                                               .Local
                                                               .Where(x => x.AgeCategoryID == category.ID && x.CheckpointID != 1)
-                                                              .ToList();
+                                                              .ToList());
 
                 ClearAllErrors();
             }
@@ -262,16 +365,14 @@ namespace turisticky_zavod.Forms
             if (e.KeyCode == Keys.Escape)
             {
                 dataGridView_categories.ClearSelection();
-                dataGridView_categories.CurrentCell = null;
+                dataGridView_checkpoints.ClearSelection();
                 ClearInputs();
-                dataGridView_checkpoints.DataSource = null;
             }
         }
 
         #endregion
 
         #region DataGridView_Checkpoints events
-
 
         private void DataGridView_Checkpoints_RowsAdded(object sender, DataGridViewRowsAddedEventArgs e)
         {
@@ -285,9 +386,65 @@ namespace turisticky_zavod.Forms
         {
             var item = (CheckpointAgeCategoryParticipation)dataGridView_checkpoints.CurrentRow.DataBoundItem;
             if (database.SaveChanges() > 0)
-                Log($"Účast kategorie \"{item.AgeCategory.Name}\" u stanoviště \"{item.Checkpoint.Name}\" úspěšně změněna na \"{(item.IsParticipating ? "Ano" : "Ne")}\"");
+            {
+                Log($"Age category \"{item.AgeCategory.Name}\"'s participation in checkpoint \"{item.Checkpoint.Name}\" changed successfully", "Data");
+                LogToUser($"Účast kategorie \"{item.AgeCategory.Name}\" u stanoviště \"{item.Checkpoint.Name}\" úspěšně změněna na \"{(item.IsParticipating ? "Ano" : "Ne")}\"");
+            }
             else
-                Log("Nastala chyba při ukládání změn");
+            {
+                Log("Failed changing Age category's checkpoint participation", "Data");
+                LogToUser("Nastala chyba při ukládání změn");
+            }
+        }
+
+        private void DataGridView_Checkpoints_UserDeletingRow(object sender, DataGridViewRowCancelEventArgs e)
+        {
+            e.Cancel = true;
+
+            if (dataGridView_checkpoints.CurrentRow != null
+                && MessageBox.Show("Opravdu chcete smazat zvolené stanoviště?",
+                "Smazat stanoviště", MessageBoxButtons.YesNo, MessageBoxIcon.Question
+                ) == DialogResult.Yes)
+            {
+                var participation = (CheckpointAgeCategoryParticipation)dataGridView_checkpoints.CurrentRow.DataBoundItem;
+                var checkpoint = participation.Checkpoint;
+
+                foreach (var p in database.CheckpointAgeCategoryParticipation.Local.Where(x => x.CheckpointID == checkpoint.ID))
+                    database.CheckpointAgeCategoryParticipation.Remove(p);
+
+                database.Checkpoint.Remove(checkpoint);
+
+                if (database.SaveChanges() > 0)
+                {
+                    Log($"Checkpoint {checkpoint.Name} deleted successfully", "Data");
+                    LogToUser($"Stanoviště \"{checkpoint.Name}\" úspěšně smazáno");
+
+                    dataGridView_checkpoints.DataSource = new BindingList<CheckpointAgeCategoryParticipation>(database.CheckpointAgeCategoryParticipation
+                                                                  .Local
+                                                                  .Where(x => x.AgeCategoryID == participation.AgeCategoryID && x.CheckpointID != 1)
+                                                                  .ToList());
+
+                    ClearInputs();
+
+                    dataGridView_checkpoints.CurrentCell = null;
+                }
+                else
+                {
+                    Log("Failed deleting Checkpoint", "Data");
+                    LogToUser("Nastala chyba při ukládání změn");
+                }
+            }
+        }
+
+        private void DataGridView_Checkpoints_CurrentCellChanged(object sender, EventArgs e)
+        {
+            if (dataGridView_checkpoints.CurrentRow != null)
+            {
+                var participation = (CheckpointAgeCategoryParticipation)dataGridView_checkpoints.CurrentRow.DataBoundItem;
+                textBox_name_checkpoint.Text = participation.Checkpoint.Name;
+
+                button_save_checkpoint.Text = "Upravit";
+            }
         }
 
         private void DataGridView_Checkpoints_KeyDown(object sender, KeyEventArgs e)
@@ -295,38 +452,60 @@ namespace turisticky_zavod.Forms
             if (e.KeyCode == Keys.Escape)
             {
                 dataGridView_categories.ClearSelection();
-                dataGridView_categories.CurrentCell = null;
+                dataGridView_checkpoints.ClearSelection();
                 ClearInputs();
-                dataGridView_checkpoints.DataSource = null;
             }
         }
 
         #endregion
 
 
-        private void Log(string message)
+        private void LogToUser(string message)
         {
             toolStripStatusLabel.Text = message;
         }
 
+        public void Log(string message, string type)
+        {
+            try
+            {
+                Invoke(() =>
+                {
+                    database.Log.Add(new Log
+                    {
+                        Message = message,
+                        Type = type
+                    });
+                    database.SaveChanges();
+                });
+            }
+            catch (ObjectDisposedException) { }
+        }
+
         private void ClearInputs()
         {
-            textBox_name.Clear();
+            textBox_name_category.Clear();
             textBox_code.Clear();
             textBox_ageMin.Clear();
             textBox_ageMax.Clear();
             textBox_color.Clear();
-            checkBox_duo.Checked = false;
-            button_save.Text = "Přidat";
+            comboBox_type.SelectedIndex = -1;
+            button_save_category.Text = "Přidat";
+
+            textBox_name_checkpoint.Clear();
+            button_save_checkpoint.Text = "Přidat";
         }
 
         private void ClearAllErrors()
         {
-            errorProvider.SetError(textBox_name, string.Empty);
-            errorProvider.SetError(textBox_code, string.Empty);
-            errorProvider.SetError(textBox_ageMin, string.Empty);
-            errorProvider.SetError(textBox_ageMax, string.Empty);
-            errorProvider.SetError(textBox_color, string.Empty);
+            errorProvider_category.SetError(textBox_name_category, string.Empty);
+            errorProvider_category.SetError(textBox_code, string.Empty);
+            errorProvider_category.SetError(textBox_ageMin, string.Empty);
+            errorProvider_category.SetError(textBox_ageMax, string.Empty);
+            errorProvider_category.SetError(textBox_color, string.Empty);
+            errorProvider_category.SetError(comboBox_type, string.Empty);
+
+            errorProvider_checkpoint.SetError(textBox_name_checkpoint, string.Empty);
         }
 
         private static bool HandleNumberOnlyField(KeyEventArgs e)

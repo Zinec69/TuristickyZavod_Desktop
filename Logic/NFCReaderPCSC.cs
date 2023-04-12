@@ -158,6 +158,7 @@ namespace turisticky_zavod.Logic
                         checkpointInfos.Add(new CheckpointRunnerInfo()
                         {
                             Checkpoint = checkpoint,
+                            CheckpointID = checkpointID,
                             TimeArrived = DateTimeOffset.FromUnixTimeSeconds(long.Parse(runner_split[j + 2]))
                                                         .DateTime.ToLocalTime(),
                             TimeDeparted = runner_split[j + 3] == "0" ? null : DateTimeOffset.FromUnixTimeSeconds(long.Parse(runner_split[j + 3]))

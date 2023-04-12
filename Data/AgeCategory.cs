@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.Text;
 using System.Text.Json.Serialization;
 
 namespace turisticky_zavod.Data
@@ -7,24 +8,28 @@ namespace turisticky_zavod.Data
     public class AgeCategory
     {
         public int ID { get; set; }
-        private string? name;
-        public string Name { get { return name ?? "-"; } set { name = value; } }
-        private string? code;
-        public string Code { get { return code ?? "-"; } set { code = value; } }
+        public string Name { get; set; }
+        public string Code { get; set; }
         public int AgeMin { get; set; }
         public int? AgeMax { get; set; }
-        public bool Duo { get; set; } = false;
+        public CategoryType Type { get; set; } = CategoryType.DEFAULT;
         public string Color { get; set; }
 
-        public static AgeCategory? GetByBirthYear(int birthYear, bool hasPartner)
+        public static AgeCategory? GetByBirthYear(int birthYear, CategoryType type = CategoryType.DEFAULT,
+            int? partnerBirthYear = null)
         {
-            if (birthYear <= 0) return null;
+            if (birthYear <= 0 || (partnerBirthYear.HasValue && partnerBirthYear <= 0))
+                return null;
 
             var age = DateTime.Now.Year - birthYear;
+
+            if (partnerBirthYear.HasValue && type == CategoryType.DUOS)
+                age += DateTime.Now.Year - partnerBirthYear.Value;
+
             return Database.Instance.AgeCategory.Local.FirstOrDefault(c =>
                 age >= c.AgeMin
                 && (!c.AgeMax.HasValue || age <= c.AgeMax.Value)
-                && c.Duo == hasPartner, null);
+                && c.Type == type, null);
         }
 
         public static bool TryGetByString(string value, bool hasPartner, out AgeCategory? category)
@@ -98,6 +103,21 @@ namespace turisticky_zavod.Data
             return false;
         }
 
-        public override string ToString() => Name;
+        public override string ToString() => Name ?? string.Empty;
+
+        [NotMapped]
+        [JsonIgnore]
+        public string TypeString
+        {
+            get => Type switch
+            {
+                CategoryType.DEFAULT => "Klasický",
+                CategoryType.DUOS    => "Dvojice",
+                CategoryType.RELAY   => "Štafety",
+                _ => "-"
+            };
+        }
     }
+
+    public enum CategoryType { DEFAULT, DUOS, RELAY }
 }

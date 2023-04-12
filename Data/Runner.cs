@@ -129,5 +129,25 @@ namespace turisticky_zavod.Data
                 return time;
             }
         }
+
+        [NotMapped]
+        [JsonIgnore]
+        public int Placement
+        {
+            get 
+            {
+                try
+                {
+                    var runners = Database.Instance.Runner.Local.OrderBy(x => x.FinalRunTime).ToList();
+                    var placement = runners.FindIndex(x => x.StartNumber == this.StartNumber);
+
+                    return placement + 1;
+                }
+                catch
+                {
+                    return 0;
+                }
+            }
+        }
     }
 }

@@ -7,7 +7,6 @@ using System.Diagnostics;
 using Windows.Devices.Enumeration;
 using Forms;
 using System.Text.Json;
-using DocumentFormat.OpenXml.Wordprocessing;
 
 namespace turisticky_zavod.Forms
 {
@@ -20,13 +19,10 @@ namespace turisticky_zavod.Forms
         {
             InitializeComponent();
             Program.SetDoubleBuffer(dataGridView_runners, true);
+            Program.SetDoubleBuffer(dataGridView_runners_results, true);
+            Program.SetDoubleBuffer(dataGridView_runnerCheckpoints, true);
 
             InitDatabase();
-        }
-
-        protected override void OnLoad(EventArgs e)
-        {
-            base.OnLoad(e);
         }
 
         protected override void OnClosing(CancelEventArgs e)
@@ -60,6 +56,7 @@ namespace turisticky_zavod.Forms
 
                     Invoke(() =>
                     {
+                        database.CheckpointRunnerInfo.Load();
                         toolStripProgressBar1.Value += 20;
                         database.Runner.Load();
                         toolStripProgressBar1.Value += 20;
@@ -84,6 +81,10 @@ namespace turisticky_zavod.Forms
                         dataGridView_runners.DataSource = database.Runner.Local.ToBindingList();
                         comboBox_team.DataSource = database.Team.Local.ToBindingList();
                         comboBox_ageCategory.DataSource = database.AgeCategory.Local.ToBindingList();
+
+                        dataGridView_runners_results.DataSource = database.Runner.Local.ToBindingList();
+                        comboBox_filter_team.DataSource = database.Team.Local.ToBindingList();
+                        comboBox_filter_category.DataSource = database.AgeCategory.Local.ToBindingList();
                     });
 
                     timer.Stop();
@@ -482,7 +483,7 @@ namespace turisticky_zavod.Forms
 
                 var startNumber = !string.IsNullOrEmpty(textBox_startNumber.Text)
                                    ? int.Parse(textBox_startNumber.Text)
-                                   : (ids.Any() ? ids.Max(r => r.StartNumber!.Value) : 1);
+                                   : (ids.Any() ? ids.Max(r => r.StartNumber!.Value) + 1 : 1);
                 var name = textBox_name.Text.Trim();
                 var birthYear = int.Parse(textBox_birthYear.Text);
                 var team = (Team)comboBox_team.SelectedItem ?? new Team() { Name = comboBox_team.Text };
@@ -496,12 +497,7 @@ namespace turisticky_zavod.Forms
                     return;
                 }
 
-                Runner runner;
-
-                if (edit)
-                    runner = (Runner)dataGridView_runners.CurrentRow.DataBoundItem;
-                else
-                    runner = new Runner();
+                var runner = edit ? (Runner)dataGridView_runners.CurrentRow.DataBoundItem : new Runner();
 
                 runner.StartNumber = startNumber;
                 runner.Name = name;
@@ -536,7 +532,7 @@ namespace turisticky_zavod.Forms
 
         #endregion
 
-        #region DataGridView events
+        #region DataGridView Start events
 
         private void DataGridView_Runners_CurrentCellChanged(object sender, EventArgs e)
         {
@@ -572,7 +568,6 @@ namespace turisticky_zavod.Forms
             foreach (DataGridViewRow row in dataGridView_runners.Rows)
             {
                 row.HeaderCell.Value = (row.Index + 1).ToString();
-                //row.HeaderCell.Value = ((BindingList<Runner>)dataGridView1.DataSource)[row.Index].ID.ToString();
             }
             ClearInputs();
         }
@@ -620,7 +615,48 @@ namespace turisticky_zavod.Forms
 
         #endregion
 
-        #region TextBox events
+        #region DataGridView Results events
+
+        private void DataGridView_Runners_Results_RowsAdded(object sender, DataGridViewRowsAddedEventArgs e)
+        {
+            foreach (DataGridViewRow row in dataGridView_runners_results.Rows)
+            {
+                row.HeaderCell.Value = ((BindingList<Runner>)dataGridView_runners_results.DataSource)[row.Index].Placement.ToString();
+            }
+            ClearInputs();
+        }
+
+        private void DataGridView_Runners_Results_CurrentCellChanged(object sender, EventArgs e)
+        {
+            if (dataGridView_runners_results.CurrentCell != null)
+                dataGridView_runnerCheckpoints.DataSource = ((Runner)dataGridView_runners_results.CurrentRow.DataBoundItem).CheckpointInfo
+                                                                                                 .Where(x => x.CheckpointID != 1).ToList();
+            else
+                dataGridView_runnerCheckpoints.DataSource = null;
+        }
+
+        #endregion
+
+        #region DataGridView RunnerCheckpoints events
+
+
+
+        #endregion
+
+        #region TextBox Start events
+
+        private void TextBox_StartNumber_Validating(object sender, CancelEventArgs e)
+        {
+            if (!string.IsNullOrEmpty(textBox_startNumber.Text)
+                && button_save.Text == "Pøidat"
+                && database.Runner.Any(x => x.StartNumber == int.Parse(textBox_startNumber.Text)))
+            {
+                e.Cancel = true;
+                errorProvider.SetError((TextBox)sender, "Bìžec s tímto startovním èíslem již existuje");
+            }
+            else
+                errorProvider.SetError((TextBox)sender, string.Empty);
+        }
 
         private void TextBox_Name_Validating(object sender, CancelEventArgs e)
         {
@@ -742,8 +778,17 @@ namespace turisticky_zavod.Forms
         {
             if (int.TryParse(textBox_birthYear.Text, out int year))
             {
+                if (year < 100)
+                {
+                    var currentYear = DateTime.Now.Year;
+                    year += year > (currentYear - 2000) ? 1900 : 2000;
+                }
+
                 var duo = !string.IsNullOrEmpty(textBox_name_partner.Text);
-                var category = Data.AgeCategory.GetByBirthYear(year, duo);
+                var category = duo
+                    ? Data.AgeCategory.GetByBirthYear(year, CategoryType.DUOS,
+                            int.TryParse(textBox_birthYear_partner.Text, out int res) ? res : null)
+                    : Data.AgeCategory.GetByBirthYear(year);
                 comboBox_ageCategory.SelectedItem = category;
             }
         }
@@ -762,10 +807,49 @@ namespace turisticky_zavod.Forms
             {
                 if (int.TryParse(textBox_birthYear.Text, out int year))
                 {
+                    if (year < 100)
+                    {
+                        var currentYear = DateTime.Now.Year;
+                        year += year > (currentYear - 2000) ? 1900 : 2000;
+                    }
+
                     var duo = !string.IsNullOrEmpty(textBox_name_partner.Text);
-                    var category = Data.AgeCategory.GetByBirthYear(year, duo);
+                    var category = duo
+                        ? Data.AgeCategory.GetByBirthYear(year, CategoryType.DUOS,
+                                int.TryParse(textBox_birthYear_partner.Text, out int res) ? res : null)
+                        : Data.AgeCategory.GetByBirthYear(year);
                     comboBox_ageCategory.SelectedItem = category;
                 }
+            }
+        }
+
+        #endregion
+
+        #region TextBox Results events
+
+
+
+        #endregion
+
+        #region TabControl events
+
+        private void Tab_Selected(object sender, TabControlEventArgs e)
+        {
+            Size size;
+
+            if (e.TabPageIndex == 0)
+            {
+                size = new Size(1225, 710);
+
+                MinimumSize = size;
+                Size = size;
+            }
+            else
+            {
+                size = new Size(1500, 710);
+
+                Size = size;
+                MinimumSize = size;
             }
         }
 
@@ -816,6 +900,72 @@ namespace turisticky_zavod.Forms
                 });
             }
             catch (ObjectDisposedException) { }
+        }
+
+        private void CheckBox_Filter_Team_CheckedChanged(object sender, EventArgs e)
+        {
+            if (checkBox_filter_team.Checked)
+            {
+                if (checkBox_filter_category.Checked)
+                {
+                    checkBox_filter_category.Checked = false;
+                    comboBox_filter_category.Enabled = false;
+                }
+                comboBox_filter_team.Enabled = true;
+            }
+            else
+            {
+                comboBox_filter_team.Enabled = false;
+            }
+        }
+
+        private void CheckBox_Filter_Category_CheckedChanged(object sender, EventArgs e)
+        {
+            if (checkBox_filter_category.Checked)
+            {
+                if (checkBox_filter_team.Checked)
+                {
+                    checkBox_filter_team.Checked = false;
+                    comboBox_filter_team.Enabled = false;
+                }
+                comboBox_filter_category.Enabled = true;
+            }
+            else
+            {
+                comboBox_filter_category.Enabled = false;
+            }
+        }
+
+        private void ComboBox_Filter_Team_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void ComboBox_Filter_Category_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void DataGridView_RunnerCheckpoints_CellEndEdit(object sender, DataGridViewCellEventArgs e)
+        {
+            var checkpointID = ((CheckpointRunnerInfo)dataGridView_runnerCheckpoints.Rows[e.RowIndex].DataBoundItem).CheckpointID;
+            if (checkpointID is not 3 and not 5 and not 6 and not 2 and not 8 and not 13)
+            {
+
+            }
+        }
+
+        private void DataGridView_RunnerCheckpoints_RowsAdded(object sender, DataGridViewRowsAddedEventArgs e)
+        {
+            foreach (DataGridViewRow row in dataGridView_runners_results.Rows)
+            {
+                row.HeaderCell.Value = (row.Index + 1).ToString();
+            }
+        }
+
+        private void DataGridView_RunnerCheckpoints_CellBeginEdit(object sender, DataGridViewCellCancelEventArgs e)
+        {
+
         }
     }
 }

@@ -10,6 +10,7 @@ namespace turisticky_zavod.Data
         public DbSet<Referee> Referee { get; set; }
         public DbSet<AgeCategory> AgeCategory { get; set; }
         public DbSet<Checkpoint> Checkpoint { get; set; }
+        public DbSet<CheckpointRunnerInfo> CheckpointRunnerInfo { get; set; }
         public DbSet<CheckpointAgeCategoryParticipation> CheckpointAgeCategoryParticipation { get; set; }
         public DbSet<Team> Team { get; set; }
         public DbSet<Log> Log { get; set; }
@@ -52,7 +53,7 @@ namespace turisticky_zavod.Data
         {
             var path = filePath ?? SavedFilePath!;
 
-            if (path.Split('.')[^1] == "json")
+            if (path[(path.LastIndexOf('.') + 1)..].ToLower() == "json")
                 ExportToJson(path);
             else
                 ExportToExcel(path);
@@ -245,193 +246,87 @@ namespace turisticky_zavod.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Checkpoint>().HasData(
-                new Checkpoint() { ID = 1, Name = "Start/cíl" },
-                new Checkpoint() { ID = 2, Name = "Odhad vzdálenosti" },
-                new Checkpoint() { ID = 3, Name = "Stavba stanu" },
-                new Checkpoint() { ID = 4, Name = "Orientace mapy" },
-                new Checkpoint() { ID = 5, Name = "Azimutové úseky" },
-                new Checkpoint() { ID = 6, Name = "Lanová lávka" },
-                new Checkpoint() { ID = 7, Name = "Uzlování" },
-                new Checkpoint() { ID = 8, Name = "Plížení" },
-                new Checkpoint() { ID = 9, Name = "Hod kriketovým míčkem" },
+                new Checkpoint() { ID = 1,  Name = "Start/cíl" },
+                new Checkpoint() { ID = 2,  Name = "Odhad vzdálenosti" },
+                new Checkpoint() { ID = 3,  Name = "Stavba stanu" },
+                new Checkpoint() { ID = 4,  Name = "Orientace mapy" },
+                new Checkpoint() { ID = 5,  Name = "Azimutové úseky" },
+                new Checkpoint() { ID = 6,  Name = "Lanová lávka" },
+                new Checkpoint() { ID = 7,  Name = "Uzlování" },
+                new Checkpoint() { ID = 8,  Name = "Plížení" },
+                new Checkpoint() { ID = 9,  Name = "Hod kriketovým míčkem" },
                 new Checkpoint() { ID = 10, Name = "Turistické a topografické značky" },
                 new Checkpoint() { ID = 11, Name = "Poznávání dřevin" },
                 new Checkpoint() { ID = 12, Name = "Kulturně poznávací činnost" },
                 new Checkpoint() { ID = 13, Name = "Kontrola \"X\"" }
             );
 
-            modelBuilder.Entity<AgeCategory>(entity => entity.Property(e => e.ID).ValueGeneratedOnAdd());
+            modelBuilder.Entity<AgeCategory>().HasIndex(x => x.Code).IsUnique();
             modelBuilder.Entity<AgeCategory>().HasData(
-                new AgeCategory() { ID = 1, AgeMin = 0, AgeMax = 10, Name = "Nejmladší žáci a žákyně", Code = "K1", Color = "Bílá" },
-                new AgeCategory() { ID = 2, AgeMin = 11, AgeMax = 12, Name = "Mladší žáci a žákyně", Code = "K2", Color = "Bílá" },
-                new AgeCategory() { ID = 3, AgeMin = 13, AgeMax = 14, Name = "Starší žáci a žákyně", Code = "K3", Color = "Bílá" },
-                new AgeCategory() { ID = 4, AgeMin = 15, AgeMax = 16, Name = "Mladší dorostenci a dorostenky", Code = "K4", Color = "Červená" },
-                new AgeCategory() { ID = 5, AgeMin = 17, AgeMax = 18, Name = "Starší dorostenci a dorostenky", Code = "K5", Color = "Červená" },
-                new AgeCategory() { ID = 6, AgeMin = 19, AgeMax = 35, Name = "Dospělí A", Code = "K6", Color = "Červená" },
-                new AgeCategory() { ID = 7, AgeMin = 36, AgeMax = null, Name = "Dospělí B", Code = "K7", Color = "Červená" },
-                new AgeCategory() { ID = 8, AgeMin = 0, AgeMax = 30, Name = "Do 30 let", Code = "K8", Color = "Červená", Duo = true },
-                new AgeCategory() { ID = 9, AgeMin = 31, AgeMax = 70, Name = "31 - 70 let", Code = "K9", Color = "Červená", Duo = true },
-                new AgeCategory() { ID = 10, AgeMin = 71, AgeMax = null, Name = "Nad 70 let", Code = "K10", Color = "Červená", Duo = true }
+                new AgeCategory() { ID = 1,  AgeMin = 0,  AgeMax = 10,   Name = "Nejmladší žáci",         Code = "NŽH",   Color = "Bílá" },
+                new AgeCategory() { ID = 2,  AgeMin = 0,  AgeMax = 10,   Name = "Nejmladší žákyně",       Code = "NŽD",   Color = "Bílá" },
+                new AgeCategory() { ID = 3,  AgeMin = 11, AgeMax = 12,   Name = "Mladší žáci",            Code = "MŽH",   Color = "Bílá" },
+                new AgeCategory() { ID = 4,  AgeMin = 11, AgeMax = 12,   Name = "Mladší žákyně",          Code = "MŽD",   Color = "Bílá" },
+                new AgeCategory() { ID = 5,  AgeMin = 13, AgeMax = 14,   Name = "Starší žáci",            Code = "SŽH",   Color = "Bílá" },
+                new AgeCategory() { ID = 6,  AgeMin = 13, AgeMax = 14,   Name = "Starší žákyně",          Code = "SŽD",   Color = "Bílá" },
+                new AgeCategory() { ID = 7,  AgeMin = 15, AgeMax = 16,   Name = "Mladší dorostenci",      Code = "MDH",   Color = "Červená" },
+                new AgeCategory() { ID = 8,  AgeMin = 15, AgeMax = 16,   Name = "Mladší dorostenky",      Code = "MDD",   Color = "Červená" },
+                new AgeCategory() { ID = 9,  AgeMin = 17, AgeMax = 18,   Name = "Starší dorostenci",      Code = "SDH",   Color = "Červená" },
+                new AgeCategory() { ID = 10, AgeMin = 17, AgeMax = 18,   Name = "Starší dorostenky",      Code = "SDD",   Color = "Červená" },
+                new AgeCategory() { ID = 11, AgeMin = 19, AgeMax = 35,   Name = "Dospělí A - Muži",       Code = "MA",    Color = "Červená" },
+                new AgeCategory() { ID = 12, AgeMin = 19, AgeMax = 35,   Name = "Dospělí A - Ženy",       Code = "ŽA",    Color = "Červená" },
+                new AgeCategory() { ID = 13, AgeMin = 19, AgeMax = 35,   Name = "Dospělí B - Muži",       Code = "MB",    Color = "Červená" },
+                new AgeCategory() { ID = 14, AgeMin = 19, AgeMax = 35,   Name = "Dospělí B - Ženy",       Code = "ŽB",    Color = "Červená" },
+                                                                                                          
+                new AgeCategory() { ID = 15, AgeMin = 0,  AgeMax = 30,   Name = "Do 30 let",              Code = "30-",   Color = "Červená", Type = CategoryType.DUOS },
+                new AgeCategory() { ID = 16, AgeMin = 31, AgeMax = 70,   Name = "31 - 70 let",            Code = "31-70", Color = "Červená", Type = CategoryType.DUOS },
+                new AgeCategory() { ID = 17, AgeMin = 71, AgeMax = null, Name = "Nad 70 let",             Code = "70+",   Color = "Červená", Type = CategoryType.DUOS },
+
+                new AgeCategory() { ID = 18, AgeMin = 0,  AgeMax = 14,   Name = "Žáci 14 let a mladší",   Code = "H14-",  Color = "Červená", Type = CategoryType.RELAY },
+                new AgeCategory() { ID = 19, AgeMin = 0,  AgeMax = 14,   Name = "Žákyně 14 let a mladší", Code = "D14-",  Color = "Červená", Type = CategoryType.RELAY },
+                new AgeCategory() { ID = 20, AgeMin = 15, AgeMax = null, Name = "Muži 15 let a starší",   Code = "M15+",  Color = "Červená", Type = CategoryType.RELAY },
+                new AgeCategory() { ID = 21, AgeMin = 15, AgeMax = null, Name = "Ženy 15 let a starší",   Code = "Ž15+",  Color = "Červená", Type = CategoryType.RELAY }
             );
-
-            //modelBuilder.Entity<Partner>().HasData(new Partner() { ID = 1, Name = "Milan Kundera", BirthYear = 2012 });
-
-            //modelBuilder.Entity<Team>().HasData(new Team() { ID = 1, Name = "Divočákos" });
-
-            //modelBuilder.Entity<Runner>().HasData(
-            //    new Runner() { ID = 1, StartNumber = 18, Name = "Jožin ZBažin", TeamID = 1, BirthYear = 2009, Disqualified = false, PartnerID = 1 },
-            //    new Runner() { ID = 2, StartNumber = 59, Name = "Pepa ZDepa", TeamID = 1, BirthYear = 1987, Disqualified = false }
-            //);
 
             modelBuilder.Entity<Runner>().HasIndex(x => x.StartNumber).IsUnique();
             modelBuilder.Entity<Partner>();
             modelBuilder.Entity<Team>().HasIndex(x => x.Name).IsUnique();
             modelBuilder.Entity<Log>();
+            modelBuilder.Entity<CheckpointRunnerInfo>();
 
             modelBuilder.Entity<Referee>().HasKey("ID");
             modelBuilder.Entity<Referee>().HasIndex(r => new { r.FirstName, r.LastName }).IsUnique();
 
             modelBuilder.Entity<CheckpointAgeCategoryParticipation>().HasData(
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 1, CheckpointID = 1, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 1, CheckpointID = 2, IsParticipating = false },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 1, CheckpointID = 3, IsParticipating = false },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 1, CheckpointID = 4, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 1, CheckpointID = 5, IsParticipating = false },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 1, CheckpointID = 6, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 1, CheckpointID = 7, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 1, CheckpointID = 8, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 1, CheckpointID = 9, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 1, CheckpointID = 10, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 1, CheckpointID = 11, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 1, CheckpointID = 12, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 1, CheckpointID = 13, IsParticipating = false },
-
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 2, CheckpointID = 1, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 2, CheckpointID = 2, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 2, CheckpointID = 3, IsParticipating = false },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 2, CheckpointID = 4, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 2, CheckpointID = 5, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 2, CheckpointID = 6, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 2, CheckpointID = 7, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 2, CheckpointID = 8, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 2, CheckpointID = 9, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 2, CheckpointID = 10, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 2, CheckpointID = 11, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 2, CheckpointID = 12, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 2, CheckpointID = 13, IsParticipating = false },
-
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 3, CheckpointID = 1, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 3, CheckpointID = 2, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 3, CheckpointID = 3, IsParticipating = false },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 3, CheckpointID = 4, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 3, CheckpointID = 5, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 3, CheckpointID = 6, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 3, CheckpointID = 7, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 3, CheckpointID = 8, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 3, CheckpointID = 9, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 3, CheckpointID = 10, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 3, CheckpointID = 11, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 3, CheckpointID = 12, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 3, CheckpointID = 13, IsParticipating = false },
-
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 4, CheckpointID = 1, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 4, CheckpointID = 2, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 4, CheckpointID = 3, IsParticipating = false },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 4, CheckpointID = 4, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 4, CheckpointID = 5, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 4, CheckpointID = 6, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 4, CheckpointID = 7, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 4, CheckpointID = 8, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 4, CheckpointID = 9, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 4, CheckpointID = 10, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 4, CheckpointID = 11, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 4, CheckpointID = 12, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 4, CheckpointID = 13, IsParticipating = false },
-
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 5, CheckpointID = 1, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 5, CheckpointID = 2, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 5, CheckpointID = 3, IsParticipating = false },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 5, CheckpointID = 4, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 5, CheckpointID = 5, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 5, CheckpointID = 6, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 5, CheckpointID = 7, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 5, CheckpointID = 8, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 5, CheckpointID = 9, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 5, CheckpointID = 10, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 5, CheckpointID = 11, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 5, CheckpointID = 12, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 5, CheckpointID = 13, IsParticipating = false },
-
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 6, CheckpointID = 1, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 6, CheckpointID = 2, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 6, CheckpointID = 3, IsParticipating = false },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 6, CheckpointID = 4, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 6, CheckpointID = 5, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 6, CheckpointID = 6, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 6, CheckpointID = 7, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 6, CheckpointID = 8, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 6, CheckpointID = 9, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 6, CheckpointID = 10, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 6, CheckpointID = 11, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 6, CheckpointID = 12, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 6, CheckpointID = 13, IsParticipating = false },
-
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 7, CheckpointID = 1, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 7, CheckpointID = 2, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 7, CheckpointID = 3, IsParticipating = false },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 7, CheckpointID = 4, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 7, CheckpointID = 5, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 7, CheckpointID = 6, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 7, CheckpointID = 7, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 7, CheckpointID = 8, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 7, CheckpointID = 9, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 7, CheckpointID = 10, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 7, CheckpointID = 11, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 7, CheckpointID = 12, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 7, CheckpointID = 13, IsParticipating = false },
-
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 8, CheckpointID = 1, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 8, CheckpointID = 2, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 8, CheckpointID = 3, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 8, CheckpointID = 4, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 8, CheckpointID = 5, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 8, CheckpointID = 6, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 8, CheckpointID = 7, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 8, CheckpointID = 8, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 8, CheckpointID = 9, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 8, CheckpointID = 10, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 8, CheckpointID = 11, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 8, CheckpointID = 12, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 8, CheckpointID = 13, IsParticipating = true },
-
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 9, CheckpointID = 1, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 9, CheckpointID = 2, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 9, CheckpointID = 3, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 9, CheckpointID = 4, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 9, CheckpointID = 5, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 9, CheckpointID = 6, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 9, CheckpointID = 7, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 9, CheckpointID = 8, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 9, CheckpointID = 9, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 9, CheckpointID = 10, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 9, CheckpointID = 11, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 9, CheckpointID = 12, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 9, CheckpointID = 13, IsParticipating = true },
-
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 10, CheckpointID = 1, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 10, CheckpointID = 2, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 10, CheckpointID = 3, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 10, CheckpointID = 4, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 10, CheckpointID = 5, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 10, CheckpointID = 6, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 10, CheckpointID = 7, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 10, CheckpointID = 8, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 10, CheckpointID = 9, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 10, CheckpointID = 10, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 10, CheckpointID = 11, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 10, CheckpointID = 12, IsParticipating = true },
-                new CheckpointAgeCategoryParticipation() { AgeCategoryID = 10, CheckpointID = 13, IsParticipating = true }
+                GetCheckpointAgeCategoryParticipations()
             );
+        }
+
+        private static CheckpointAgeCategoryParticipation[] GetCheckpointAgeCategoryParticipations()
+        {
+            var res = new CheckpointAgeCategoryParticipation[21 * 13];
+
+            var index = 0;
+            for (int i = 1; i <= 21; i++)
+            {
+                for (int j = 1; j <= 13; j++)
+                {
+                    res[index++] = new CheckpointAgeCategoryParticipation()
+                    {
+                        AgeCategoryID = i,
+                        CheckpointID = j,
+                        IsParticipating = i switch
+                        {
+                            <= 2  => j is not 2 and not 3 and not 5 and not 13,
+                            >= 18 => j is not 3 and not 13,
+                            >= 15 => true,
+                            >= 3  => j is not 3 and not 13
+                        }
+                    };
+                }
+            }
+
+            return res;
         }
     }
 }
