@@ -51,7 +51,7 @@ namespace turisticky_zavod.Data
 
         [NotMapped]
         [JsonIgnore]
-        public string PartnerBirthYear { get { return (Partner != null && Partner.BirthYear.HasValue) ? Partner.BirthYear.Value.ToString() : "-"; } }
+        public DateTime? PartnerBirthdate { get => Partner?.Birthdate; }
 
         [NotMapped]
         [JsonIgnore]

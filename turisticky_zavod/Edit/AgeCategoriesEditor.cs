@@ -382,9 +382,15 @@ namespace turisticky_zavod.Forms
             }
         }
 
-        private void DataGridView_Checkpoints_CellEndEdit(object sender, DataGridViewCellEventArgs e)
+        private void DataGridView_Checkpoints_CellBeginEdit(object sender, DataGridViewCellCancelEventArgs e)
         {
+            e.Cancel = true;
+
             var item = (CheckpointAgeCategoryParticipation)dataGridView_checkpoints.CurrentRow.DataBoundItem;
+            item.IsParticipating = !item.IsParticipating;
+
+            database.CheckpointAgeCategoryParticipation.Update(item);
+
             if (database.SaveChanges() > 0)
             {
                 Log($"Age category \"{item.AgeCategory.Name}\"'s participation in checkpoint \"{item.Checkpoint.Name}\" changed successfully", "Data");

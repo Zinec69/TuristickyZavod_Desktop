@@ -51,7 +51,7 @@ namespace turisticky_zavod.Forms
                 try
                 {
                     // TODO
-                    //database.Database.EnsureDeleted();
+                    database.Database.EnsureDeleted();
                     database.Database.EnsureCreated();
 
                     Invoke(() =>
@@ -104,13 +104,13 @@ namespace turisticky_zavod.Forms
             })).Start();
         }
 
-        private void AddRunnersCSV(string filepath)
+        private async void AddRunnersCSV(string filepath)
         {
             try
             {
                 var timer = Stopwatch.StartNew();
 
-                var runners = FileHelper.LoadFromCSV(filepath);
+                var runners = await Task.Run(() => FileHelper.LoadFromCSV(filepath));
 
                 if (runners.Find(r => r.StartNumber != null) == null)
                 {
@@ -120,7 +120,7 @@ namespace turisticky_zavod.Forms
                     {
                         var ids = database.Runner.Local.Where(r => r.StartNumber.HasValue);
                         int i = ids.Any() ? ids.Max(r => r.StartNumber!.Value) : 0;
-                        foreach (Runner runner in database.ChangeTracker.Entries<Runner>().Select(x => x.Entity))
+                        foreach (var runner in runners)
                         {
                             runner.StartNumber = ++i;
                         }
@@ -128,7 +128,8 @@ namespace turisticky_zavod.Forms
                     }
                 }
 
-                database.SaveChanges();
+                await database.Runner.AddRangeAsync(runners);
+                await database.SaveChangesAsync();
 
                 timer.Stop();
                 Log($"Csv loaded and saved to database in {timer.ElapsedMilliseconds}ms", "Files");
@@ -485,7 +486,8 @@ namespace turisticky_zavod.Forms
                                    ? int.Parse(textBox_startNumber.Text)
                                    : (ids.Any() ? ids.Max(r => r.StartNumber!.Value) + 1 : 1);
                 var name = textBox_name.Text.Trim();
-                var birthYear = int.Parse(textBox_birthYear.Text);
+                var birthdate = dateTimePicker_birthdate.Value;
+                var gender = comboBox_gender.SelectedIndex == 1 ? Gender.FEMALE : Gender.MALE;
                 var team = (Team)comboBox_team.SelectedItem ?? new Team() { Name = comboBox_team.Text };
                 var ageCategory = (AgeCategory)comboBox_ageCategory.SelectedItem;
                 var partnerName = textBox_name_partner.Text.Trim();
@@ -501,19 +503,27 @@ namespace turisticky_zavod.Forms
 
                 runner.StartNumber = startNumber;
                 runner.Name = name;
-                runner.BirthYear = birthYear;
+                runner.Birthdate = birthdate;
                 runner.Team = team;
                 runner.AgeCategory = ageCategory;
 
                 if (!string.IsNullOrEmpty(partnerName))
                 {
-                    runner.Partner = database.Partner.ToList()
-                                             .FirstOrDefault(x => x.Name == partnerName, null)
-                                              ?? new()
-                                              {
-                                                  Name = partnerName,
-                                                  BirthYear = int.Parse(textBox_birthYear_partner.Text)
-                                              };
+                    var partnerBirthdate = dateTimePicker_birthdate_partner.Value;
+
+                    if (runner.Partner != null)
+                    {
+                        runner.Partner.Name = partnerName;
+                        runner.Partner.Birthdate = partnerBirthdate;
+                    }
+                    else
+                    {
+                        runner.Partner = new Partner()
+                        {
+                            Name = partnerName,
+                            Birthdate = partnerBirthdate
+                        };
+                    }
                 }
                 else
                     runner.Partner = null;
@@ -542,11 +552,14 @@ namespace turisticky_zavod.Forms
 
                 textBox_startNumber.Text = runner.StartNumber?.ToString() ?? string.Empty;
                 textBox_name.Text = runner.Name;
-                textBox_birthYear.Text = runner.BirthYear?.ToString() ?? string.Empty;
+                dateTimePicker_birthdate.Value = runner.Birthdate ?? new DateTime(2000, 1, 1);
                 comboBox_team.SelectedItem = runner.Team;
                 comboBox_ageCategory.SelectedItem = runner.AgeCategory;
+                comboBox_gender.SelectedIndex = runner.Gender == Gender.MALE ? 0 : 1;
+
                 textBox_name_partner.Text = runner.Partner?.Name ?? string.Empty;
-                textBox_birthYear_partner.Text = runner.Partner?.BirthYear?.ToString() ?? string.Empty;
+                dateTimePicker_birthdate_partner.Value = runner.Partner?.Birthdate ?? new DateTime(2000, 1, 1);
+                comboBox_gender_partner.SelectedIndex = runner.Partner != null ? (runner.Partner!.Gender == Gender.MALE ? 0 : 1) : -1;
 
                 button_save.Text = "Upravit";
             }
@@ -621,7 +634,7 @@ namespace turisticky_zavod.Forms
         {
             foreach (DataGridViewRow row in dataGridView_runners_results.Rows)
             {
-                row.HeaderCell.Value = ((BindingList<Runner>)dataGridView_runners_results.DataSource)[row.Index].Placement.ToString();
+                row.HeaderCell.Value = ((IList<Runner>)dataGridView_runners_results.DataSource)[row.Index].Placement.ToString();
             }
             ClearInputs();
         }
@@ -676,26 +689,6 @@ namespace turisticky_zavod.Forms
                 errorProvider.SetError((TextBox)sender, string.Empty);
         }
 
-        private void TextBox_BirthYear_Validating(object sender, CancelEventArgs e)
-        {
-            if (string.IsNullOrEmpty(textBox_birthYear.Text))
-            {
-                e.Cancel = true;
-                errorProvider.SetError((TextBox)sender, "Roèník je povinná položka");
-            }
-            else
-            {
-                var year = int.Parse(textBox_birthYear.Text);
-                if ((year >= 100 && year <= 1900) || year > DateTime.Now.Year)
-                {
-                    e.Cancel = true;
-                    errorProvider.SetError((TextBox)sender, "Roèník je ve špatném formátu, podporované jsou celé roky nebo poslední dvojèíslí");
-                }
-                else
-                    errorProvider.SetError((TextBox)sender, string.Empty);
-            }
-        }
-
         private void ComboBox_Team_Validating(object sender, CancelEventArgs e)
         {
             if (!(!string.IsNullOrEmpty(comboBox_team.Text) || comboBox_team.SelectedIndex > -1))
@@ -727,35 +720,33 @@ namespace turisticky_zavod.Forms
                 e.Cancel = true;
                 errorProvider.SetError((TextBox)sender, "Vyplòte jméno i pøíjmení, oddìlené mezerou");
             }
-            else if (string.IsNullOrEmpty(name) && !string.IsNullOrEmpty(textBox_birthYear_partner.Text))
-            {
-                e.Cancel = true;
-                errorProvider.SetError((TextBox)sender, "Povinné je jméno i roèník");
-            }
             else
                 errorProvider.SetError((TextBox)sender, string.Empty);
         }
 
-        private void TextBox_BirthYear_Partner_Validating(object sender, CancelEventArgs e)
+        private void ComboBox_Gender_Validating(object sender, CancelEventArgs e)
         {
-            if (!string.IsNullOrEmpty(textBox_birthYear_partner.Text))
-            {
-                var year = int.Parse(textBox_birthYear_partner.Text);
-                if ((year >= 100 && year <= 1900) || year > DateTime.Now.Year)
-                {
-                    e.Cancel = true;
-                    errorProvider.SetError((TextBox)sender, "Roèník je ve špatném formátu, podporované jsou celé roky nebo poslední dvojèíslí");
-                }
-                else
-                    errorProvider.SetError((TextBox)sender, string.Empty);
-            }
-            else if (!string.IsNullOrEmpty(textBox_name_partner.Text))
+            if (comboBox_gender.SelectedIndex == -1)
             {
                 e.Cancel = true;
-                errorProvider.SetError((TextBox)sender, "Povinné je jméno i roèník");
+                errorProvider.SetError((ComboBox)sender, "Pohlaví je povinná položka");
             }
             else
-                errorProvider.SetError((TextBox)sender, string.Empty);
+                errorProvider.SetError((ComboBox)sender, string.Empty);
+        }
+
+        private void ComboBox_Gender_Partner_Validating(object sender, CancelEventArgs e)
+        {
+            var name = textBox_name_partner.Text.Trim();
+
+            if (!string.IsNullOrEmpty(name) && name.Split(' ').Length > 1
+                && comboBox_gender_partner.SelectedIndex == -1)
+            {
+                e.Cancel = true;
+                errorProvider.SetError((ComboBox)sender, "Pohlaví je povinná položka");
+            }
+            else
+                errorProvider.SetError((ComboBox)sender, string.Empty);
         }
 
         private void TextBox_StartNumber_KeyDown(object sender, KeyEventArgs e)
@@ -774,25 +765,6 @@ namespace turisticky_zavod.Forms
                 e.SuppressKeyPress = true;
         }
 
-        private void TextBox_BirthYear_KeyUp(object sender, KeyEventArgs e)
-        {
-            if (int.TryParse(textBox_birthYear.Text, out int year))
-            {
-                if (year < 100)
-                {
-                    var currentYear = DateTime.Now.Year;
-                    year += year > (currentYear - 2000) ? 1900 : 2000;
-                }
-
-                var duo = !string.IsNullOrEmpty(textBox_name_partner.Text);
-                var category = duo
-                    ? Data.AgeCategory.GetByBirthYear(year, CategoryType.DUOS,
-                            int.TryParse(textBox_birthYear_partner.Text, out int res) ? res : null)
-                    : Data.AgeCategory.GetByBirthYear(year);
-                comboBox_ageCategory.SelectedItem = category;
-            }
-        }
-
         private void TextBox_BirthYear_Partner_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
@@ -803,24 +775,44 @@ namespace turisticky_zavod.Forms
 
         private void TextBox_Name_Partner_KeyUp(object sender, KeyEventArgs e)
         {
-            if (textBox_name_partner.Text.Length <= 1 && !string.IsNullOrEmpty(textBox_birthYear.Text))
+            if (textBox_name_partner.Text.Length <= 1)
             {
-                if (int.TryParse(textBox_birthYear.Text, out int year))
-                {
-                    if (year < 100)
-                    {
-                        var currentYear = DateTime.Now.Year;
-                        year += year > (currentYear - 2000) ? 1900 : 2000;
-                    }
-
-                    var duo = !string.IsNullOrEmpty(textBox_name_partner.Text);
-                    var category = duo
-                        ? Data.AgeCategory.GetByBirthYear(year, CategoryType.DUOS,
-                                int.TryParse(textBox_birthYear_partner.Text, out int res) ? res : null)
-                        : Data.AgeCategory.GetByBirthYear(year);
-                    comboBox_ageCategory.SelectedItem = category;
-                }
+                Set_AgeCategory_ComboBox_Value();
             }
+        }
+
+        private void DateTimePicker_Birthdate_ValueChanged(object sender, EventArgs e)
+        {
+            Set_AgeCategory_ComboBox_Value();
+        }
+
+        private void DateTimePicker_Birthdate_Partner_ValueChanged(object sender, EventArgs e)
+        {
+            Set_AgeCategory_ComboBox_Value();
+        }
+
+        private void ComboBox_Gender_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (comboBox_gender.SelectedIndex > -1)
+            {
+                Set_AgeCategory_ComboBox_Value();
+            }
+        }
+
+        private void ComboBox_Gender_Partner_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (comboBox_gender_partner.SelectedIndex > -1)
+            {
+                Set_AgeCategory_ComboBox_Value();
+            }
+        }
+
+        private void Set_AgeCategory_ComboBox_Value()
+        {
+            comboBox_ageCategory.SelectedItem = Data.AgeCategory.TryGetByBirthdate(dateTimePicker_birthdate.Value, database.AgeCategory.Local,
+                comboBox_gender.SelectedIndex == 0 ? Gender.MALE : Gender.FEMALE, out AgeCategory? category,
+                string.IsNullOrEmpty(textBox_name_partner.Text) ? CategoryType.DEFAULT : CategoryType.DUOS,
+                dateTimePicker_birthdate_partner.Value) ? category : null;
         }
 
         #endregion
@@ -839,14 +831,14 @@ namespace turisticky_zavod.Forms
 
             if (e.TabPageIndex == 0)
             {
-                size = new Size(1225, 710);
+                size = new Size(1111, 750);
 
                 MinimumSize = size;
                 Size = size;
             }
             else
             {
-                size = new Size(1500, 710);
+                size = new Size(1500, 750);
 
                 Size = size;
                 MinimumSize = size;
@@ -859,11 +851,13 @@ namespace turisticky_zavod.Forms
         {
             textBox_startNumber.Clear();
             textBox_name.Clear();
-            textBox_birthYear.Clear();
+            dateTimePicker_birthdate.Value = new DateTime(2000, 1, 1);
+            comboBox_gender.SelectedIndex = -1;
             comboBox_team.SelectedIndex = -1;
             comboBox_ageCategory.SelectedIndex = -1;
             textBox_name_partner.Clear();
-            textBox_birthYear_partner.Clear();
+            dateTimePicker_birthdate_partner.Value = new DateTime(2000, 1, 1);
+            comboBox_gender_partner.SelectedIndex = -1;
 
             button_save.Text = "Pøidat";
         }
@@ -872,11 +866,11 @@ namespace turisticky_zavod.Forms
         {
             errorProvider.SetError(textBox_name, string.Empty);
             errorProvider.SetError(textBox_name, string.Empty);
-            errorProvider.SetError(textBox_birthYear, string.Empty);
             errorProvider.SetError(comboBox_team, string.Empty);
             errorProvider.SetError(comboBox_ageCategory, string.Empty);
+            errorProvider.SetError(comboBox_gender, string.Empty);
             errorProvider.SetError(textBox_name_partner, string.Empty);
-            errorProvider.SetError(textBox_birthYear_partner, string.Empty);
+            errorProvider.SetError(comboBox_gender_partner, string.Empty);
         }
 
         private static bool HandleNumberOnlyField(KeyEventArgs e)
@@ -948,23 +942,62 @@ namespace turisticky_zavod.Forms
 
         private void DataGridView_RunnerCheckpoints_CellBeginEdit(object sender, DataGridViewCellCancelEventArgs e)
         {
-            var checkpointID = ((CheckpointRunnerInfo)dataGridView_runnerCheckpoints.Rows[e.RowIndex].DataBoundItem).CheckpointID;
-            if (checkpointID is not 2 and not 3 and not 5 and not 6 and not 8 and not 13)
+            if (e.ColumnIndex == 3)
             {
                 e.Cancel = true;
-                MessageBox.Show("V tomto stanovišti nelze diskvalifikovat",
-                    "Chyba", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                var checkpointInfo = (CheckpointRunnerInfo)dataGridView_runnerCheckpoints.Rows[e.RowIndex].DataBoundItem;
+
+                if (checkpointInfo.CheckpointID is not 2 and not 3 and not 5 and not 6 and not 8 and not 13)
+                {
+                    MessageBox.Show("V tomto stanovišti nelze diskvalifikovat",
+                        "Chyba", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                else
+                {
+                    var checkpointInfos = (List<CheckpointRunnerInfo>)dataGridView_runnerCheckpoints.DataSource;
+                    var runner = (Runner)dataGridView_runners_results.CurrentRow.DataBoundItem;
+
+                    checkpointInfo.Disqualified = !checkpointInfo.Disqualified;
+                    database.CheckpointRunnerInfo.Update(checkpointInfo);
+
+                    var runnerDisqualified = runner.Disqualified;
+                    runner.Disqualified = checkpointInfo.Disqualified || checkpointInfos.Any(x => x.Disqualified);
+
+                    if (runnerDisqualified != runner.Disqualified)
+                        database.Runner.Update(runner);
+
+                    database.SaveChanges();
+
+                    Refresh_RunnersResults_DataGridView();
+                }
             }
         }
 
         private void DataGridView_RunnerCheckpoints_CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {
-            
+            Refresh_RunnersResults_DataGridView();
+        }
+
+        private void Refresh_RunnersResults_DataGridView()
+        {
+            if (checkBox_filter_team.Checked)
+            {
+                var team = (Team)comboBox_filter_team.SelectedItem;
+                dataGridView_runners_results.DataSource = database.Runner.Local.Where(x => x.Team.ID == team.ID).ToList();
+            }
+            else if (checkBox_filter_category.Checked)
+            {
+                var category = (AgeCategory)comboBox_filter_category.SelectedItem;
+                dataGridView_runners_results.DataSource = database.Runner.Local.Where(x => x.AgeCategory != null && x.AgeCategory.ID == category.ID).ToList();
+            }
+            else
+                dataGridView_runners_results.DataSource = database.Runner.Local.ToBindingList();
         }
 
         private void DataGridView_RunnerCheckpoints_RowsAdded(object sender, DataGridViewRowsAddedEventArgs e)
         {
-            foreach (DataGridViewRow row in dataGridView_runners_results.Rows)
+            foreach (DataGridViewRow row in dataGridView_runnerCheckpoints.Rows)
             {
                 row.HeaderCell.Value = (row.Index + 1).ToString();
             }

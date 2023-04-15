@@ -85,10 +85,10 @@ namespace turisticky_zavod.Data
 
             writer.WriteString(nameof(value.Name), value.Name);
 
-            if (value.BirthYear.HasValue)
-                writer.WriteNumber(nameof(value.BirthYear), value.BirthYear.Value);
+            if (value.Birthdate.HasValue)
+                writer.WriteString(nameof(value.Birthdate), value.Birthdate.Value);
             else
-                writer.WriteNull(nameof(value.BirthYear));
+                writer.WriteNull(nameof(value.Birthdate));
 
             if (value.StartTime.HasValue)
                 writer.WriteString(nameof(value.StartTime), value.StartTime.Value);

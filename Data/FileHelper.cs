@@ -1,4 +1,5 @@
 ﻿using ClosedXML.Excel;
+using System.Diagnostics;
 using System.Text;
 using System.Text.Json;
 
@@ -9,57 +10,61 @@ namespace turisticky_zavod.Data
         public static List<Runner> LoadFromCSV(string filePath)
         {
             List<Runner> runners = new();
+
             var database = Database.Instance;
+            var allCategories = database.AgeCategory.Local;
 
-            using var reader = new StreamReader(filePath, Encoding.GetEncoding("Windows-1250"));
-
-            reader.ReadLine();
-            while (!reader.EndOfStream)
+            using (var reader = new StreamReader(filePath, Encoding.GetEncoding("Windows-1250")))
             {
-                var line = reader.ReadLine()?.Split(';');
-                if (line != null && line.Length >= 5)
+                reader.ReadLine();
+                while (!reader.EndOfStream)
                 {
-                    var runner = new Runner()
-                    {
-                        StartNumber = !string.IsNullOrEmpty(line[0].Trim()) ? int.Parse(line[0].Trim()) : null,
-                        LastName = line[1].Trim(),
-                        FirstName = line[2].Trim(),
-                        BirthYear = int.TryParse(line[3].Trim(), out int result) ? result : null,
-                        Team = database.ChangeTracker.Entries<Team>()
-                                                     .FirstOrDefault(x => x.Entity.Name == line[4].Trim(), null)?.Entity
-                                                      ?? new() { Name = line[4].Trim() }
-                    };
+                    var line = reader.ReadLine()?.Split(';');
 
-                    if (line.Length >= 8)
+                    if (line != null)
                     {
-                        runner.Partner = string.IsNullOrEmpty(line[5].Trim()) ? null : new()
+                        var startNumber = line[0].Trim();
+                        var runner = new Runner()
                         {
-                            LastName = line[5].Trim(),
-                            FirstName = line[6].Trim(),
-                            BirthYear = int.TryParse(line[7].Trim(), out int result2) ? result2 : null
+                            StartNumber = !string.IsNullOrEmpty(startNumber) ? int.Parse(startNumber) : null,
+                            LastName = line[1].Trim(),
+                            FirstName = line[2].Trim(),
+                            Gender = line[3].Trim().ToLower()[0] == 'm' ? Gender.MALE : Gender.FEMALE,
+                            Birthdate = DateTime.TryParse(line[4].Trim(), out DateTime birthday) ? birthday : null
                         };
-                    }
-                    else
-                        runner.Partner = null;
 
-                    if (line.Length >= 10 && AgeCategory.TryGetByString(line[9].Trim(), runner.Partner != null, out AgeCategory? category))
-                    {
-                        runner.AgeCategory = category;
-                    }
-                    else
-                    {
-                        runner.AgeCategory = runner.BirthYear.HasValue
+                        var teamName = line[5].Trim();
+                        var team = database.ChangeTracker.Entries<Team>().FirstOrDefault(x => x.Entity.Name == teamName, null)?.Entity;
+                        if (team == null)
+                        {
+                            runner.Team = new() { Name = teamName };
+                            database.Team.Add(runner.Team);
+                        }
+                        else
+                            runner.Team = team;
+
+                        var partnerLastName = line[6].Trim();
+                        runner.Partner = string.IsNullOrEmpty(partnerLastName) ? null : new()
+                        {
+                            LastName = partnerLastName,
+                            FirstName = line[7].Trim(),
+                            Gender = line[8].Trim().ToLower()[0] == 'm' ? Gender.MALE : Gender.FEMALE,
+                            Birthdate = DateTime.TryParse(line[9].Trim(), out DateTime birthday2) ? birthday2 : null
+                        };
+
+                        runner.AgeCategory = runner.Birthdate.HasValue
                             ? (runner.Partner == null
-                                    ? AgeCategory.GetByBirthYear(runner.BirthYear.Value)
-                                    : AgeCategory.GetByBirthYear(runner.BirthYear.Value, CategoryType.DUOS,
-                                        runner.Partner!.BirthYear.HasValue ? runner.Partner?.BirthYear.Value : null))
+                                    ? (AgeCategory.TryGetByBirthdate(runner.Birthdate.Value, allCategories, runner.Gender, out AgeCategory? category) ? category : null)
+                                    : (AgeCategory.TryGetByBirthdate(runner.Birthdate.Value, allCategories, runner.Gender, out AgeCategory? category2, CategoryType.DUOS,
+                                            runner.Partner!.Birthdate.HasValue ? runner.Partner?.Birthdate.Value : null) ? category2 : null))
                             : null;
-                    }
 
-                    runners.Add(runner);
-                    database.Runner.Add(runner);
+                        runners.Add(runner);
+                    }
                 }
             }
+
+            //database.Runner.AddRange(runners);
 
             return runners;
         }
@@ -110,7 +115,7 @@ namespace turisticky_zavod.Data
                 worksheet.Cell($"{cellColumn++}{cellRow}").Value = runner.FirstName;
                 worksheet.Cell($"{cellColumn++}{cellRow}").Value = runner.LastName;
                 worksheet.Cell($"{cellColumn++}{cellRow}").Value = runner.Team.ToString();
-                worksheet.Cell($"{cellColumn++}{cellRow}").Value = runner.BirthYear;
+                worksheet.Cell($"{cellColumn++}{cellRow}").Value = runner.Birthdate;
                 worksheet.Cell($"{cellColumn++}{cellRow}").Value = runner.AgeCategory != null
                                                                     ? runner.AgeCategory.ToString()
                                                                     : string.Empty;
@@ -123,7 +128,7 @@ namespace turisticky_zavod.Data
                                                                         ? runner.Partner!.LastName
                                                                         : string.Empty;
                     worksheet.Cell($"{cellColumn++}{cellRow}").Value = runner.Partner != null
-                                                                        ? runner.Partner!.BirthYear
+                                                                        ? runner.Partner!.Birthdate
                                                                         : string.Empty;
                 }
                 worksheet.Cell($"{cellColumn++}{cellRow}").Value = runner.FinalRunTime.HasValue
@@ -190,7 +195,7 @@ namespace turisticky_zavod.Data
                     sheet.Cell($"{cellColumn++}{cellRow}").Value = runner.FirstName;
                     sheet.Cell($"{cellColumn++}{cellRow}").Value = runner.LastName;
                     sheet.Cell($"{cellColumn++}{cellRow}").Value = runner.Team.ToString();
-                    sheet.Cell($"{cellColumn++}{cellRow}").Value = runner.BirthYear;
+                    sheet.Cell($"{cellColumn++}{cellRow}").Value = runner.Birthdate;
                     if (partners)
                     {
                         sheet.Cell($"{cellColumn++}{cellRow}").Value = runner.Partner != null
@@ -200,7 +205,7 @@ namespace turisticky_zavod.Data
                                                                             ? runner.Partner!.LastName
                                                                             : string.Empty;
                         sheet.Cell($"{cellColumn++}{cellRow}").Value = runner.Partner != null
-                                                                            ? runner.Partner!.BirthYear
+                                                                            ? runner.Partner!.Birthdate
                                                                             : string.Empty;
                     }
                     sheet.Cell($"{cellColumn++}{cellRow}").Value = runner.FinalRunTime.HasValue

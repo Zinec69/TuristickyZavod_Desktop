@@ -56,15 +56,7 @@ namespace turisticky_zavod.Data
             if (path[(path.LastIndexOf('.') + 1)..].ToLower() == "json")
                 ExportToJson(path);
             else
-                ExportToExcel(path);
-        }
-
-        private void ExportToExcel(string filePath)
-        {
-            FileHelper.ExportToExcel(instance.Runner.Local.ToList(), filePath);
-
-            IsSaved = true;
-            SavedFilePath = filePath;
+                FileHelper.ExportToExcel(instance.Runner.Local.ToList(), path);
         }
 
         private void ExportToJson(string filePath)
@@ -263,29 +255,29 @@ namespace turisticky_zavod.Data
 
             modelBuilder.Entity<AgeCategory>().HasIndex(x => x.Code).IsUnique();
             modelBuilder.Entity<AgeCategory>().HasData(
-                new AgeCategory() { ID = 1,  AgeMin = 0,  AgeMax = 10,   Name = "Nejmladší žáci",         Code = "NŽH",   Color = "Bílá" },
-                new AgeCategory() { ID = 2,  AgeMin = 0,  AgeMax = 10,   Name = "Nejmladší žákyně",       Code = "NŽD",   Color = "Bílá" },
-                new AgeCategory() { ID = 3,  AgeMin = 11, AgeMax = 12,   Name = "Mladší žáci",            Code = "MŽH",   Color = "Bílá" },
-                new AgeCategory() { ID = 4,  AgeMin = 11, AgeMax = 12,   Name = "Mladší žákyně",          Code = "MŽD",   Color = "Bílá" },
-                new AgeCategory() { ID = 5,  AgeMin = 13, AgeMax = 14,   Name = "Starší žáci",            Code = "SŽH",   Color = "Bílá" },
-                new AgeCategory() { ID = 6,  AgeMin = 13, AgeMax = 14,   Name = "Starší žákyně",          Code = "SŽD",   Color = "Bílá" },
-                new AgeCategory() { ID = 7,  AgeMin = 15, AgeMax = 16,   Name = "Mladší dorostenci",      Code = "MDH",   Color = "Červená" },
-                new AgeCategory() { ID = 8,  AgeMin = 15, AgeMax = 16,   Name = "Mladší dorostenky",      Code = "MDD",   Color = "Červená" },
-                new AgeCategory() { ID = 9,  AgeMin = 17, AgeMax = 18,   Name = "Starší dorostenci",      Code = "SDH",   Color = "Červená" },
-                new AgeCategory() { ID = 10, AgeMin = 17, AgeMax = 18,   Name = "Starší dorostenky",      Code = "SDD",   Color = "Červená" },
-                new AgeCategory() { ID = 11, AgeMin = 19, AgeMax = 35,   Name = "Dospělí A - Muži",       Code = "MA",    Color = "Červená" },
-                new AgeCategory() { ID = 12, AgeMin = 19, AgeMax = 35,   Name = "Dospělí A - Ženy",       Code = "ŽA",    Color = "Červená" },
-                new AgeCategory() { ID = 13, AgeMin = 19, AgeMax = 35,   Name = "Dospělí B - Muži",       Code = "MB",    Color = "Červená" },
-                new AgeCategory() { ID = 14, AgeMin = 19, AgeMax = 35,   Name = "Dospělí B - Ženy",       Code = "ŽB",    Color = "Červená" },
+                new AgeCategory() { ID = 1,  AgeMin = 0,  AgeMax = 10,   Name = "Nejmladší žáci",         Code = "NŽH",   Gender = Gender.MALE,       Color = "Bílá" },
+                new AgeCategory() { ID = 2,  AgeMin = 0,  AgeMax = 10,   Name = "Nejmladší žákyně",       Code = "NŽD",   Gender = Gender.FEMALE,     Color = "Bílá" },
+                new AgeCategory() { ID = 3,  AgeMin = 11, AgeMax = 12,   Name = "Mladší žáci",            Code = "MŽH",   Gender = Gender.MALE,       Color = "Bílá" },
+                new AgeCategory() { ID = 4,  AgeMin = 11, AgeMax = 12,   Name = "Mladší žákyně",          Code = "MŽD",   Gender = Gender.FEMALE,     Color = "Bílá" },
+                new AgeCategory() { ID = 5,  AgeMin = 13, AgeMax = 14,   Name = "Starší žáci",            Code = "SŽH",   Gender = Gender.MALE,       Color = "Bílá" },
+                new AgeCategory() { ID = 6,  AgeMin = 13, AgeMax = 14,   Name = "Starší žákyně",          Code = "SŽD",   Gender = Gender.FEMALE,     Color = "Bílá" },
+                new AgeCategory() { ID = 7,  AgeMin = 15, AgeMax = 16,   Name = "Mladší dorostenci",      Code = "MDH",   Gender = Gender.MALE,       Color = "Červená" },
+                new AgeCategory() { ID = 8,  AgeMin = 15, AgeMax = 16,   Name = "Mladší dorostenky",      Code = "MDD",   Gender = Gender.FEMALE,     Color = "Červená" },
+                new AgeCategory() { ID = 9,  AgeMin = 17, AgeMax = 18,   Name = "Starší dorostenci",      Code = "SDH",   Gender = Gender.MALE,       Color = "Červená" },
+                new AgeCategory() { ID = 10, AgeMin = 17, AgeMax = 18,   Name = "Starší dorostenky",      Code = "SDD",   Gender = Gender.FEMALE,     Color = "Červená" },
+                new AgeCategory() { ID = 11, AgeMin = 19, AgeMax = 35,   Name = "Dospělí A - Muži",       Code = "MA",    Gender = Gender.MALE,       Color = "Červená" },
+                new AgeCategory() { ID = 12, AgeMin = 19, AgeMax = 35,   Name = "Dospělí A - Ženy",       Code = "ŽA",    Gender = Gender.FEMALE,     Color = "Červená" },
+                new AgeCategory() { ID = 13, AgeMin = 36, AgeMax = null, Name = "Dospělí B - Muži",       Code = "MB",    Gender = Gender.MALE,       Color = "Červená" },
+                new AgeCategory() { ID = 14, AgeMin = 36, AgeMax = null, Name = "Dospělí B - Ženy",       Code = "ŽB",    Gender = Gender.FEMALE,     Color = "Červená" },
                                                                                                           
-                new AgeCategory() { ID = 15, AgeMin = 0,  AgeMax = 30,   Name = "Do 30 let",              Code = "30-",   Color = "Červená", Type = CategoryType.DUOS },
-                new AgeCategory() { ID = 16, AgeMin = 31, AgeMax = 70,   Name = "31 - 70 let",            Code = "31-70", Color = "Červená", Type = CategoryType.DUOS },
-                new AgeCategory() { ID = 17, AgeMin = 71, AgeMax = null, Name = "Nad 70 let",             Code = "70+",   Color = "Červená", Type = CategoryType.DUOS },
+                new AgeCategory() { ID = 15, AgeMin = 0,  AgeMax = 30,   Name = "Do 30 let",              Code = "30-",   Gender = Gender.IRRELEVANT, Color = "Červená", Type = CategoryType.DUOS },
+                new AgeCategory() { ID = 16, AgeMin = 31, AgeMax = 70,   Name = "31 - 70 let",            Code = "31-70", Gender = Gender.IRRELEVANT, Color = "Červená", Type = CategoryType.DUOS },
+                new AgeCategory() { ID = 17, AgeMin = 71, AgeMax = null, Name = "Nad 70 let",             Code = "70+",   Gender = Gender.IRRELEVANT, Color = "Červená", Type = CategoryType.DUOS },
 
-                new AgeCategory() { ID = 18, AgeMin = 0,  AgeMax = 14,   Name = "Žáci 14 let a mladší",   Code = "H14-",  Color = "Červená", Type = CategoryType.RELAY },
-                new AgeCategory() { ID = 19, AgeMin = 0,  AgeMax = 14,   Name = "Žákyně 14 let a mladší", Code = "D14-",  Color = "Červená", Type = CategoryType.RELAY },
-                new AgeCategory() { ID = 20, AgeMin = 15, AgeMax = null, Name = "Muži 15 let a starší",   Code = "M15+",  Color = "Červená", Type = CategoryType.RELAY },
-                new AgeCategory() { ID = 21, AgeMin = 15, AgeMax = null, Name = "Ženy 15 let a starší",   Code = "Ž15+",  Color = "Červená", Type = CategoryType.RELAY }
+                new AgeCategory() { ID = 18, AgeMin = 0,  AgeMax = 14,   Name = "Žáci 14 let a mladší",   Code = "H14-",  Gender = Gender.MALE,       Color = "Červená", Type = CategoryType.RELAY },
+                new AgeCategory() { ID = 19, AgeMin = 0,  AgeMax = 14,   Name = "Žákyně 14 let a mladší", Code = "D14-",  Gender = Gender.FEMALE,     Color = "Červená", Type = CategoryType.RELAY },
+                new AgeCategory() { ID = 20, AgeMin = 15, AgeMax = null, Name = "Muži 15 let a starší",   Code = "M15+",  Gender = Gender.MALE,       Color = "Červená", Type = CategoryType.RELAY },
+                new AgeCategory() { ID = 21, AgeMin = 15, AgeMax = null, Name = "Ženy 15 let a starší",   Code = "Ž15+",  Gender = Gender.FEMALE,     Color = "Červená", Type = CategoryType.RELAY }
             );
 
             modelBuilder.Entity<Runner>().HasIndex(x => x.StartNumber).IsUnique();

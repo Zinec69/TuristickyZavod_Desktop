@@ -390,7 +390,7 @@
             dataGridView_checkpoints.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dataGridView_checkpoints.Size = new Size(356, 327);
             dataGridView_checkpoints.TabIndex = 0;
-            dataGridView_checkpoints.CellEndEdit += DataGridView_Checkpoints_CellEndEdit;
+            dataGridView_checkpoints.CellBeginEdit += DataGridView_Checkpoints_CellBeginEdit;
             dataGridView_checkpoints.CurrentCellChanged += DataGridView_Checkpoints_CurrentCellChanged;
             dataGridView_checkpoints.RowsAdded += DataGridView_Checkpoints_RowsAdded;
             dataGridView_checkpoints.UserDeletingRow += DataGridView_Checkpoints_UserDeletingRow;
