@@ -1,5 +1,4 @@
 ﻿using ClosedXML.Excel;
-using System.Diagnostics;
 using System.Text;
 using System.Text.Json;
 
@@ -7,7 +6,7 @@ namespace turisticky_zavod.Data
 {
     public static class FileHelper
     {
-        public static List<Runner> LoadFromCSV(string filePath)
+        public async static Task<List<Runner>> LoadFromCSV(string filePath)
         {
             List<Runner> runners = new();
 
@@ -16,10 +15,10 @@ namespace turisticky_zavod.Data
 
             using (var reader = new StreamReader(filePath, Encoding.GetEncoding("Windows-1250")))
             {
-                reader.ReadLine();
+                await reader.ReadLineAsync();
                 while (!reader.EndOfStream)
                 {
-                    var line = reader.ReadLine()?.Split(';');
+                    var line = (await reader.ReadLineAsync())?.Split(';');
 
                     if (line != null)
                     {
@@ -64,8 +63,6 @@ namespace turisticky_zavod.Data
                 }
             }
 
-            //database.Runner.AddRange(runners);
-
             return runners;
         }
 
@@ -82,18 +79,18 @@ namespace turisticky_zavod.Data
             var cellRow = 4;
             var cellColumn = 'B';
 
-            worksheet.Cell($"{cellColumn++}3").Value = "Pořadí";
+            worksheet.Cell($"{cellColumn++}3").Value = "Umístění";
             worksheet.Cell($"{cellColumn++}3").Value = "Startovní číslo";
             worksheet.Cell($"{cellColumn++}3").Value = "Jméno";
             worksheet.Cell($"{cellColumn++}3").Value = "Příjmení";
             worksheet.Cell($"{cellColumn++}3").Value = "Oddíl";
-            worksheet.Cell($"{cellColumn++}3").Value = "Ročník";
+            worksheet.Cell($"{cellColumn++}3").Value = "Datum narození";
             worksheet.Cell($"{cellColumn++}3").Value = "Věková kategorie";
             if (partners)
             {
                 worksheet.Cell($"{cellColumn++}3").Value = "Jméno 2";
                 worksheet.Cell($"{cellColumn++}3").Value = "Příjmení 2";
-                worksheet.Cell($"{cellColumn++}3").Value = "Ročník 2";
+                worksheet.Cell($"{cellColumn++}3").Value = "Datum narození 2";
             }
             worksheet.Cell($"{cellColumn++}3").Value = "Výsledný čas";
             worksheet.Cell($"{cellColumn++}3").Value = "Celkový čas strávený čekáním";
@@ -142,7 +139,7 @@ namespace turisticky_zavod.Data
                 {
                     var disqualificationCheckpoint = runner.CheckpointInfo.Find(x => x.Disqualified);
                     worksheet.Cell($"{cellColumn}{cellRow}").Value = $"Diskvalifikován/a na stanovišti {disqualificationCheckpoint!.Checkpoint.Name}";
-                    worksheet.Range($"B{cellRow}:{(char)(cellColumn - 1)}{cellRow}").Style.Fill.BackgroundColor = XLColor.FromArgb(230, 184, 183);
+                    worksheet.Range($"B{cellRow}:{(char)(cellColumn - 1)}{cellRow}").Style.Fill.BackgroundColor = XLColor.FromArgb(237, 204, 203);
                 }
 
                 cellRow++;
@@ -164,17 +161,17 @@ namespace turisticky_zavod.Data
                 sheet.Cell("B2").Value = $"Výsledky {DateTime.Now.Date:d.M.yyyy} - {category.Name}";
                 sheet.Cell("B2").Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
 
-                sheet.Cell($"{cellColumn++}3").Value = "Pořadí";
+                sheet.Cell($"{cellColumn++}3").Value = "Umístění";
                 sheet.Cell($"{cellColumn++}3").Value = "Startovní číslo";
                 sheet.Cell($"{cellColumn++}3").Value = "Jméno";
                 sheet.Cell($"{cellColumn++}3").Value = "Příjmení";
                 sheet.Cell($"{cellColumn++}3").Value = "Oddíl";
-                sheet.Cell($"{cellColumn++}3").Value = "Ročník";
+                sheet.Cell($"{cellColumn++}3").Value = "Datum narození";
                 if (partners)
                 {
                     sheet.Cell($"{cellColumn++}3").Value = "Jméno 2";
                     sheet.Cell($"{cellColumn++}3").Value = "Příjmení 2";
-                    sheet.Cell($"{cellColumn++}3").Value = "Ročník 2";
+                    sheet.Cell($"{cellColumn++}3").Value = "Datum narození 2";
                 }
                 sheet.Cell($"{cellColumn++}3").Value = "Výsledný čas";
                 sheet.Cell($"{cellColumn++}3").Value = "Celkový čas strávený čekáním";
@@ -219,7 +216,7 @@ namespace turisticky_zavod.Data
                     {
                         var disqualificationCheckpoint = runner.CheckpointInfo.Find(x => x.Disqualified);
                         sheet.Cell($"{cellColumn}{cellRow}").Value = $"Diskvalifikován/a na stanovišti {disqualificationCheckpoint!.Checkpoint.Name}";
-                        sheet.Range($"B{cellRow}:{(char)(cellColumn - 1)}{cellRow}").Style.Fill.BackgroundColor = XLColor.FromArgb(230, 184, 183);
+                        sheet.Range($"B{cellRow}:{(char)(cellColumn - 1)}{cellRow}").Style.Fill.BackgroundColor = XLColor.FromArgb(237, 204, 203);
                     }
 
                     cellRow++;

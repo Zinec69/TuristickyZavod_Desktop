@@ -82,12 +82,12 @@ namespace turisticky_zavod.Forms
 
             try
             {
-                // TODO
-                // var runner = Reader.ReadRunnerFromTag(checkBox_eraseTag.Checked);
                 var runner = Reader.ReadRunnerFromTag();
                 timer.Stop();
                 SaveRunner(runner);
                 toolStripStatusLabel.Text = $"Běžec č. {runner.StartNumber} úspěšně načten [{timer.ElapsedMilliseconds}ms]"; // TODO odebrat ms
+
+                DialogResult = DialogResult.OK;
             }
             catch (NFCException ex)
             {

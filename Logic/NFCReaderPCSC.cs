@@ -293,12 +293,20 @@ namespace turisticky_zavod.Logic
             Monitor.Dispose();
             try
             {
-                foreach (var del in OnCardDetected.GetInvocationList())
-                    OnCardDetected -= (EventHandler<CardStatusEventArgs>)del;
-                foreach (var del in OnReaderDisconnected.GetInvocationList())
-                    OnReaderDisconnected -= (EventHandler)del;
-                foreach (var del in OnReaderReconnected.GetInvocationList())
-                    OnReaderReconnected -= (EventHandler)del;
+                var list = OnCardDetected?.GetInvocationList();
+                if (list != null)
+                    foreach (var del in list)
+                        OnCardDetected -= (EventHandler<CardStatusEventArgs>)del;
+
+                list = OnReaderDisconnected?.GetInvocationList();
+                if (list != null)
+                    foreach (var del in list)
+                        OnReaderDisconnected -= (EventHandler)del;
+
+                list = OnReaderReconnected?.GetInvocationList();
+                if (list != null)
+                    foreach (var del in list)
+                        OnReaderReconnected -= (EventHandler)del;
             }
             catch (Exception) { }
         }

@@ -51,28 +51,28 @@ namespace turisticky_zavod.Forms
                 try
                 {
                     // TODO
-                    database.Database.EnsureDeleted();
+                    //database.Database.EnsureDeleted();
                     database.Database.EnsureCreated();
 
-                    Invoke(() =>
+                    Invoke(async () =>
                     {
-                        database.CheckpointRunnerInfo.Load();
+                        await database.CheckpointRunnerInfo.LoadAsync();
                         toolStripProgressBar1.Value += 20;
-                        database.Runner.Load();
+                        await database.Runner.LoadAsync();
                         toolStripProgressBar1.Value += 20;
-                        database.Partner.Load();
+                        await database.Partner.LoadAsync();
                         toolStripProgressBar1.Value += 10;
-                        database.AgeCategory.Load();
+                        await database.AgeCategory.LoadAsync();
                         toolStripProgressBar1.Value += 15;
-                        database.Checkpoint.Load();
+                        await database.Checkpoint.LoadAsync();
                         toolStripProgressBar1.Value += 15;
-                        database.Referee.Load();
+                        await database.Referee.LoadAsync();
                         toolStripProgressBar1.Value += 5;
-                        database.Team.Load();
+                        await database.Team.LoadAsync();
                         toolStripProgressBar1.Value += 5;
-                        database.CheckpointAgeCategoryParticipation.Load();
+                        await database.CheckpointAgeCategoryParticipation.LoadAsync();
                         toolStripProgressBar1.Value += 10;
-                        database.Log.Load();
+                        await database.Log.LoadAsync();
 
                         logWindow = new LogWindow();
                         logWindow.Show(); // TODO
@@ -110,7 +110,7 @@ namespace turisticky_zavod.Forms
             {
                 var timer = Stopwatch.StartNew();
 
-                var runners = await Task.Run(() => FileHelper.LoadFromCSV(filepath));
+                var runners = await FileHelper.LoadFromCSV(filepath);
 
                 if (runners.Find(r => r.StartNumber != null) == null)
                 {
@@ -124,12 +124,39 @@ namespace turisticky_zavod.Forms
                         {
                             runner.StartNumber = ++i;
                         }
-                        dataGridView_runners.Refresh();
                     }
                 }
 
-                await database.Runner.AddRangeAsync(runners);
-                await database.SaveChangesAsync();
+                dataGridView_runners.DataSource = null;
+                dataGridView_runners_results.DataSource = null;
+
+                toolStripStatusLabel1.Text = "Naèítání ze souboru";
+                toolStripProgressBar1.Value = 40;
+                toolStripProgressBar1.Visible = true;
+
+                new Thread(new ThreadStart(async () =>
+                {
+                    await database.Runner.AddRangeAsync(runners);
+                    await database.SaveChangesAsync();
+
+                    Invoke(() =>
+                    {
+                        dataGridView_runners.DataSource = database.Runner.Local.ToBindingList();
+                        dataGridView_runners_results.DataSource = database.Runner.Local.ToBindingList();
+
+                        toolStripStatusLabel1.Text = "Soubor úspìšnì naèten";
+                        toolStripProgressBar1.Value = 100;
+                    });
+
+                    Thread.Sleep(1000);
+
+                    Invoke(() =>
+                    {
+                        toolStripStatusLabel1.Text = string.Empty;
+                        toolStripProgressBar1.Visible = false;
+                        toolStripProgressBar1.Value = 0;
+                    });
+                })).Start();
 
                 timer.Stop();
                 Log($"Csv loaded and saved to database in {timer.ElapsedMilliseconds}ms", "Files");
@@ -440,7 +467,12 @@ namespace turisticky_zavod.Forms
             if (!nfcWindow.IsDisposed)
             {
                 nfcWindow.OnRunnerNotInDB += OnNFCScanned;
-                nfcWindow.ShowDialog();
+
+                if (nfcWindow.ShowDialog() == DialogResult.OK)
+                {
+                    dataGridView_runners.Refresh();
+                    dataGridView_runners_results.Refresh();
+                }
             }
         }
 
@@ -634,7 +666,8 @@ namespace turisticky_zavod.Forms
         {
             foreach (DataGridViewRow row in dataGridView_runners_results.Rows)
             {
-                row.HeaderCell.Value = ((IList<Runner>)dataGridView_runners_results.DataSource)[row.Index].Placement.ToString();
+                var placement = ((IList<Runner>)dataGridView_runners_results.DataSource)[row.Index].Placement;
+                row.HeaderCell.Value = placement?.ToString() ?? "-";
             }
             ClearInputs();
         }
@@ -648,15 +681,99 @@ namespace turisticky_zavod.Forms
                 dataGridView_runnerCheckpoints.DataSource = null;
         }
 
+        private void DataGridView_Runners_Results_CellEndEdit(object sender, DataGridViewCellEventArgs e)
+        {
+            database.SaveChanges();
+
+            dataGridView_runners_results.Refresh();
+        }
+
+        private void DataGridView_Runners_Results_DataError(object sender, DataGridViewDataErrorEventArgs e)
+        {
+            if (e.Exception is FormatException)
+            {
+                e.Cancel = true;
+                MessageBox.Show("Zadaná hodnota je ve špatném formátu",
+                    "Chyba", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
         #endregion
 
         #region DataGridView RunnerCheckpoints events
 
+        private void DataGridView_RunnerCheckpoints_CellBeginEdit(object sender, DataGridViewCellCancelEventArgs e)
+        {
+            if (e.ColumnIndex == 3)
+            {
+                e.Cancel = true;
 
+                var checkpointInfo = (CheckpointRunnerInfo)dataGridView_runnerCheckpoints.Rows[e.RowIndex].DataBoundItem;
+
+                if (checkpointInfo.CheckpointID is not 2 and not 3 and not 5 and not 6 and not 8 and not 13)
+                {
+                    MessageBox.Show("V tomto stanovišti nelze diskvalifikovat",
+                        "Chyba", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                else
+                {
+                    var checkpointInfos = (List<CheckpointRunnerInfo>)dataGridView_runnerCheckpoints.DataSource;
+                    var runner = (Runner)dataGridView_runners_results.CurrentRow.DataBoundItem;
+
+                    checkpointInfo.Disqualified = !checkpointInfo.Disqualified;
+                    database.CheckpointRunnerInfo.Update(checkpointInfo);
+
+                    var runnerDisqualified = runner.Disqualified;
+                    runner.Disqualified = checkpointInfo.Disqualified || checkpointInfos.Any(x => x.Disqualified);
+
+                    if (runnerDisqualified != runner.Disqualified)
+                        database.Runner.Update(runner);
+
+                    database.SaveChanges();
+
+                    dataGridView_runners_results.Refresh();
+                }
+            }
+            else
+            {
+                if (!TimeSpan.TryParse(dataGridView_runnerCheckpoints.Rows[e.RowIndex].Cells[e.ColumnIndex].Value.ToString(), out _))
+                {
+                    e.Cancel = true;
+
+                    MessageBox.Show("Zadaná hodnota je ve špatném formátu",
+                        "Chyba", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+        }
+
+        private void DataGridView_RunnerCheckpoints_CellEndEdit(object sender, DataGridViewCellEventArgs e)
+        {
+            database.SaveChanges();
+
+            dataGridView_runners_results.Refresh();
+        }
+
+        private void DataGridView_RunnerCheckpoints_RowsAdded(object sender, DataGridViewRowsAddedEventArgs e)
+        {
+            foreach (DataGridViewRow row in dataGridView_runnerCheckpoints.Rows)
+            {
+                row.HeaderCell.Value = (row.Index + 1).ToString();
+            }
+        }
+
+        private void DataGridView_RunnerCheckpoints_DataError(object sender, DataGridViewDataErrorEventArgs e)
+        {
+            if (e.Exception is FormatException)
+            {
+                e.Cancel = true;
+                MessageBox.Show("Zadaná hodnota je ve špatném formátu",
+                    "Chyba", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
 
         #endregion
 
-        #region TextBox Start events
+        #region TextBox/ComboBox/DateTimePicker Start events
 
         private void TextBox_StartNumber_Validating(object sender, CancelEventArgs e)
         {
@@ -817,9 +934,71 @@ namespace turisticky_zavod.Forms
 
         #endregion
 
-        #region TextBox Results events
+        #region CheckBox/ComboBox Results events
 
+        private void CheckBox_Filter_Team_CheckedChanged(object sender, EventArgs e)
+        {
+            if (checkBox_filter_team.Checked)
+            {
+                if (checkBox_filter_category.Checked)
+                {
+                    checkBox_filter_category.Checked = false;
+                    comboBox_filter_category.Enabled = false;
+                }
+                comboBox_filter_team.Enabled = true;
 
+                var team = (Team)comboBox_filter_team.SelectedItem;
+                dataGridView_runners_results.DataSource = database.Runner.Local.Where(x => x.Team.ID == team.ID).ToList();
+            }
+            else
+            {
+                comboBox_filter_team.Enabled = false;
+
+                if (!checkBox_filter_category.Checked)
+                    dataGridView_runners_results.DataSource = database.Runner.Local.ToBindingList();
+            }
+        }
+
+        private void CheckBox_Filter_Category_CheckedChanged(object sender, EventArgs e)
+        {
+            if (checkBox_filter_category.Checked)
+            {
+                if (checkBox_filter_team.Checked)
+                {
+                    checkBox_filter_team.Checked = false;
+                    comboBox_filter_team.Enabled = false;
+                }
+                comboBox_filter_category.Enabled = true;
+
+                var category = (AgeCategory)comboBox_filter_category.SelectedItem;
+                dataGridView_runners_results.DataSource = database.Runner.Local.Where(x => x.AgeCategory != null && x.AgeCategory.ID == category.ID).ToList();
+            }
+            else
+            {
+                comboBox_filter_category.Enabled = false;
+
+                if (!checkBox_filter_team.Checked)
+                    dataGridView_runners_results.DataSource = database.Runner.Local.ToBindingList();
+            }
+        }
+
+        private void ComboBox_Filter_Team_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (checkBox_filter_team.Checked)
+            {
+                var team = (Team)comboBox_filter_team.SelectedItem;
+                dataGridView_runners_results.DataSource = database.Runner.Local.Where(x => x.Team.ID == team.ID).ToList();
+            }
+        }
+
+        private void ComboBox_Filter_Category_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (checkBox_filter_category.Checked)
+            {
+                var category = (AgeCategory)comboBox_filter_category.SelectedItem;
+                dataGridView_runners_results.DataSource = database.Runner.Local.Where(x => x.AgeCategory != null && x.AgeCategory.ID == category.ID).ToList();
+            }
+        }
 
         #endregion
 
@@ -894,113 +1073,6 @@ namespace turisticky_zavod.Forms
                 });
             }
             catch (ObjectDisposedException) { }
-        }
-
-        private void CheckBox_Filter_Team_CheckedChanged(object sender, EventArgs e)
-        {
-            if (checkBox_filter_team.Checked)
-            {
-                if (checkBox_filter_category.Checked)
-                {
-                    checkBox_filter_category.Checked = false;
-                    comboBox_filter_category.Enabled = false;
-                }
-                comboBox_filter_team.Enabled = true;
-            }
-            else
-            {
-                comboBox_filter_team.Enabled = false;
-            }
-        }
-
-        private void CheckBox_Filter_Category_CheckedChanged(object sender, EventArgs e)
-        {
-            if (checkBox_filter_category.Checked)
-            {
-                if (checkBox_filter_team.Checked)
-                {
-                    checkBox_filter_team.Checked = false;
-                    comboBox_filter_team.Enabled = false;
-                }
-                comboBox_filter_category.Enabled = true;
-            }
-            else
-            {
-                comboBox_filter_category.Enabled = false;
-            }
-        }
-
-        private void ComboBox_Filter_Team_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void ComboBox_Filter_Category_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void DataGridView_RunnerCheckpoints_CellBeginEdit(object sender, DataGridViewCellCancelEventArgs e)
-        {
-            if (e.ColumnIndex == 3)
-            {
-                e.Cancel = true;
-
-                var checkpointInfo = (CheckpointRunnerInfo)dataGridView_runnerCheckpoints.Rows[e.RowIndex].DataBoundItem;
-
-                if (checkpointInfo.CheckpointID is not 2 and not 3 and not 5 and not 6 and not 8 and not 13)
-                {
-                    MessageBox.Show("V tomto stanovišti nelze diskvalifikovat",
-                        "Chyba", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-                else
-                {
-                    var checkpointInfos = (List<CheckpointRunnerInfo>)dataGridView_runnerCheckpoints.DataSource;
-                    var runner = (Runner)dataGridView_runners_results.CurrentRow.DataBoundItem;
-
-                    checkpointInfo.Disqualified = !checkpointInfo.Disqualified;
-                    database.CheckpointRunnerInfo.Update(checkpointInfo);
-
-                    var runnerDisqualified = runner.Disqualified;
-                    runner.Disqualified = checkpointInfo.Disqualified || checkpointInfos.Any(x => x.Disqualified);
-
-                    if (runnerDisqualified != runner.Disqualified)
-                        database.Runner.Update(runner);
-
-                    database.SaveChanges();
-
-                    Refresh_RunnersResults_DataGridView();
-                }
-            }
-        }
-
-        private void DataGridView_RunnerCheckpoints_CellEndEdit(object sender, DataGridViewCellEventArgs e)
-        {
-            Refresh_RunnersResults_DataGridView();
-        }
-
-        private void Refresh_RunnersResults_DataGridView()
-        {
-            if (checkBox_filter_team.Checked)
-            {
-                var team = (Team)comboBox_filter_team.SelectedItem;
-                dataGridView_runners_results.DataSource = database.Runner.Local.Where(x => x.Team.ID == team.ID).ToList();
-            }
-            else if (checkBox_filter_category.Checked)
-            {
-                var category = (AgeCategory)comboBox_filter_category.SelectedItem;
-                dataGridView_runners_results.DataSource = database.Runner.Local.Where(x => x.AgeCategory != null && x.AgeCategory.ID == category.ID).ToList();
-            }
-            else
-                dataGridView_runners_results.DataSource = database.Runner.Local.ToBindingList();
-        }
-
-        private void DataGridView_RunnerCheckpoints_RowsAdded(object sender, DataGridViewRowsAddedEventArgs e)
-        {
-            foreach (DataGridViewRow row in dataGridView_runnerCheckpoints.Rows)
-            {
-                row.HeaderCell.Value = (row.Index + 1).ToString();
-            }
         }
     }
 }

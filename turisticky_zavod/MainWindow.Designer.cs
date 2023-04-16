@@ -29,21 +29,21 @@
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
-            DataGridViewCellStyle dataGridViewCellStyle22 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle23 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle24 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle25 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle26 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle27 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle28 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle29 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle30 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle16 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle17 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle18 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle19 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle20 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle21 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle7 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle8 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle9 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle10 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle11 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle12 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle13 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle14 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle15 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle4 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle5 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle6 = new DataGridViewCellStyle();
             statusStrip1 = new StatusStrip();
             toolStripStatusLabel1 = new ToolStripStatusLabel();
             toolStripProgressBar1 = new ToolStripProgressBar();
@@ -57,9 +57,6 @@
             toolStripMenuItem_nfcImport = new ToolStripMenuItem();
             toolStripMenuItem_edit = new ToolStripMenuItem();
             toolStripMenuItem_ageCategories = new ToolStripMenuItem();
-            toolStripSeparator1 = new ToolStripSeparator();
-            toolStripMenuItem_test = new ToolStripMenuItem();
-            toolStripMenuItem_testQR = new ToolStripMenuItem();
             nápovědaToolStripMenuItem = new ToolStripMenuItem();
             toolStripMenuItem_about = new ToolStripMenuItem();
             toolStripMenuItem_debug = new ToolStripMenuItem();
@@ -101,9 +98,9 @@
             dataGridViewTextBoxColumn1 = new DataGridViewTextBoxColumn();
             partnerFirstNameDataGridViewTextBoxColumn = new DataGridViewTextBoxColumn();
             partnerLastNameDataGridViewTextBoxColumn = new DataGridViewTextBoxColumn();
+            disqualifiedDataGridViewCheckBoxColumn = new DataGridViewCheckBoxColumn();
             startTimeDataGridViewTextBoxColumn = new DataGridViewTextBoxColumn();
             finishTimeDataGridViewTextBoxColumn = new DataGridViewTextBoxColumn();
-            disqualifiedDataGridViewCheckBoxColumn = new DataGridViewCheckBoxColumn();
             finalRunTimeDataGridViewTextBoxColumn = new DataGridViewTextBoxColumn();
             totalWaitTimeDataGridViewTextBoxColumn = new DataGridViewTextBoxColumn();
             totalPenaltyTimeDataGridViewTextBoxColumn = new DataGridViewTextBoxColumn();
@@ -229,7 +226,7 @@
             // 
             // toolStripMenuItem_edit
             // 
-            toolStripMenuItem_edit.DropDownItems.AddRange(new ToolStripItem[] { toolStripMenuItem_ageCategories, toolStripSeparator1, toolStripMenuItem_test, toolStripMenuItem_testQR });
+            toolStripMenuItem_edit.DropDownItems.AddRange(new ToolStripItem[] { toolStripMenuItem_ageCategories });
             toolStripMenuItem_edit.Name = "toolStripMenuItem_edit";
             toolStripMenuItem_edit.Size = new Size(57, 20);
             toolStripMenuItem_edit.Text = "Upravit";
@@ -240,25 +237,6 @@
             toolStripMenuItem_ageCategories.Size = new Size(163, 22);
             toolStripMenuItem_ageCategories.Text = "Věkové kategorie";
             toolStripMenuItem_ageCategories.Click += AgeCategoriesToolStripMenuItem_Click;
-            // 
-            // toolStripSeparator1
-            // 
-            toolStripSeparator1.Name = "toolStripSeparator1";
-            toolStripSeparator1.Size = new Size(160, 6);
-            // 
-            // toolStripMenuItem_test
-            // 
-            toolStripMenuItem_test.Name = "toolStripMenuItem_test";
-            toolStripMenuItem_test.Size = new Size(163, 22);
-            toolStripMenuItem_test.Text = "Test Wifi";
-            toolStripMenuItem_test.Click += TestWifiToolStripMenuItem_Click;
-            // 
-            // toolStripMenuItem_testQR
-            // 
-            toolStripMenuItem_testQR.Name = "toolStripMenuItem_testQR";
-            toolStripMenuItem_testQR.Size = new Size(163, 22);
-            toolStripMenuItem_testQR.Text = "Test QR";
-            toolStripMenuItem_testQR.Click += TestQRToolStripMenuItem_Click;
             // 
             // nápovědaToolStripMenuItem
             // 
@@ -299,14 +277,14 @@
             dataGridView_runners.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dataGridView_runners.Columns.AddRange(new DataGridViewColumn[] { StartNumber, FirstName, LastName, Birthdate, Team, AgeCategory, PartnerFirstName, PartnerLastName, PartnerBirthdate });
             dataGridView_runners.DataSource = runnerBindingSource;
-            dataGridViewCellStyle22.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle22.BackColor = SystemColors.Window;
-            dataGridViewCellStyle22.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewCellStyle22.ForeColor = SystemColors.ControlText;
-            dataGridViewCellStyle22.SelectionBackColor = SystemColors.Highlight;
-            dataGridViewCellStyle22.SelectionForeColor = SystemColors.HighlightText;
-            dataGridViewCellStyle22.WrapMode = DataGridViewTriState.False;
-            dataGridView_runners.DefaultCellStyle = dataGridViewCellStyle22;
+            dataGridViewCellStyle7.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle7.BackColor = SystemColors.Window;
+            dataGridViewCellStyle7.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewCellStyle7.ForeColor = SystemColors.ControlText;
+            dataGridViewCellStyle7.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle7.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle7.WrapMode = DataGridViewTriState.False;
+            dataGridView_runners.DefaultCellStyle = dataGridViewCellStyle7;
             dataGridView_runners.EditMode = DataGridViewEditMode.EditProgrammatically;
             dataGridView_runners.Location = new Point(6, 22);
             dataGridView_runners.MultiSelect = false;
@@ -371,14 +349,15 @@
             // 
             // dateTimePicker_birthdate_partner
             // 
+            errorProvider.SetIconAlignment(dateTimePicker_birthdate_partner, ErrorIconAlignment.MiddleLeft);
             dateTimePicker_birthdate_partner.Location = new Point(381, 109);
             dateTimePicker_birthdate_partner.Margin = new Padding(3, 3, 16, 3);
-            dateTimePicker_birthdate_partner.MaxDate = DateTime.Today;
+            dateTimePicker_birthdate_partner.MaxDate = new DateTime(2023, 4, 15, 0, 0, 0, 0);
             dateTimePicker_birthdate_partner.MinDate = new DateTime(1900, 1, 1, 0, 0, 0, 0);
             dateTimePicker_birthdate_partner.Name = "dateTimePicker_birthdate_partner";
             dateTimePicker_birthdate_partner.Size = new Size(174, 23);
             dateTimePicker_birthdate_partner.TabIndex = 29;
-            dateTimePicker_birthdate_partner.Value = DateTime.Today;
+            dateTimePicker_birthdate_partner.Value = new DateTime(2023, 4, 15, 0, 0, 0, 0);
             dateTimePicker_birthdate_partner.ValueChanged += DateTimePicker_Birthdate_Partner_ValueChanged;
             // 
             // label_birthdate_partner
@@ -438,14 +417,15 @@
             // 
             // dateTimePicker_birthdate
             // 
+            errorProvider.SetIconAlignment(dateTimePicker_birthdate, ErrorIconAlignment.MiddleLeft);
             dateTimePicker_birthdate.Location = new Point(381, 50);
             dateTimePicker_birthdate.Margin = new Padding(3, 3, 16, 3);
-            dateTimePicker_birthdate.MaxDate = DateTime.Today;
+            dateTimePicker_birthdate.MaxDate = new DateTime(2023, 4, 15, 0, 0, 0, 0);
             dateTimePicker_birthdate.MinDate = new DateTime(1900, 1, 1, 0, 0, 0, 0);
             dateTimePicker_birthdate.Name = "dateTimePicker_birthdate";
             dateTimePicker_birthdate.Size = new Size(174, 23);
             dateTimePicker_birthdate.TabIndex = 23;
-            dateTimePicker_birthdate.Value = DateTime.Today;
+            dateTimePicker_birthdate.Value = new DateTime(2023, 4, 15, 0, 0, 0, 0);
             dateTimePicker_birthdate.ValueChanged += DateTimePicker_Birthdate_ValueChanged;
             // 
             // label_ageCategory
@@ -641,18 +621,19 @@
             dataGridView_runners_results.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             dataGridView_runners_results.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.DisplayedCells;
             dataGridView_runners_results.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridView_runners_results.Columns.AddRange(new DataGridViewColumn[] { startNumberDataGridViewTextBoxColumn, firstNameDataGridViewTextBoxColumn, lastNameDataGridViewTextBoxColumn, teamDataGridViewTextBoxColumn, dataGridViewTextBoxColumn1, partnerFirstNameDataGridViewTextBoxColumn, partnerLastNameDataGridViewTextBoxColumn, startTimeDataGridViewTextBoxColumn, finishTimeDataGridViewTextBoxColumn, disqualifiedDataGridViewCheckBoxColumn, finalRunTimeDataGridViewTextBoxColumn, totalWaitTimeDataGridViewTextBoxColumn, totalPenaltyTimeDataGridViewTextBoxColumn });
+            dataGridView_runners_results.Columns.AddRange(new DataGridViewColumn[] { startNumberDataGridViewTextBoxColumn, firstNameDataGridViewTextBoxColumn, lastNameDataGridViewTextBoxColumn, teamDataGridViewTextBoxColumn, dataGridViewTextBoxColumn1, partnerFirstNameDataGridViewTextBoxColumn, partnerLastNameDataGridViewTextBoxColumn, disqualifiedDataGridViewCheckBoxColumn, startTimeDataGridViewTextBoxColumn, finishTimeDataGridViewTextBoxColumn, finalRunTimeDataGridViewTextBoxColumn, totalWaitTimeDataGridViewTextBoxColumn, totalPenaltyTimeDataGridViewTextBoxColumn });
             dataGridView_runners_results.DataSource = runnerBindingSource;
             dataGridView_runners_results.Location = new Point(6, 22);
             dataGridView_runners_results.MultiSelect = false;
             dataGridView_runners_results.Name = "dataGridView_runners_results";
-            dataGridView_runners_results.ReadOnly = true;
             dataGridView_runners_results.RowHeadersWidth = 60;
             dataGridView_runners_results.RowTemplate.Height = 25;
             dataGridView_runners_results.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dataGridView_runners_results.Size = new Size(1039, 405);
             dataGridView_runners_results.TabIndex = 0;
+            dataGridView_runners_results.CellEndEdit += DataGridView_Runners_Results_CellEndEdit;
             dataGridView_runners_results.CurrentCellChanged += DataGridView_Runners_Results_CurrentCellChanged;
+            dataGridView_runners_results.DataError += DataGridView_Runners_Results_DataError;
             dataGridView_runners_results.RowsAdded += DataGridView_Runners_Results_RowsAdded;
             // 
             // startNumberDataGridViewTextBoxColumn
@@ -689,8 +670,8 @@
             // 
             dataGridViewTextBoxColumn1.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
             dataGridViewTextBoxColumn1.DataPropertyName = "AgeCategory";
-            dataGridViewCellStyle23.NullValue = "-";
-            dataGridViewTextBoxColumn1.DefaultCellStyle = dataGridViewCellStyle23;
+            dataGridViewCellStyle8.NullValue = "-";
+            dataGridViewTextBoxColumn1.DefaultCellStyle = dataGridViewCellStyle8;
             dataGridViewTextBoxColumn1.HeaderText = "Věková kategorie";
             dataGridViewTextBoxColumn1.Name = "dataGridViewTextBoxColumn1";
             dataGridViewTextBoxColumn1.ReadOnly = true;
@@ -710,26 +691,6 @@
             partnerLastNameDataGridViewTextBoxColumn.Name = "partnerLastNameDataGridViewTextBoxColumn";
             partnerLastNameDataGridViewTextBoxColumn.ReadOnly = true;
             // 
-            // startTimeDataGridViewTextBoxColumn
-            // 
-            startTimeDataGridViewTextBoxColumn.DataPropertyName = "StartTime";
-            dataGridViewCellStyle24.Format = "T";
-            dataGridViewCellStyle24.NullValue = "-";
-            startTimeDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle24;
-            startTimeDataGridViewTextBoxColumn.HeaderText = "Start";
-            startTimeDataGridViewTextBoxColumn.Name = "startTimeDataGridViewTextBoxColumn";
-            startTimeDataGridViewTextBoxColumn.ReadOnly = true;
-            // 
-            // finishTimeDataGridViewTextBoxColumn
-            // 
-            finishTimeDataGridViewTextBoxColumn.DataPropertyName = "FinishTime";
-            dataGridViewCellStyle25.Format = "T";
-            dataGridViewCellStyle25.NullValue = "-";
-            finishTimeDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle25;
-            finishTimeDataGridViewTextBoxColumn.HeaderText = "Cíl";
-            finishTimeDataGridViewTextBoxColumn.Name = "finishTimeDataGridViewTextBoxColumn";
-            finishTimeDataGridViewTextBoxColumn.ReadOnly = true;
-            // 
             // disqualifiedDataGridViewCheckBoxColumn
             // 
             disqualifiedDataGridViewCheckBoxColumn.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
@@ -739,12 +700,30 @@
             disqualifiedDataGridViewCheckBoxColumn.ReadOnly = true;
             disqualifiedDataGridViewCheckBoxColumn.Width = 103;
             // 
+            // startTimeDataGridViewTextBoxColumn
+            // 
+            startTimeDataGridViewTextBoxColumn.DataPropertyName = "StartTime";
+            dataGridViewCellStyle9.Format = "T";
+            dataGridViewCellStyle9.NullValue = "-";
+            startTimeDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle9;
+            startTimeDataGridViewTextBoxColumn.HeaderText = "Start";
+            startTimeDataGridViewTextBoxColumn.Name = "startTimeDataGridViewTextBoxColumn";
+            // 
+            // finishTimeDataGridViewTextBoxColumn
+            // 
+            finishTimeDataGridViewTextBoxColumn.DataPropertyName = "FinishTime";
+            dataGridViewCellStyle10.Format = "T";
+            dataGridViewCellStyle10.NullValue = "-";
+            finishTimeDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle10;
+            finishTimeDataGridViewTextBoxColumn.HeaderText = "Cíl";
+            finishTimeDataGridViewTextBoxColumn.Name = "finishTimeDataGridViewTextBoxColumn";
+            // 
             // finalRunTimeDataGridViewTextBoxColumn
             // 
             finalRunTimeDataGridViewTextBoxColumn.DataPropertyName = "FinalRunTime";
-            dataGridViewCellStyle26.Format = "T";
-            dataGridViewCellStyle26.NullValue = "-";
-            finalRunTimeDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle26;
+            dataGridViewCellStyle11.Format = "T";
+            dataGridViewCellStyle11.NullValue = "-";
+            finalRunTimeDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle11;
             finalRunTimeDataGridViewTextBoxColumn.HeaderText = "Výsledný čas";
             finalRunTimeDataGridViewTextBoxColumn.Name = "finalRunTimeDataGridViewTextBoxColumn";
             finalRunTimeDataGridViewTextBoxColumn.ReadOnly = true;
@@ -752,9 +731,9 @@
             // totalWaitTimeDataGridViewTextBoxColumn
             // 
             totalWaitTimeDataGridViewTextBoxColumn.DataPropertyName = "TotalWaitTime";
-            dataGridViewCellStyle27.Format = "T";
-            dataGridViewCellStyle27.NullValue = null;
-            totalWaitTimeDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle27;
+            dataGridViewCellStyle12.Format = "T";
+            dataGridViewCellStyle12.NullValue = null;
+            totalWaitTimeDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle12;
             totalWaitTimeDataGridViewTextBoxColumn.HeaderText = "Zdržení";
             totalWaitTimeDataGridViewTextBoxColumn.Name = "totalWaitTimeDataGridViewTextBoxColumn";
             totalWaitTimeDataGridViewTextBoxColumn.ReadOnly = true;
@@ -762,9 +741,9 @@
             // totalPenaltyTimeDataGridViewTextBoxColumn
             // 
             totalPenaltyTimeDataGridViewTextBoxColumn.DataPropertyName = "TotalPenaltyTime";
-            dataGridViewCellStyle28.Format = "T";
-            dataGridViewCellStyle28.NullValue = null;
-            totalPenaltyTimeDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle28;
+            dataGridViewCellStyle13.Format = "T";
+            dataGridViewCellStyle13.NullValue = null;
+            totalPenaltyTimeDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle13;
             totalPenaltyTimeDataGridViewTextBoxColumn.HeaderText = "Trestný čas";
             totalPenaltyTimeDataGridViewTextBoxColumn.Name = "totalPenaltyTimeDataGridViewTextBoxColumn";
             totalPenaltyTimeDataGridViewTextBoxColumn.ReadOnly = true;
@@ -801,6 +780,7 @@
             dataGridView_runnerCheckpoints.TabIndex = 0;
             dataGridView_runnerCheckpoints.CellBeginEdit += DataGridView_RunnerCheckpoints_CellBeginEdit;
             dataGridView_runnerCheckpoints.CellEndEdit += DataGridView_RunnerCheckpoints_CellEndEdit;
+            dataGridView_runnerCheckpoints.DataError += DataGridView_RunnerCheckpoints_DataError;
             dataGridView_runnerCheckpoints.RowsAdded += DataGridView_RunnerCheckpoints_RowsAdded;
             // 
             // checkpointDataGridViewTextBoxColumn
@@ -813,18 +793,18 @@
             // timeWaitedDataGridViewTextBoxColumn
             // 
             timeWaitedDataGridViewTextBoxColumn.DataPropertyName = "TimeWaited";
-            dataGridViewCellStyle29.Format = "T";
-            dataGridViewCellStyle29.NullValue = null;
-            timeWaitedDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle29;
+            dataGridViewCellStyle14.Format = "T";
+            dataGridViewCellStyle14.NullValue = null;
+            timeWaitedDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle14;
             timeWaitedDataGridViewTextBoxColumn.HeaderText = "Zdržení";
             timeWaitedDataGridViewTextBoxColumn.Name = "timeWaitedDataGridViewTextBoxColumn";
             // 
             // penaltyDataGridViewTextBoxColumn
             // 
             penaltyDataGridViewTextBoxColumn.DataPropertyName = "Penalty";
-            dataGridViewCellStyle30.Format = "T";
-            dataGridViewCellStyle30.NullValue = null;
-            penaltyDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle30;
+            dataGridViewCellStyle15.Format = "T";
+            dataGridViewCellStyle15.NullValue = null;
+            penaltyDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle15;
             penaltyDataGridViewTextBoxColumn.HeaderText = "Trestný čas";
             penaltyDataGridViewTextBoxColumn.Name = "penaltyDataGridViewTextBoxColumn";
             // 
@@ -917,44 +897,50 @@
             // 
             // StartNumber
             // 
-            StartNumber.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCellsExceptHeader;
+            StartNumber.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
             StartNumber.DataPropertyName = "StartNumber";
             StartNumber.HeaderText = "Startovní číslo";
             StartNumber.MinimumWidth = 65;
             StartNumber.Name = "StartNumber";
             StartNumber.ReadOnly = true;
-            StartNumber.Width = 65;
+            StartNumber.Width = 106;
             // 
             // FirstName
             // 
+            FirstName.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
             FirstName.DataPropertyName = "FirstName";
             FirstName.HeaderText = "Jméno";
             FirstName.Name = "FirstName";
             FirstName.ReadOnly = true;
+            FirstName.Width = 123;
             // 
             // LastName
             // 
+            LastName.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
             LastName.DataPropertyName = "LastName";
             LastName.HeaderText = "Příjmení";
             LastName.Name = "LastName";
             LastName.ReadOnly = true;
+            LastName.Width = 124;
             // 
             // Birthdate
             // 
+            Birthdate.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
             Birthdate.DataPropertyName = "Birthdate";
-            dataGridViewCellStyle16.Format = "d";
-            dataGridViewCellStyle16.NullValue = "-";
-            Birthdate.DefaultCellStyle = dataGridViewCellStyle16;
+            dataGridViewCellStyle1.Format = "d";
+            dataGridViewCellStyle1.NullValue = "-";
+            Birthdate.DefaultCellStyle = dataGridViewCellStyle1;
             Birthdate.HeaderText = "Datum narození";
             Birthdate.Name = "Birthdate";
             Birthdate.ReadOnly = true;
+            Birthdate.Width = 123;
             // 
             // Team
             // 
             Team.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
             Team.DataPropertyName = "Team";
-            dataGridViewCellStyle17.NullValue = "-";
-            Team.DefaultCellStyle = dataGridViewCellStyle17;
+            dataGridViewCellStyle2.NullValue = "-";
+            Team.DefaultCellStyle = dataGridViewCellStyle2;
             Team.HeaderText = "Oddíl";
             Team.Name = "Team";
             Team.ReadOnly = true;
@@ -964,8 +950,8 @@
             // 
             AgeCategory.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
             AgeCategory.DataPropertyName = "AgeCategory";
-            dataGridViewCellStyle18.NullValue = "-";
-            AgeCategory.DefaultCellStyle = dataGridViewCellStyle18;
+            dataGridViewCellStyle3.NullValue = "-";
+            AgeCategory.DefaultCellStyle = dataGridViewCellStyle3;
             AgeCategory.HeaderText = "Věková kategorie";
             AgeCategory.Name = "AgeCategory";
             AgeCategory.ReadOnly = true;
@@ -974,8 +960,8 @@
             // PartnerFirstName
             // 
             PartnerFirstName.DataPropertyName = "PartnerFirstName";
-            dataGridViewCellStyle19.NullValue = "-";
-            PartnerFirstName.DefaultCellStyle = dataGridViewCellStyle19;
+            dataGridViewCellStyle4.NullValue = "-";
+            PartnerFirstName.DefaultCellStyle = dataGridViewCellStyle4;
             PartnerFirstName.HeaderText = "Jméno 2";
             PartnerFirstName.Name = "PartnerFirstName";
             PartnerFirstName.ReadOnly = true;
@@ -983,8 +969,8 @@
             // PartnerLastName
             // 
             PartnerLastName.DataPropertyName = "PartnerLastName";
-            dataGridViewCellStyle20.NullValue = "-";
-            PartnerLastName.DefaultCellStyle = dataGridViewCellStyle20;
+            dataGridViewCellStyle5.NullValue = "-";
+            PartnerLastName.DefaultCellStyle = dataGridViewCellStyle5;
             PartnerLastName.HeaderText = "Příjmení 2";
             PartnerLastName.Name = "PartnerLastName";
             PartnerLastName.ReadOnly = true;
@@ -992,9 +978,9 @@
             // PartnerBirthdate
             // 
             PartnerBirthdate.DataPropertyName = "PartnerBirthdate";
-            dataGridViewCellStyle21.Format = "d";
-            dataGridViewCellStyle21.NullValue = "-";
-            PartnerBirthdate.DefaultCellStyle = dataGridViewCellStyle21;
+            dataGridViewCellStyle6.Format = "d";
+            dataGridViewCellStyle6.NullValue = "-";
+            PartnerBirthdate.DefaultCellStyle = dataGridViewCellStyle6;
             PartnerBirthdate.HeaderText = "Datum narození 2";
             PartnerBirthdate.Name = "PartnerBirthdate";
             PartnerBirthdate.ReadOnly = true;
@@ -1011,7 +997,7 @@
             Controls.Add(menuStrip1);
             ForeColor = SystemColors.ControlText;
             MainMenuStrip = menuStrip1;
-            MinimumSize = new Size(1111, 400);
+            MinimumSize = new Size(1111, 750);
             Name = "MainWindow";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Turistický závod";
@@ -1048,8 +1034,6 @@
         private ToolStripMenuItem toolStripMenuItem_ageCategories;
         private DataGridView dataGridView_runners;
         private GroupBox groupBox_runnersList;
-        private ToolStripMenuItem toolStripMenuItem_test;
-        private ToolStripMenuItem toolStripMenuItem_testQR;
         private ToolStripMenuItem nápovědaToolStripMenuItem;
         private ToolStripMenuItem toolStripMenuItem_about;
         private ToolStripMenuItem toolStripMenuItem_debug;
@@ -1061,7 +1045,6 @@
         private ToolStripMenuItem toolStripMenuItem_import;
         private ToolStripMenuItem toolStripMenuItem_fileImport;
         private ToolStripMenuItem toolStripMenuItem_nfcImport;
-        private ToolStripSeparator toolStripSeparator1;
         private ToolStripMenuItem toolStripMenuItem_saveAs;
         private GroupBox groupBox_edit;
         private Button button_save;
@@ -1098,19 +1081,6 @@
         private DataGridViewTextBoxColumn timeWaitedDataGridViewTextBoxColumn;
         private DataGridViewTextBoxColumn penaltyDataGridViewTextBoxColumn;
         private DataGridViewCheckBoxColumn disqualifiedDataGridViewCheckBoxColumn1;
-        private DataGridViewTextBoxColumn startNumberDataGridViewTextBoxColumn;
-        private DataGridViewTextBoxColumn firstNameDataGridViewTextBoxColumn;
-        private DataGridViewTextBoxColumn lastNameDataGridViewTextBoxColumn;
-        private DataGridViewTextBoxColumn teamDataGridViewTextBoxColumn;
-        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn1;
-        private DataGridViewTextBoxColumn partnerFirstNameDataGridViewTextBoxColumn;
-        private DataGridViewTextBoxColumn partnerLastNameDataGridViewTextBoxColumn;
-        private DataGridViewTextBoxColumn startTimeDataGridViewTextBoxColumn;
-        private DataGridViewTextBoxColumn finishTimeDataGridViewTextBoxColumn;
-        private DataGridViewCheckBoxColumn disqualifiedDataGridViewCheckBoxColumn;
-        private DataGridViewTextBoxColumn finalRunTimeDataGridViewTextBoxColumn;
-        private DataGridViewTextBoxColumn totalWaitTimeDataGridViewTextBoxColumn;
-        private DataGridViewTextBoxColumn totalPenaltyTimeDataGridViewTextBoxColumn;
         private DateTimePicker dateTimePicker_birthdate;
         private DateTimePicker dateTimePicker_birthdate_partner;
         private Label label_birthdate_partner;
@@ -1118,6 +1088,19 @@
         private ComboBox comboBox_gender_partner;
         private Label label_gender;
         private ComboBox comboBox_gender;
+        private DataGridViewTextBoxColumn startNumberDataGridViewTextBoxColumn;
+        private DataGridViewTextBoxColumn firstNameDataGridViewTextBoxColumn;
+        private DataGridViewTextBoxColumn lastNameDataGridViewTextBoxColumn;
+        private DataGridViewTextBoxColumn teamDataGridViewTextBoxColumn;
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn1;
+        private DataGridViewTextBoxColumn partnerFirstNameDataGridViewTextBoxColumn;
+        private DataGridViewTextBoxColumn partnerLastNameDataGridViewTextBoxColumn;
+        private DataGridViewCheckBoxColumn disqualifiedDataGridViewCheckBoxColumn;
+        private DataGridViewTextBoxColumn startTimeDataGridViewTextBoxColumn;
+        private DataGridViewTextBoxColumn finishTimeDataGridViewTextBoxColumn;
+        private DataGridViewTextBoxColumn finalRunTimeDataGridViewTextBoxColumn;
+        private DataGridViewTextBoxColumn totalWaitTimeDataGridViewTextBoxColumn;
+        private DataGridViewTextBoxColumn totalPenaltyTimeDataGridViewTextBoxColumn;
         private DataGridViewTextBoxColumn StartNumber;
         private DataGridViewTextBoxColumn FirstName;
         private DataGridViewTextBoxColumn LastName;

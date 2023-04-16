@@ -137,7 +137,7 @@
             // dataGridViewTextBoxColumn9
             // 
             dataGridViewTextBoxColumn9.DataPropertyName = "AgeMax";
-            dataGridViewCellStyle1.NullValue = "-";
+            dataGridViewCellStyle1.NullValue = "∞";
             dataGridViewTextBoxColumn9.DefaultCellStyle = dataGridViewCellStyle1;
             dataGridViewTextBoxColumn9.HeaderText = "Věk do";
             dataGridViewTextBoxColumn9.Name = "dataGridViewTextBoxColumn9";
@@ -542,12 +542,6 @@
         private ToolStripStatusLabel toolStripStatusLabel;
         private Label label_type;
         private ComboBox comboBox_type;
-        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn6;
-        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn7;
-        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn8;
-        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn9;
-        private DataGridViewTextBoxColumn TypeString;
-        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn10;
         private GroupBox groupBox_edit_checkpoint;
         private Button button_save_checkpoint;
         private Label label_name_checkpoint;
@@ -555,5 +549,11 @@
         private ErrorProvider errorProvider_checkpoint;
         private DataGridViewTextBoxColumn Checkpoint;
         private DataGridViewCheckBoxColumn dataGridViewCheckBoxColumn3;
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn6;
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn7;
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn8;
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn9;
+        private DataGridViewTextBoxColumn TypeString;
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn10;
     }
 }
