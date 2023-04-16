@@ -1,15 +1,17 @@
-﻿using System.ComponentModel;
-using turisticky_zavod.Data;
+﻿using turisticky_zavod.Data;
 
 namespace turisticky_zavod.Forms
 {
     public partial class AgeCategoriesEditor : Form
     {
-        private readonly Database database = Database.Instance;
+        private readonly Database database;
 
         public AgeCategoriesEditor()
         {
             InitializeComponent();
+
+            database = Database.Instance;
+
             Program.SetDoubleBuffer(dataGridView_categories, true);
             Program.SetDoubleBuffer(dataGridView_checkpoints, true);
         }
@@ -75,7 +77,7 @@ namespace turisticky_zavod.Forms
                     database.AgeCategory.Add(category);
                     database.SaveChanges();
 
-                    var id = database.AgeCategory.OrderByDescending(x => x.ID).First().ID;
+                    var id = database.AgeCategory.Local.OrderByDescending(x => x.ID).First().ID;
                     for (int i = 1; i <= 13; i++)
                     {
                         database.CheckpointAgeCategoryParticipation.Add(new() { AgeCategoryID = id, CheckpointID = i, IsParticipating = true });
@@ -94,10 +96,10 @@ namespace turisticky_zavod.Forms
                 var row = dataGridView_categories.Rows[0];
                 var rowCategory = (AgeCategory)row.DataBoundItem;
                 row.Cells[0].Selected = true;
-                dataGridView_checkpoints.DataSource = new BindingList<CheckpointAgeCategoryParticipation>(database.CheckpointAgeCategoryParticipation
+                dataGridView_checkpoints.DataSource = database.CheckpointAgeCategoryParticipation
                                                               .Local
                                                               .Where(x => x.AgeCategoryID == rowCategory.ID && x.CheckpointID != 1)
-                                                              .ToList());
+                                                              .ToList();
                 ClearInputs();
             }
         }
@@ -112,17 +114,20 @@ namespace turisticky_zavod.Forms
             {
                 var edit = button_save_checkpoint.Text == "Upravit";
                 var name = textBox_name_checkpoint.Text.Trim();
+                var disqualifiable = checkBox_disqualifiable.Checked;
 
                 if (edit)
                 {
-                    var checkpoint = ((CheckpointAgeCategoryParticipation)dataGridView_checkpoints.CurrentRow!.DataBoundItem).Checkpoint;
+                    var participation = (CheckpointAgeCategoryParticipation)dataGridView_checkpoints.CurrentRow.DataBoundItem;
+                    var checkpoint = database.Checkpoint.Local.First(x => x.ID == participation.CheckpointID);
                     checkpoint.Name = name;
+                    checkpoint.Disqualifiable = disqualifiable;
 
                     database.Checkpoint.Update(checkpoint);
                 }
                 else
                 {
-                    var checkpoint = new Checkpoint { Name = name };
+                    var checkpoint = new Checkpoint { Name = name, Disqualifiable = disqualifiable };
                     database.Checkpoint.Add(checkpoint);
 
                     var categories = database.AgeCategory.Local.ToList();
@@ -134,10 +139,10 @@ namespace turisticky_zavod.Forms
 
                 database.SaveChanges();
 
-                dataGridView_checkpoints.DataSource = new BindingList<CheckpointAgeCategoryParticipation>(database.CheckpointAgeCategoryParticipation
+                dataGridView_checkpoints.DataSource = database.CheckpointAgeCategoryParticipation
                                                               .Local
                                                               .Where(x => x.AgeCategoryID == currentCategory.ID && x.CheckpointID != 1)
-                                                              .ToList());
+                                                              .ToList();
                 ClearInputs();
             }
         }
@@ -339,19 +344,13 @@ namespace turisticky_zavod.Forms
                 textBox_ageMin.Text = category.AgeMin.ToString();
                 textBox_ageMax.Text = category.AgeMax.HasValue ? category.AgeMax.Value.ToString() : string.Empty;
                 textBox_color.Text = category.Color;
-                comboBox_type.SelectedIndex = category.Type switch
-                {
-                    CategoryType.DEFAULT => 0,
-                    CategoryType.DUOS => 1,
-                    CategoryType.RELAY => 2,
-                    _ => -1
-                };
-                button_save_category.Text = "Uložit";
+                comboBox_type.SelectedIndex = (int)category.Type;
+                button_save_category.Text = "Upravit";
 
-                dataGridView_checkpoints.DataSource = new BindingList<CheckpointAgeCategoryParticipation>(database.CheckpointAgeCategoryParticipation
+                dataGridView_checkpoints.DataSource = database.CheckpointAgeCategoryParticipation
                                                               .Local
                                                               .Where(x => x.AgeCategoryID == category.ID && x.CheckpointID != 1)
-                                                              .ToList());
+                                                              .ToList();
 
                 ClearAllErrors();
             }
@@ -386,20 +385,44 @@ namespace turisticky_zavod.Forms
         {
             e.Cancel = true;
 
-            var item = (CheckpointAgeCategoryParticipation)dataGridView_checkpoints.CurrentRow.DataBoundItem;
-            item.IsParticipating = !item.IsParticipating;
+            var participation = (CheckpointAgeCategoryParticipation)dataGridView_checkpoints.CurrentRow.DataBoundItem;
 
-            database.CheckpointAgeCategoryParticipation.Update(item);
-
-            if (database.SaveChanges() > 0)
+            if (e.ColumnIndex == 1)
             {
-                Log($"Age category \"{item.AgeCategory.Name}\"'s participation in checkpoint \"{item.Checkpoint.Name}\" changed successfully", "Data");
-                LogToUser($"Účast kategorie \"{item.AgeCategory.Name}\" u stanoviště \"{item.Checkpoint.Name}\" úspěšně změněna na \"{(item.IsParticipating ? "Ano" : "Ne")}\"");
+                participation.IsParticipating = !participation.IsParticipating;
+
+                database.CheckpointAgeCategoryParticipation.Update(participation);
+
+                if (database.SaveChanges() > 0)
+                {
+                    Log($"Age category {participation.AgeCategory.Name}'s participation in checkpoint " +
+                        $"\"{participation.Checkpoint.Name}\" changed successfully", "Data");
+                    LogToUser($"Účast kategorie \"{participation.AgeCategory.Name}\" u stanoviště \"{participation.Checkpoint.Name}\" " +
+                        $"úspěšně změněna na \"{(participation.IsParticipating ? "Ano" : "Ne")}\"");
+                }
+                else
+                {
+                    Log("Failed changing Age category's checkpoint participation", "Data");
+                    LogToUser("Nastala chyba při ukládání změn");
+                }
             }
             else
             {
-                Log("Failed changing Age category's checkpoint participation", "Data");
-                LogToUser("Nastala chyba při ukládání změn");
+                var checkpoint = participation.Checkpoint;
+                checkpoint.Disqualifiable = !checkpoint.Disqualifiable;
+
+                database.Checkpoint.Update(checkpoint);
+
+                if (database.SaveChanges() > 0)
+                {
+                    Log($"Disqualifiability of checkpoint {checkpoint.Name} changed successfully", "Data");
+                    LogToUser($"Diskvalifikačnost stanoviště \"{checkpoint.Name}\" úspěšně změněna na \"{(checkpoint.Disqualifiable ? "Ano" : "Ne")}\"");
+                }
+                else
+                {
+                    Log("Failed changing Checkpoint's disqualifiability", "Data");
+                    LogToUser("Nastala chyba při ukládání změn");
+                }
             }
         }
 
@@ -425,10 +448,10 @@ namespace turisticky_zavod.Forms
                     Log($"Checkpoint {checkpoint.Name} deleted successfully", "Data");
                     LogToUser($"Stanoviště \"{checkpoint.Name}\" úspěšně smazáno");
 
-                    dataGridView_checkpoints.DataSource = new BindingList<CheckpointAgeCategoryParticipation>(database.CheckpointAgeCategoryParticipation
+                    dataGridView_checkpoints.DataSource = database.CheckpointAgeCategoryParticipation
                                                                   .Local
                                                                   .Where(x => x.AgeCategoryID == participation.AgeCategoryID && x.CheckpointID != 1)
-                                                                  .ToList());
+                                                                  .ToList();
 
                     ClearInputs();
 
@@ -447,7 +470,10 @@ namespace turisticky_zavod.Forms
             if (dataGridView_checkpoints.CurrentRow != null)
             {
                 var participation = (CheckpointAgeCategoryParticipation)dataGridView_checkpoints.CurrentRow.DataBoundItem;
-                textBox_name_checkpoint.Text = participation.Checkpoint.Name;
+                var checkpoint = participation.Checkpoint;
+
+                textBox_name_checkpoint.Text = checkpoint.Name;
+                checkBox_disqualifiable.Checked = checkpoint.Disqualifiable;
 
                 button_save_checkpoint.Text = "Upravit";
             }
@@ -499,6 +525,7 @@ namespace turisticky_zavod.Forms
             button_save_category.Text = "Přidat";
 
             textBox_name_checkpoint.Clear();
+            checkBox_disqualifiable.Checked = false;
             button_save_checkpoint.Text = "Přidat";
         }
 

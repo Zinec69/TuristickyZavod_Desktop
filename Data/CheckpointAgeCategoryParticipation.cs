@@ -23,5 +23,9 @@ namespace turisticky_zavod.Data
         public virtual AgeCategory AgeCategory { get; set; }
 
         public bool IsParticipating { get; set; }
+
+        [NotMapped]
+        [JsonIgnore]
+        public bool CheckpointDisqualifiable { get => Checkpoint.Disqualifiable; set => Checkpoint.Disqualifiable = value; }
     }
 }

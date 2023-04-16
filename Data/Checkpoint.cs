@@ -9,6 +9,7 @@ namespace turisticky_zavod.Data
     {
         public int ID { get; set; }
         public string Name { get; set; }
+        public bool Disqualifiable { get; set; } = false;
 
         public int? RefereeID { get; set; }
 

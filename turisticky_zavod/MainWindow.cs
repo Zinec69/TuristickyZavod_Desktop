@@ -710,7 +710,7 @@ namespace turisticky_zavod.Forms
 
                 var checkpointInfo = (CheckpointRunnerInfo)dataGridView_runnerCheckpoints.Rows[e.RowIndex].DataBoundItem;
 
-                if (checkpointInfo.CheckpointID is not 2 and not 3 and not 5 and not 6 and not 8 and not 13)
+                if (!checkpointInfo.Checkpoint.Disqualifiable)
                 {
                     MessageBox.Show("V tomto stanovišti nelze diskvalifikovat",
                         "Chyba", MessageBoxButtons.OK, MessageBoxIcon.Error);

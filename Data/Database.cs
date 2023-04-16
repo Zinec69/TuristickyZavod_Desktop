@@ -238,19 +238,19 @@ namespace turisticky_zavod.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Checkpoint>().HasData(
-                new Checkpoint() { ID = 1,  Name = "Start/cíl" },
-                new Checkpoint() { ID = 2,  Name = "Odhad vzdálenosti" },
-                new Checkpoint() { ID = 3,  Name = "Stavba stanu" },
-                new Checkpoint() { ID = 4,  Name = "Orientace mapy" },
-                new Checkpoint() { ID = 5,  Name = "Azimutové úseky" },
-                new Checkpoint() { ID = 6,  Name = "Lanová lávka" },
-                new Checkpoint() { ID = 7,  Name = "Uzlování" },
-                new Checkpoint() { ID = 8,  Name = "Plížení" },
-                new Checkpoint() { ID = 9,  Name = "Hod kriketovým míčkem" },
-                new Checkpoint() { ID = 10, Name = "Turistické a topografické značky" },
-                new Checkpoint() { ID = 11, Name = "Poznávání dřevin" },
-                new Checkpoint() { ID = 12, Name = "Kulturně poznávací činnost" },
-                new Checkpoint() { ID = 13, Name = "Kontrola \"X\"" }
+                new Checkpoint() { ID = 1,  Name = "Start/cíl",                        Disqualifiable = false },
+                new Checkpoint() { ID = 2,  Name = "Odhad vzdálenosti",                Disqualifiable = true },
+                new Checkpoint() { ID = 3,  Name = "Stavba a složení stanu",           Disqualifiable = true },
+                new Checkpoint() { ID = 4,  Name = "Orientace mapy",                   Disqualifiable = false },
+                new Checkpoint() { ID = 5,  Name = "Azimutové úseky",                  Disqualifiable = true },
+                new Checkpoint() { ID = 6,  Name = "Lanová lávka",                     Disqualifiable = true },
+                new Checkpoint() { ID = 7,  Name = "Uzlování",                         Disqualifiable = false },
+                new Checkpoint() { ID = 8,  Name = "Plížení",                          Disqualifiable = true },
+                new Checkpoint() { ID = 9,  Name = "Hod kriketovým míčkem",            Disqualifiable = false },
+                new Checkpoint() { ID = 10, Name = "Turistické a topografické značky", Disqualifiable = false },
+                new Checkpoint() { ID = 11, Name = "Dřeviny",                          Disqualifiable = false },
+                new Checkpoint() { ID = 12, Name = "Kulturně poznávací činnost",       Disqualifiable = false },
+                new Checkpoint() { ID = 13, Name = "Kontrola \"X\"",                   Disqualifiable = true }
             );
 
             modelBuilder.Entity<AgeCategory>().HasIndex(x => x.Code).IsUnique();

@@ -63,15 +63,17 @@
             textBox_name_checkpoint = new TextBox();
             groupBox_checkpoints = new GroupBox();
             dataGridView_checkpoints = new DataGridView();
-            Checkpoint = new DataGridViewTextBoxColumn();
-            dataGridViewCheckBoxColumn3 = new DataGridViewCheckBoxColumn();
             checkpointAgeCategoryParticipationBindingSource = new BindingSource(components);
             statusStrip1 = new StatusStrip();
             toolStripStatusLabel = new ToolStripStatusLabel();
             groupBox_edit_checkpoint = new GroupBox();
+            checkBox_disqualifiable = new CheckBox();
             label_name_checkpoint = new Label();
             button_save_checkpoint = new Button();
             errorProvider_checkpoint = new ErrorProvider(components);
+            Checkpoint = new DataGridViewTextBoxColumn();
+            dataGridViewCheckBoxColumn3 = new DataGridViewCheckBoxColumn();
+            CheckpointDisqualifiable = new DataGridViewCheckBoxColumn();
             ((System.ComponentModel.ISupportInitialize)dataGridView_categories).BeginInit();
             ((System.ComponentModel.ISupportInitialize)ageCategoryBindingSource).BeginInit();
             groupBox_categories.SuspendLayout();
@@ -102,7 +104,7 @@
             dataGridView_categories.RowHeadersWidth = 50;
             dataGridView_categories.RowTemplate.Height = 25;
             dataGridView_categories.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dataGridView_categories.Size = new Size(779, 327);
+            dataGridView_categories.Size = new Size(775, 327);
             dataGridView_categories.TabIndex = 0;
             dataGridView_categories.CurrentCellChanged += DataGridView_AgeCategories_CurrentCellChanged;
             dataGridView_categories.RowsAdded += DataGridView_AgeCategories_RowsAdded;
@@ -191,7 +193,7 @@
             groupBox_categories.Controls.Add(dataGridView_categories);
             groupBox_categories.Location = new Point(12, 111);
             groupBox_categories.Name = "groupBox_categories";
-            groupBox_categories.Size = new Size(791, 355);
+            groupBox_categories.Size = new Size(787, 355);
             groupBox_categories.TabIndex = 8;
             groupBox_categories.TabStop = false;
             groupBox_categories.Text = "Věkové kategorie";
@@ -214,7 +216,7 @@
             groupBox_edit_category.Controls.Add(button_save_category);
             groupBox_edit_category.Location = new Point(12, 12);
             groupBox_edit_category.Name = "groupBox_edit_category";
-            groupBox_edit_category.Size = new Size(791, 93);
+            groupBox_edit_category.Size = new Size(787, 93);
             groupBox_edit_category.TabIndex = 9;
             groupBox_edit_category.TabStop = false;
             groupBox_edit_category.Text = "Přidat/upravit kategorii";
@@ -341,7 +343,7 @@
             button_save_category.Location = new Point(683, 34);
             button_save_category.Margin = new Padding(3, 3, 15, 3);
             button_save_category.Name = "button_save_category";
-            button_save_category.Size = new Size(90, 33);
+            button_save_category.Size = new Size(86, 33);
             button_save_category.TabIndex = 6;
             button_save_category.Text = "Přidat";
             button_save_category.UseVisualStyleBackColor = true;
@@ -366,9 +368,9 @@
             // 
             groupBox_checkpoints.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
             groupBox_checkpoints.Controls.Add(dataGridView_checkpoints);
-            groupBox_checkpoints.Location = new Point(809, 111);
+            groupBox_checkpoints.Location = new Point(805, 111);
             groupBox_checkpoints.Name = "groupBox_checkpoints";
-            groupBox_checkpoints.Size = new Size(368, 355);
+            groupBox_checkpoints.Size = new Size(467, 355);
             groupBox_checkpoints.TabIndex = 11;
             groupBox_checkpoints.TabStop = false;
             groupBox_checkpoints.Text = "Stanoviště";
@@ -380,7 +382,7 @@
             dataGridView_checkpoints.AutoGenerateColumns = false;
             dataGridView_checkpoints.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.DisplayedCells;
             dataGridView_checkpoints.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridView_checkpoints.Columns.AddRange(new DataGridViewColumn[] { Checkpoint, dataGridViewCheckBoxColumn3 });
+            dataGridView_checkpoints.Columns.AddRange(new DataGridViewColumn[] { Checkpoint, dataGridViewCheckBoxColumn3, CheckpointDisqualifiable });
             dataGridView_checkpoints.DataSource = checkpointAgeCategoryParticipationBindingSource;
             dataGridView_checkpoints.Location = new Point(6, 22);
             dataGridView_checkpoints.MultiSelect = false;
@@ -388,13 +390,80 @@
             dataGridView_checkpoints.RowHeadersWidth = 50;
             dataGridView_checkpoints.RowTemplate.Height = 25;
             dataGridView_checkpoints.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dataGridView_checkpoints.Size = new Size(356, 327);
+            dataGridView_checkpoints.Size = new Size(455, 327);
             dataGridView_checkpoints.TabIndex = 0;
             dataGridView_checkpoints.CellBeginEdit += DataGridView_Checkpoints_CellBeginEdit;
             dataGridView_checkpoints.CurrentCellChanged += DataGridView_Checkpoints_CurrentCellChanged;
             dataGridView_checkpoints.RowsAdded += DataGridView_Checkpoints_RowsAdded;
             dataGridView_checkpoints.UserDeletingRow += DataGridView_Checkpoints_UserDeletingRow;
             dataGridView_checkpoints.KeyDown += DataGridView_Checkpoints_KeyDown;
+            // 
+            // checkpointAgeCategoryParticipationBindingSource
+            // 
+            checkpointAgeCategoryParticipationBindingSource.DataSource = typeof(Data.CheckpointAgeCategoryParticipation);
+            // 
+            // statusStrip1
+            // 
+            statusStrip1.Items.AddRange(new ToolStripItem[] { toolStripStatusLabel });
+            statusStrip1.Location = new Point(0, 469);
+            statusStrip1.Name = "statusStrip1";
+            statusStrip1.Size = new Size(1284, 22);
+            statusStrip1.TabIndex = 12;
+            statusStrip1.Text = "statusStrip";
+            // 
+            // toolStripStatusLabel
+            // 
+            toolStripStatusLabel.Name = "toolStripStatusLabel";
+            toolStripStatusLabel.Size = new Size(0, 17);
+            // 
+            // groupBox_edit_checkpoint
+            // 
+            groupBox_edit_checkpoint.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            groupBox_edit_checkpoint.Controls.Add(checkBox_disqualifiable);
+            groupBox_edit_checkpoint.Controls.Add(label_name_checkpoint);
+            groupBox_edit_checkpoint.Controls.Add(textBox_name_checkpoint);
+            groupBox_edit_checkpoint.Controls.Add(button_save_checkpoint);
+            groupBox_edit_checkpoint.Location = new Point(805, 12);
+            groupBox_edit_checkpoint.Name = "groupBox_edit_checkpoint";
+            groupBox_edit_checkpoint.Size = new Size(467, 93);
+            groupBox_edit_checkpoint.TabIndex = 13;
+            groupBox_edit_checkpoint.TabStop = false;
+            groupBox_edit_checkpoint.Text = "Přidat/upravit stanoviště";
+            // 
+            // checkBox_disqualifiable
+            // 
+            checkBox_disqualifiable.AutoSize = true;
+            checkBox_disqualifiable.Location = new Point(231, 46);
+            checkBox_disqualifiable.Name = "checkBox_disqualifiable";
+            checkBox_disqualifiable.Size = new Size(101, 19);
+            checkBox_disqualifiable.TabIndex = 10;
+            checkBox_disqualifiable.Text = "Diskvalifikační";
+            checkBox_disqualifiable.UseVisualStyleBackColor = true;
+            // 
+            // label_name_checkpoint
+            // 
+            label_name_checkpoint.AutoSize = true;
+            label_name_checkpoint.Location = new Point(23, 26);
+            label_name_checkpoint.Name = "label_name_checkpoint";
+            label_name_checkpoint.Size = new Size(44, 15);
+            label_name_checkpoint.TabIndex = 9;
+            label_name_checkpoint.Text = "Název*";
+            // 
+            // button_save_checkpoint
+            // 
+            button_save_checkpoint.Location = new Point(359, 38);
+            button_save_checkpoint.Margin = new Padding(3, 3, 15, 3);
+            button_save_checkpoint.Name = "button_save_checkpoint";
+            button_save_checkpoint.Size = new Size(90, 33);
+            button_save_checkpoint.TabIndex = 8;
+            button_save_checkpoint.Text = "Přidat";
+            button_save_checkpoint.UseVisualStyleBackColor = true;
+            button_save_checkpoint.Click += Button_Checkpoint_Save_Click;
+            // 
+            // errorProvider_checkpoint
+            // 
+            errorProvider_checkpoint.BlinkStyle = ErrorBlinkStyle.NeverBlink;
+            errorProvider_checkpoint.ContainerControl = this;
             // 
             // Checkpoint
             // 
@@ -412,75 +481,25 @@
             dataGridViewCheckBoxColumn3.MinimumWidth = 100;
             dataGridViewCheckBoxColumn3.Name = "dataGridViewCheckBoxColumn3";
             // 
-            // checkpointAgeCategoryParticipationBindingSource
+            // CheckpointDisqualifiable
             // 
-            checkpointAgeCategoryParticipationBindingSource.DataSource = typeof(Data.CheckpointAgeCategoryParticipation);
-            // 
-            // statusStrip1
-            // 
-            statusStrip1.Items.AddRange(new ToolStripItem[] { toolStripStatusLabel });
-            statusStrip1.Location = new Point(0, 469);
-            statusStrip1.Name = "statusStrip1";
-            statusStrip1.Size = new Size(1189, 22);
-            statusStrip1.TabIndex = 12;
-            statusStrip1.Text = "statusStrip";
-            // 
-            // toolStripStatusLabel
-            // 
-            toolStripStatusLabel.Name = "toolStripStatusLabel";
-            toolStripStatusLabel.Size = new Size(0, 17);
-            // 
-            // groupBox_edit_checkpoint
-            // 
-            groupBox_edit_checkpoint.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            groupBox_edit_checkpoint.Controls.Add(label_name_checkpoint);
-            groupBox_edit_checkpoint.Controls.Add(textBox_name_checkpoint);
-            groupBox_edit_checkpoint.Controls.Add(button_save_checkpoint);
-            groupBox_edit_checkpoint.Location = new Point(809, 12);
-            groupBox_edit_checkpoint.Name = "groupBox_edit_checkpoint";
-            groupBox_edit_checkpoint.Size = new Size(368, 93);
-            groupBox_edit_checkpoint.TabIndex = 13;
-            groupBox_edit_checkpoint.TabStop = false;
-            groupBox_edit_checkpoint.Text = "Přidat/upravit stanoviště";
-            // 
-            // label_name_checkpoint
-            // 
-            label_name_checkpoint.AutoSize = true;
-            label_name_checkpoint.Location = new Point(23, 26);
-            label_name_checkpoint.Name = "label_name_checkpoint";
-            label_name_checkpoint.Size = new Size(44, 15);
-            label_name_checkpoint.TabIndex = 9;
-            label_name_checkpoint.Text = "Název*";
-            // 
-            // button_save_checkpoint
-            // 
-            button_save_checkpoint.Location = new Point(260, 34);
-            button_save_checkpoint.Margin = new Padding(3, 3, 15, 3);
-            button_save_checkpoint.Name = "button_save_checkpoint";
-            button_save_checkpoint.Size = new Size(90, 33);
-            button_save_checkpoint.TabIndex = 8;
-            button_save_checkpoint.Text = "Přidat";
-            button_save_checkpoint.UseVisualStyleBackColor = true;
-            button_save_checkpoint.Click += Button_Checkpoint_Save_Click;
-            // 
-            // errorProvider_checkpoint
-            // 
-            errorProvider_checkpoint.BlinkStyle = ErrorBlinkStyle.NeverBlink;
-            errorProvider_checkpoint.ContainerControl = this;
+            CheckpointDisqualifiable.DataPropertyName = "CheckpointDisqualifiable";
+            CheckpointDisqualifiable.HeaderText = "Diskvalifikační";
+            CheckpointDisqualifiable.Name = "CheckpointDisqualifiable";
             // 
             // AgeCategoriesEditor
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             AutoValidate = AutoValidate.EnableAllowFocusChange;
-            ClientSize = new Size(1189, 491);
+            ClientSize = new Size(1284, 491);
             Controls.Add(groupBox_edit_checkpoint);
             Controls.Add(statusStrip1);
             Controls.Add(groupBox_checkpoints);
             Controls.Add(groupBox_edit_category);
             Controls.Add(groupBox_categories);
             HelpButton = true;
-            MinimumSize = new Size(1205, 530);
+            MinimumSize = new Size(1300, 530);
             Name = "AgeCategoriesEditor";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Nastavení věkových kategorií";
@@ -547,13 +566,16 @@
         private Label label_name_checkpoint;
         private TextBox textBox_name_checkpoint;
         private ErrorProvider errorProvider_checkpoint;
-        private DataGridViewTextBoxColumn Checkpoint;
-        private DataGridViewCheckBoxColumn dataGridViewCheckBoxColumn3;
+        private DataGridViewCheckBoxColumn dataGridViewCheckBoxColumn4;
         private DataGridViewTextBoxColumn dataGridViewTextBoxColumn6;
         private DataGridViewTextBoxColumn dataGridViewTextBoxColumn7;
         private DataGridViewTextBoxColumn dataGridViewTextBoxColumn8;
         private DataGridViewTextBoxColumn dataGridViewTextBoxColumn9;
         private DataGridViewTextBoxColumn TypeString;
         private DataGridViewTextBoxColumn dataGridViewTextBoxColumn10;
+        private CheckBox checkBox_disqualifiable;
+        private DataGridViewTextBoxColumn Checkpoint;
+        private DataGridViewCheckBoxColumn dataGridViewCheckBoxColumn3;
+        private DataGridViewCheckBoxColumn CheckpointDisqualifiable;
     }
 }
