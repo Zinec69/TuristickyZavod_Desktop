@@ -1,0 +1,17 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<FKIndexAssociation class="oracle.dbtools.crest.model.design.relational.FKIndexAssociation" directorySegmentName="seg_0" id="2140C8FB-439B-47B5-B6D2-BA7AF9706094" containerWithKeyObject="6F58AE96-74C5-BB5E-D763-F8B443EFAE72" localFKIndex="5615F54D-E8DA-0A59-783A-5B35794BC0FF" name="CheckpointAgeCategoryParticipation_AgeCategory_FK">
+<createdBy>Zinec</createdBy>
+<createdTime>2023-04-20 18:47:32 UTC</createdTime>
+<generatorID>E381012F-79C4-5868-3EFE-33586D7525F8</generatorID>
+<ownerDesignName>db</ownerDesignName>
+<referredTableLongName>AgeCategory</referredTableLongName>
+<deleteRule>NO ACTION</deleteRule>
+<referredTableID>14812497-A12E-EAB5-080A-6BB5F6C35ED1</referredTableID>
+<keyObject>63267862-3478-4792-1578-80294120BA10</keyObject>
+<referredKeyID>63267862-3478-4792-1578-80294120BA10</referredKeyID>
+<mandatory>true</mandatory>
+<refColNames>ID</refColNames>
+<transferable>true</transferable>
+<rely>false</rely>
+<columnDependencyConstraintGenerateInDDL>true</columnDependencyConstraintGenerateInDDL>
+</FKIndexAssociation>

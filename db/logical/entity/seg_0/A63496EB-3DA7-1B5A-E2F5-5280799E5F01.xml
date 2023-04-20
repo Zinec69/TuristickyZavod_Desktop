@@ -1,0 +1,83 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Entity class="oracle.dbtools.crest.model.design.logical.Entity" directorySegmentName="seg_0" id="A63496EB-3DA7-1B5A-E2F5-5280799E5F01" name="Checkpoint">
+<createdBy>Zinec</createdBy>
+<createdTime>2023-04-20 18:26:53 UTC</createdTime>
+<ownerDesignName>db</ownerDesignName>
+<engineerTo>
+<item key="0545B332-284E-15AF-632C-B412231C2C82" value="true"/>
+</engineerTo>
+<adequatelyNormalized>NO</adequatelyNormalized>
+<expectedVolumes>0</expectedVolumes>
+<fwdEngineeringStrategyName>Single Table</fwdEngineeringStrategyName>
+<growthPercent>0</growthPercent>
+<growthType>Year</growthType>
+<maxVolumes>9999999</maxVolumes>
+<minVolumes>0</minVolumes>
+<normalForm>Third</normalForm>
+<attributes itemClass="oracle.dbtools.crest.model.design.logical.Attribute">
+<Attribute name="ID" id="B0667240-DAF2-1067-EC5B-B98AF88AB466">
+<createdBy>Zinec</createdBy>
+<createdTime>2023-04-20 18:27:01 UTC</createdTime>
+<ownerDesignName>db</ownerDesignName>
+<engineerTo>
+<item key="0545B332-284E-15AF-632C-B412231C2C82" value="true"/>
+</engineerTo>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT011</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="Name" id="6202AA93-4A8A-8558-D881-D6836B2AB492">
+<createdBy>Zinec</createdBy>
+<createdTime>2023-04-20 18:27:10 UTC</createdTime>
+<ownerDesignName>db</ownerDesignName>
+<engineerTo>
+<item key="0545B332-284E-15AF-632C-B412231C2C82" value="true"/>
+</engineerTo>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT040</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="Disqualifiable" id="FC01205B-9ACB-B4F1-C8E8-B0C02724A675">
+<createdBy>Zinec</createdBy>
+<createdTime>2023-04-20 18:27:19 UTC</createdTime>
+<ownerDesignName>db</ownerDesignName>
+<engineerTo>
+<item key="0545B332-284E-15AF-632C-B412231C2C82" value="true"/>
+</engineerTo>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT011</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="ID1" id="3816AE2F-3FE9-32CF-664B-30607BA402C8">
+<createdBy>Zinec</createdBy>
+<createdTime>2023-04-20 18:41:12 UTC</createdTime>
+<generatorID>1CFEA884-DC0B-FDEC-2963-CD77FA0EEDD9</generatorID>
+<ownerDesignName>db</ownerDesignName>
+<engineerTo>
+<item key="0545B332-284E-15AF-632C-B412231C2C82" value="true"/>
+</engineerTo>
+<referedAttribute>50670EE9-30FD-17E9-2BD9-ABF11B410086</referedAttribute>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT011</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+</attributes>
+<identifiers itemClass="oracle.dbtools.crest.model.design.logical.CandidateKey">
+<identifier id="B1AA68AC-F97C-CEA1-49A3-5EC0045307B0" name="Checkpoint PK">
+<createdBy>Zinec</createdBy>
+<createdTime>2023-04-20 18:27:09 UTC</createdTime>
+<ownerDesignName>db</ownerDesignName>
+<engineerTo>
+<item key="0545B332-284E-15AF-632C-B412231C2C82" value="true"/>
+</engineerTo>
+<pk>true</pk>
+<usedAttributes>
+<attributeRef>B0667240-DAF2-1067-EC5B-B98AF88AB466</attributeRef>
+</usedAttributes>
+</identifier>
+</identifiers>
+</Entity>

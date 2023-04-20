@@ -1,0 +1,17 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<FKIndexAssociation class="oracle.dbtools.crest.model.design.relational.FKIndexAssociation" directorySegmentName="seg_0" id="48F41FF9-DD01-AD0E-CDC3-025A3E794BBB" containerWithKeyObject="61C74680-048C-C866-74EF-C96AC0972F62" localFKIndex="DAC89725-AB52-D735-ED8D-B8E5D7C1F46B" name="Runner_AgeCategory_FK">
+<createdBy>Zinec</createdBy>
+<createdTime>2023-04-20 18:47:32 UTC</createdTime>
+<generatorID>9B7587CE-427B-AC96-AD9A-91FEB767DD67</generatorID>
+<ownerDesignName>db</ownerDesignName>
+<referredTableLongName>AgeCategory</referredTableLongName>
+<deleteRule>NO ACTION</deleteRule>
+<referredTableID>14812497-A12E-EAB5-080A-6BB5F6C35ED1</referredTableID>
+<keyObject>63267862-3478-4792-1578-80294120BA10</keyObject>
+<referredKeyID>63267862-3478-4792-1578-80294120BA10</referredKeyID>
+<mandatory>true</mandatory>
+<refColNames>ID</refColNames>
+<transferable>true</transferable>
+<rely>false</rely>
+<columnDependencyConstraintGenerateInDDL>true</columnDependencyConstraintGenerateInDDL>
+</FKIndexAssociation>

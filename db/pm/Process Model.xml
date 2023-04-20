@@ -1,0 +1,7 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<ProcessModel class="oracle.dbtools.crest.model.design.process.ProcessModel" name="Process Model" id="1E41C918-6C02-BE29-3028-2A5D4827B7BF">
+<createdBy>Zinec</createdBy>
+<createdTime>2023-04-20 15:24:35 UTC</createdTime>
+<ownerDesignName>db</ownerDesignName>
+<shouldBeOpen>false</shouldBeOpen>
+</ProcessModel>

@@ -366,3 +366,9 @@ FodyWeavers.xsd
 /Data/tz.db-wal
 /test
 /db_diagram.pdf
+/turisticky_zavod/publish.ps1
+/turisticky_zavod/tz.db
+**/*.localz
+**/*.local
+**/*.git
+**/*.DS_Store

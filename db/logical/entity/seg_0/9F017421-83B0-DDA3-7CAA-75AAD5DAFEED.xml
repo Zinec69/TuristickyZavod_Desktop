@@ -1,0 +1,186 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Entity class="oracle.dbtools.crest.model.design.logical.Entity" directorySegmentName="seg_0" id="9F017421-83B0-DDA3-7CAA-75AAD5DAFEED" name="Runner">
+<createdBy>Zinec</createdBy>
+<createdTime>2023-04-20 17:26:19 UTC</createdTime>
+<ownerDesignName>db</ownerDesignName>
+<engineerTo>
+<item key="0545B332-284E-15AF-632C-B412231C2C82" value="true"/>
+</engineerTo>
+<adequatelyNormalized>NO</adequatelyNormalized>
+<expectedVolumes>0</expectedVolumes>
+<fwdEngineeringStrategyName>Single Table</fwdEngineeringStrategyName>
+<growthPercent>0</growthPercent>
+<growthType>Year</growthType>
+<maxVolumes>9999999</maxVolumes>
+<minVolumes>0</minVolumes>
+<normalForm>Third</normalForm>
+<attributes itemClass="oracle.dbtools.crest.model.design.logical.Attribute">
+<Attribute name="ID" id="40354A0B-4AAD-25A4-29AE-5DCB9BD18170">
+<createdBy>Zinec</createdBy>
+<createdTime>2023-04-20 17:27:53 UTC</createdTime>
+<ownerDesignName>db</ownerDesignName>
+<engineerTo>
+<item key="0545B332-284E-15AF-632C-B412231C2C82" value="true"/>
+</engineerTo>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT011</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="StartNumber" id="C6B6AFA3-1131-3AAE-2083-29A7DAE9DACF">
+<createdBy>Zinec</createdBy>
+<createdTime>2023-04-20 18:22:58 UTC</createdTime>
+<ownerDesignName>db</ownerDesignName>
+<engineerTo>
+<item key="0545B332-284E-15AF-632C-B412231C2C82" value="true"/>
+</engineerTo>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT011</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="StartTime" id="D2C5AB6C-B57E-4E41-452E-94177DF1DAE7">
+<createdBy>Zinec</createdBy>
+<createdTime>2023-04-20 18:24:07 UTC</createdTime>
+<ownerDesignName>db</ownerDesignName>
+<engineerTo>
+<item key="0545B332-284E-15AF-632C-B412231C2C82" value="true"/>
+</engineerTo>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT040</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="FinishTime" id="C4DF2CA9-6F88-0D63-E824-0997F306A551">
+<createdBy>Zinec</createdBy>
+<createdTime>2023-04-20 18:25:41 UTC</createdTime>
+<ownerDesignName>db</ownerDesignName>
+<engineerTo>
+<item key="0545B332-284E-15AF-632C-B412231C2C82" value="true"/>
+</engineerTo>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT040</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="Disqualified" id="031326AA-E1A9-AE55-C14C-08F044A6F7FC">
+<createdBy>Zinec</createdBy>
+<createdTime>2023-04-20 18:25:51 UTC</createdTime>
+<ownerDesignName>db</ownerDesignName>
+<engineerTo>
+<item key="0545B332-284E-15AF-632C-B412231C2C82" value="true"/>
+</engineerTo>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT011</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="FirstName" id="70346241-3086-9912-DE92-A8653F453E63">
+<createdBy>Zinec</createdBy>
+<createdTime>2023-04-20 18:26:03 UTC</createdTime>
+<ownerDesignName>db</ownerDesignName>
+<engineerTo>
+<item key="0545B332-284E-15AF-632C-B412231C2C82" value="true"/>
+</engineerTo>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT040</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="LastName" id="F9095E84-661B-247D-99A7-F06DD564FBF7">
+<createdBy>Zinec</createdBy>
+<createdTime>2023-04-20 18:26:15 UTC</createdTime>
+<ownerDesignName>db</ownerDesignName>
+<engineerTo>
+<item key="0545B332-284E-15AF-632C-B412231C2C82" value="true"/>
+</engineerTo>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT040</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="Birthdate" id="42262F9B-A31F-D1A6-496F-E98E173E3416">
+<createdBy>Zinec</createdBy>
+<createdTime>2023-04-20 18:26:23 UTC</createdTime>
+<ownerDesignName>db</ownerDesignName>
+<engineerTo>
+<item key="0545B332-284E-15AF-632C-B412231C2C82" value="true"/>
+</engineerTo>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT040</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="Gender" id="582E5531-B0F0-683C-F43A-BB0FC1E68BBA">
+<createdBy>Zinec</createdBy>
+<createdTime>2023-04-20 18:26:32 UTC</createdTime>
+<ownerDesignName>db</ownerDesignName>
+<engineerTo>
+<item key="0545B332-284E-15AF-632C-B412231C2C82" value="true"/>
+</engineerTo>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT011</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="ID1" id="49A0D7C0-E05E-DFEB-78B2-3D1FD0C9AF14">
+<createdBy>Zinec</createdBy>
+<createdTime>2023-04-20 18:35:27 UTC</createdTime>
+<generatorID>B421F91D-FB86-1AD2-0D97-A31FB6754239</generatorID>
+<ownerDesignName>db</ownerDesignName>
+<engineerTo>
+<item key="0545B332-284E-15AF-632C-B412231C2C82" value="true"/>
+</engineerTo>
+<referedAttribute>D88C24FD-59E7-7596-70D3-1B675256FAB6</referedAttribute>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT011</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="ID3" id="3B7C681B-F85E-39E5-1AA4-4FB2D670EE09">
+<createdBy>Zinec</createdBy>
+<createdTime>2023-04-20 18:40:56 UTC</createdTime>
+<generatorID>52A58C68-9DFC-0B14-854F-66FF23926D9A</generatorID>
+<ownerDesignName>db</ownerDesignName>
+<engineerTo>
+<item key="0545B332-284E-15AF-632C-B412231C2C82" value="true"/>
+</engineerTo>
+<referedAttribute>E9FFC3E8-BE8E-A67D-765F-E4E8834A4068</referedAttribute>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT011</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="ID2" id="38D0F6D4-9ADF-E914-12B8-1B1AF698F02D">
+<createdBy>Zinec</createdBy>
+<createdTime>2023-04-20 18:47:19 UTC</createdTime>
+<generatorID>9B7587CE-427B-AC96-AD9A-91FEB767DD67</generatorID>
+<ownerDesignName>db</ownerDesignName>
+<engineerTo>
+<item key="0545B332-284E-15AF-632C-B412231C2C82" value="true"/>
+</engineerTo>
+<referedAttribute>D22CD87E-A0EB-D227-2923-C6015362C18B</referedAttribute>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT011</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+</attributes>
+<identifiers itemClass="oracle.dbtools.crest.model.design.logical.CandidateKey">
+<identifier id="F739E0A7-469B-429A-EA8A-A48764C1A657" name="Runner PK">
+<createdBy>Zinec</createdBy>
+<createdTime>2023-04-20 17:28:17 UTC</createdTime>
+<ownerDesignName>db</ownerDesignName>
+<engineerTo>
+<item key="0545B332-284E-15AF-632C-B412231C2C82" value="true"/>
+</engineerTo>
+<pk>true</pk>
+<usedAttributes>
+<attributeRef>40354A0B-4AAD-25A4-29AE-5DCB9BD18170</attributeRef>
+</usedAttributes>
+</identifier>
+</identifiers>
+</Entity>
