@@ -44,12 +44,14 @@
             DataGridViewCellStyle dataGridViewCellStyle4 = new DataGridViewCellStyle();
             DataGridViewCellStyle dataGridViewCellStyle5 = new DataGridViewCellStyle();
             DataGridViewCellStyle dataGridViewCellStyle6 = new DataGridViewCellStyle();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainWindow));
             statusStrip1 = new StatusStrip();
             toolStripStatusLabel1 = new ToolStripStatusLabel();
             toolStripProgressBar1 = new ToolStripProgressBar();
             menuStrip1 = new MenuStrip();
             souborToolStripMenuItem = new ToolStripMenuItem();
             toolStripMenuItem_close = new ToolStripMenuItem();
+            toolStripMenuItem_reset = new ToolStripMenuItem();
             toolStripMenuItem_save = new ToolStripMenuItem();
             toolStripMenuItem_saveAs = new ToolStripMenuItem();
             toolStripMenuItem_import = new ToolStripMenuItem();
@@ -86,9 +88,26 @@
             textBox_startNumber = new TextBox();
             button_save = new Button();
             errorProvider = new ErrorProvider(components);
+            maskedTextBox_penalty = new MaskedTextBox();
+            maskedTextBox_timeWaited = new MaskedTextBox();
+            comboBox_checkpoints_checkpointInfo = new ComboBox();
             tabControl = new TabControl();
             tabPage_start = new TabPage();
             tabPage_results = new TabPage();
+            groupBox1 = new GroupBox();
+            textBox_startNumber_checkpointInfo = new TextBox();
+            button_add_checkpointInfo = new Button();
+            checkBox_disqualified_checkpointInfo = new CheckBox();
+            label_penalty = new Label();
+            label_timeWaited = new Label();
+            label_checkpoints_checkpointInfo = new Label();
+            label_ageCategory_checkpointInfo = new Label();
+            textBox_ageCategory_checkpointInfo = new TextBox();
+            label_team_checkpointInfo = new Label();
+            textBox_team_checkpointInfo = new TextBox();
+            label_name_checkpointInfo = new Label();
+            textBox_name_checkpointInfo = new TextBox();
+            label_startNumber_checkpointInfo = new Label();
             groupBox_runners_results = new GroupBox();
             dataGridView_runners_results = new DataGridView();
             startNumberDataGridViewTextBoxColumn = new DataGridViewTextBoxColumn();
@@ -107,6 +126,7 @@
             groupBox_checkpoints = new GroupBox();
             dataGridView_runnerCheckpoints = new DataGridView();
             checkpointDataGridViewTextBoxColumn = new DataGridViewTextBoxColumn();
+            CheckpointRefereeName = new DataGridViewTextBoxColumn();
             timeWaitedDataGridViewTextBoxColumn = new DataGridViewTextBoxColumn();
             penaltyDataGridViewTextBoxColumn = new DataGridViewTextBoxColumn();
             disqualifiedDataGridViewCheckBoxColumn1 = new DataGridViewCheckBoxColumn();
@@ -137,6 +157,7 @@
             tabControl.SuspendLayout();
             tabPage_start.SuspendLayout();
             tabPage_results.SuspendLayout();
+            groupBox1.SuspendLayout();
             groupBox_runners_results.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dataGridView_runners_results).BeginInit();
             groupBox_checkpoints.SuspendLayout();
@@ -177,7 +198,7 @@
             // 
             // souborToolStripMenuItem
             // 
-            souborToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { toolStripMenuItem_close, toolStripMenuItem_save, toolStripMenuItem_saveAs, toolStripMenuItem_import });
+            souborToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { toolStripMenuItem_close, toolStripMenuItem_reset, toolStripMenuItem_save, toolStripMenuItem_saveAs, toolStripMenuItem_import });
             souborToolStripMenuItem.Name = "souborToolStripMenuItem";
             souborToolStripMenuItem.Size = new Size(57, 20);
             souborToolStripMenuItem.Text = "Soubor";
@@ -188,6 +209,14 @@
             toolStripMenuItem_close.Size = new Size(129, 22);
             toolStripMenuItem_close.Text = "Zavřít";
             toolStripMenuItem_close.Click += CloseToolStripMenuItem_Click;
+            // 
+            // toolStripMenuItem_reset
+            // 
+            toolStripMenuItem_reset.Name = "toolStripMenuItem_reset";
+            toolStripMenuItem_reset.Size = new Size(129, 22);
+            toolStripMenuItem_reset.Text = "Resetovat";
+            toolStripMenuItem_reset.ToolTipText = "Vymaže všechna data a uvede aplikaci do původního stavu";
+            toolStripMenuItem_reset.Click += ToolStripMenuItem_Reset_Click;
             // 
             // toolStripMenuItem_save
             // 
@@ -297,6 +326,8 @@
             dataGridView_runners.TabIndex = 3;
             dataGridView_runners.CurrentCellChanged += DataGridView_Runners_CurrentCellChanged;
             dataGridView_runners.RowsAdded += DataGridView_Runners_RowsAdded;
+            dataGridView_runners.UserDeletedRow += DataGridView_Runners_UserDeletedRow;
+            dataGridView_runners.UserDeletingRow += DataGridView_Runners_UserDeletingRow;
             dataGridView_runners.DragDrop += DataGridView_Runners_DragDrop;
             dataGridView_runners.DragEnter += DataGridView_Runners_DragEnter;
             dataGridView_runners.KeyDown += DataGridView_Runners_KeyDown;
@@ -352,12 +383,12 @@
             errorProvider.SetIconAlignment(dateTimePicker_birthdate_partner, ErrorIconAlignment.MiddleLeft);
             dateTimePicker_birthdate_partner.Location = new Point(381, 109);
             dateTimePicker_birthdate_partner.Margin = new Padding(3, 3, 16, 3);
-            dateTimePicker_birthdate_partner.MaxDate = new DateTime(2023, 4, 15, 0, 0, 0, 0);
+            dateTimePicker_birthdate_partner.MaxDate = new DateTime(2023, 4, 19, 0, 0, 0, 0);
             dateTimePicker_birthdate_partner.MinDate = new DateTime(1900, 1, 1, 0, 0, 0, 0);
             dateTimePicker_birthdate_partner.Name = "dateTimePicker_birthdate_partner";
             dateTimePicker_birthdate_partner.Size = new Size(174, 23);
             dateTimePicker_birthdate_partner.TabIndex = 29;
-            dateTimePicker_birthdate_partner.Value = new DateTime(2023, 4, 15, 0, 0, 0, 0);
+            dateTimePicker_birthdate_partner.Value = new DateTime(2023, 4, 19, 0, 0, 0, 0);
             dateTimePicker_birthdate_partner.ValueChanged += DateTimePicker_Birthdate_Partner_ValueChanged;
             // 
             // label_birthdate_partner
@@ -420,12 +451,12 @@
             errorProvider.SetIconAlignment(dateTimePicker_birthdate, ErrorIconAlignment.MiddleLeft);
             dateTimePicker_birthdate.Location = new Point(381, 50);
             dateTimePicker_birthdate.Margin = new Padding(3, 3, 16, 3);
-            dateTimePicker_birthdate.MaxDate = new DateTime(2023, 4, 15, 0, 0, 0, 0);
+            dateTimePicker_birthdate.MaxDate = new DateTime(2023, 4, 19, 0, 0, 0, 0);
             dateTimePicker_birthdate.MinDate = new DateTime(1900, 1, 1, 0, 0, 0, 0);
             dateTimePicker_birthdate.Name = "dateTimePicker_birthdate";
             dateTimePicker_birthdate.Size = new Size(174, 23);
             dateTimePicker_birthdate.TabIndex = 23;
-            dateTimePicker_birthdate.Value = new DateTime(2023, 4, 15, 0, 0, 0, 0);
+            dateTimePicker_birthdate.Value = new DateTime(2023, 4, 19, 0, 0, 0, 0);
             dateTimePicker_birthdate.ValueChanged += DateTimePicker_Birthdate_ValueChanged;
             // 
             // label_ageCategory
@@ -550,10 +581,10 @@
             // button_save
             // 
             button_save.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left;
-            button_save.Location = new Point(931, 64);
+            button_save.Location = new Point(930, 63);
             button_save.Margin = new Padding(0);
             button_save.Name = "button_save";
-            button_save.Size = new Size(90, 38);
+            button_save.Size = new Size(100, 42);
             button_save.TabIndex = 7;
             button_save.Text = "Přidat";
             button_save.UseVisualStyleBackColor = true;
@@ -563,6 +594,41 @@
             // 
             errorProvider.BlinkStyle = ErrorBlinkStyle.NeverBlink;
             errorProvider.ContainerControl = this;
+            // 
+            // maskedTextBox_penalty
+            // 
+            errorProvider.SetIconAlignment(maskedTextBox_penalty, ErrorIconAlignment.MiddleLeft);
+            maskedTextBox_penalty.Location = new Point(997, 46);
+            maskedTextBox_penalty.Margin = new Padding(3, 3, 16, 3);
+            maskedTextBox_penalty.Mask = "00:00";
+            maskedTextBox_penalty.Name = "maskedTextBox_penalty";
+            maskedTextBox_penalty.Size = new Size(71, 23);
+            maskedTextBox_penalty.TabIndex = 13;
+            maskedTextBox_penalty.Text = "0000";
+            maskedTextBox_penalty.ValidatingType = typeof(int);
+            // 
+            // maskedTextBox_timeWaited
+            // 
+            errorProvider.SetIconAlignment(maskedTextBox_timeWaited, ErrorIconAlignment.MiddleLeft);
+            maskedTextBox_timeWaited.Location = new Point(907, 46);
+            maskedTextBox_timeWaited.Margin = new Padding(3, 3, 16, 3);
+            maskedTextBox_timeWaited.Mask = "00:00";
+            maskedTextBox_timeWaited.Name = "maskedTextBox_timeWaited";
+            maskedTextBox_timeWaited.Size = new Size(71, 23);
+            maskedTextBox_timeWaited.TabIndex = 11;
+            maskedTextBox_timeWaited.Text = "0000";
+            maskedTextBox_timeWaited.ValidatingType = typeof(int);
+            // 
+            // comboBox_checkpoints_checkpointInfo
+            // 
+            comboBox_checkpoints_checkpointInfo.DropDownStyle = ComboBoxStyle.DropDownList;
+            comboBox_checkpoints_checkpointInfo.FormattingEnabled = true;
+            errorProvider.SetIconAlignment(comboBox_checkpoints_checkpointInfo, ErrorIconAlignment.MiddleLeft);
+            comboBox_checkpoints_checkpointInfo.Location = new Point(706, 47);
+            comboBox_checkpoints_checkpointInfo.Margin = new Padding(3, 3, 16, 3);
+            comboBox_checkpoints_checkpointInfo.Name = "comboBox_checkpoints_checkpointInfo";
+            comboBox_checkpoints_checkpointInfo.Size = new Size(182, 23);
+            comboBox_checkpoints_checkpointInfo.TabIndex = 8;
             // 
             // tabControl
             // 
@@ -590,6 +656,7 @@
             // 
             // tabPage_results
             // 
+            tabPage_results.Controls.Add(groupBox1);
             tabPage_results.Controls.Add(groupBox_runners_results);
             tabPage_results.Controls.Add(groupBox_checkpoints);
             tabPage_results.Controls.Add(groupBox_filter);
@@ -601,13 +668,158 @@
             tabPage_results.Text = "Výsledková listina";
             tabPage_results.UseVisualStyleBackColor = true;
             // 
+            // groupBox1
+            // 
+            groupBox1.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            groupBox1.Controls.Add(textBox_startNumber_checkpointInfo);
+            groupBox1.Controls.Add(button_add_checkpointInfo);
+            groupBox1.Controls.Add(checkBox_disqualified_checkpointInfo);
+            groupBox1.Controls.Add(label_penalty);
+            groupBox1.Controls.Add(maskedTextBox_penalty);
+            groupBox1.Controls.Add(label_timeWaited);
+            groupBox1.Controls.Add(maskedTextBox_timeWaited);
+            groupBox1.Controls.Add(label_checkpoints_checkpointInfo);
+            groupBox1.Controls.Add(comboBox_checkpoints_checkpointInfo);
+            groupBox1.Controls.Add(label_ageCategory_checkpointInfo);
+            groupBox1.Controls.Add(textBox_ageCategory_checkpointInfo);
+            groupBox1.Controls.Add(label_team_checkpointInfo);
+            groupBox1.Controls.Add(textBox_team_checkpointInfo);
+            groupBox1.Controls.Add(label_name_checkpointInfo);
+            groupBox1.Controls.Add(textBox_name_checkpointInfo);
+            groupBox1.Controls.Add(label_startNumber_checkpointInfo);
+            groupBox1.Location = new Point(6, 6);
+            groupBox1.Name = "groupBox1";
+            groupBox1.Size = new Size(1051, 97);
+            groupBox1.TabIndex = 3;
+            groupBox1.TabStop = false;
+            groupBox1.Text = "Přidat záznam stanoviště";
+            // 
+            // textBox_startNumber_checkpointInfo
+            // 
+            textBox_startNumber_checkpointInfo.Enabled = false;
+            textBox_startNumber_checkpointInfo.Location = new Point(30, 47);
+            textBox_startNumber_checkpointInfo.Margin = new Padding(3, 3, 16, 3);
+            textBox_startNumber_checkpointInfo.Name = "textBox_startNumber_checkpointInfo";
+            textBox_startNumber_checkpointInfo.Size = new Size(104, 23);
+            textBox_startNumber_checkpointInfo.TabIndex = 17;
+            // 
+            // button_add_checkpointInfo
+            // 
+            button_add_checkpointInfo.Location = new Point(1294, 31);
+            button_add_checkpointInfo.Name = "button_add_checkpointInfo";
+            button_add_checkpointInfo.Size = new Size(123, 41);
+            button_add_checkpointInfo.TabIndex = 16;
+            button_add_checkpointInfo.Text = "Přidat";
+            button_add_checkpointInfo.UseVisualStyleBackColor = true;
+            button_add_checkpointInfo.Click += Button_CheckpointInfo_Add_Click;
+            // 
+            // checkBox_disqualified_checkpointInfo
+            // 
+            checkBox_disqualified_checkpointInfo.AutoSize = true;
+            checkBox_disqualified_checkpointInfo.Location = new Point(1100, 49);
+            checkBox_disqualified_checkpointInfo.Name = "checkBox_disqualified_checkpointInfo";
+            checkBox_disqualified_checkpointInfo.Size = new Size(116, 19);
+            checkBox_disqualified_checkpointInfo.TabIndex = 15;
+            checkBox_disqualified_checkpointInfo.Text = "Diskvalifikován/a";
+            checkBox_disqualified_checkpointInfo.UseVisualStyleBackColor = true;
+            // 
+            // label_penalty
+            // 
+            label_penalty.AutoSize = true;
+            label_penalty.Location = new Point(997, 28);
+            label_penalty.Name = "label_penalty";
+            label_penalty.Size = new Size(64, 15);
+            label_penalty.TabIndex = 14;
+            label_penalty.Text = "Trestný čas";
+            // 
+            // label_timeWaited
+            // 
+            label_timeWaited.AutoSize = true;
+            label_timeWaited.Location = new Point(907, 28);
+            label_timeWaited.Name = "label_timeWaited";
+            label_timeWaited.Size = new Size(46, 15);
+            label_timeWaited.TabIndex = 12;
+            label_timeWaited.Text = "Zdržení";
+            // 
+            // label_checkpoints_checkpointInfo
+            // 
+            label_checkpoints_checkpointInfo.AutoSize = true;
+            label_checkpoints_checkpointInfo.Location = new Point(706, 29);
+            label_checkpoints_checkpointInfo.Name = "label_checkpoints_checkpointInfo";
+            label_checkpoints_checkpointInfo.Size = new Size(61, 15);
+            label_checkpoints_checkpointInfo.TabIndex = 9;
+            label_checkpoints_checkpointInfo.Text = "Stanoviště";
+            // 
+            // label_ageCategory_checkpointInfo
+            // 
+            label_ageCategory_checkpointInfo.AutoSize = true;
+            label_ageCategory_checkpointInfo.Location = new Point(547, 29);
+            label_ageCategory_checkpointInfo.Name = "label_ageCategory_checkpointInfo";
+            label_ageCategory_checkpointInfo.Size = new Size(96, 15);
+            label_ageCategory_checkpointInfo.TabIndex = 7;
+            label_ageCategory_checkpointInfo.Text = "Věková kategorie";
+            // 
+            // textBox_ageCategory_checkpointInfo
+            // 
+            textBox_ageCategory_checkpointInfo.Enabled = false;
+            textBox_ageCategory_checkpointInfo.Location = new Point(547, 47);
+            textBox_ageCategory_checkpointInfo.Margin = new Padding(3, 3, 16, 3);
+            textBox_ageCategory_checkpointInfo.Name = "textBox_ageCategory_checkpointInfo";
+            textBox_ageCategory_checkpointInfo.Size = new Size(140, 23);
+            textBox_ageCategory_checkpointInfo.TabIndex = 6;
+            // 
+            // label_team_checkpointInfo
+            // 
+            label_team_checkpointInfo.AutoSize = true;
+            label_team_checkpointInfo.Location = new Point(394, 29);
+            label_team_checkpointInfo.Name = "label_team_checkpointInfo";
+            label_team_checkpointInfo.Size = new Size(36, 15);
+            label_team_checkpointInfo.TabIndex = 5;
+            label_team_checkpointInfo.Text = "Oddíl";
+            // 
+            // textBox_team_checkpointInfo
+            // 
+            textBox_team_checkpointInfo.Enabled = false;
+            textBox_team_checkpointInfo.Location = new Point(394, 47);
+            textBox_team_checkpointInfo.Margin = new Padding(3, 3, 16, 3);
+            textBox_team_checkpointInfo.Name = "textBox_team_checkpointInfo";
+            textBox_team_checkpointInfo.Size = new Size(134, 23);
+            textBox_team_checkpointInfo.TabIndex = 4;
+            // 
+            // label_name_checkpointInfo
+            // 
+            label_name_checkpointInfo.AutoSize = true;
+            label_name_checkpointInfo.Location = new Point(153, 29);
+            label_name_checkpointInfo.Name = "label_name_checkpointInfo";
+            label_name_checkpointInfo.Size = new Size(42, 15);
+            label_name_checkpointInfo.TabIndex = 3;
+            label_name_checkpointInfo.Text = "Jméno";
+            // 
+            // textBox_name_checkpointInfo
+            // 
+            textBox_name_checkpointInfo.Enabled = false;
+            textBox_name_checkpointInfo.Location = new Point(153, 47);
+            textBox_name_checkpointInfo.Margin = new Padding(3, 3, 16, 3);
+            textBox_name_checkpointInfo.Name = "textBox_name_checkpointInfo";
+            textBox_name_checkpointInfo.Size = new Size(222, 23);
+            textBox_name_checkpointInfo.TabIndex = 2;
+            // 
+            // label_startNumber_checkpointInfo
+            // 
+            label_startNumber_checkpointInfo.AutoSize = true;
+            label_startNumber_checkpointInfo.Location = new Point(30, 29);
+            label_startNumber_checkpointInfo.Name = "label_startNumber_checkpointInfo";
+            label_startNumber_checkpointInfo.Size = new Size(81, 15);
+            label_startNumber_checkpointInfo.TabIndex = 1;
+            label_startNumber_checkpointInfo.Text = "Startovní číslo";
+            // 
             // groupBox_runners_results
             // 
             groupBox_runners_results.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             groupBox_runners_results.Controls.Add(dataGridView_runners_results);
-            groupBox_runners_results.Location = new Point(6, 192);
+            groupBox_runners_results.Location = new Point(6, 308);
             groupBox_runners_results.Name = "groupBox_runners_results";
-            groupBox_runners_results.Size = new Size(1051, 433);
+            groupBox_runners_results.Size = new Size(1051, 311);
             groupBox_runners_results.TabIndex = 2;
             groupBox_runners_results.TabStop = false;
             groupBox_runners_results.Text = "Seznam běžců";
@@ -629,7 +841,7 @@
             dataGridView_runners_results.RowHeadersWidth = 60;
             dataGridView_runners_results.RowTemplate.Height = 25;
             dataGridView_runners_results.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dataGridView_runners_results.Size = new Size(1039, 405);
+            dataGridView_runners_results.Size = new Size(1039, 277);
             dataGridView_runners_results.TabIndex = 0;
             dataGridView_runners_results.CellEndEdit += DataGridView_Runners_Results_CellEndEdit;
             dataGridView_runners_results.CurrentCellChanged += DataGridView_Runners_Results_CurrentCellChanged;
@@ -752,9 +964,9 @@
             // 
             groupBox_checkpoints.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             groupBox_checkpoints.Controls.Add(dataGridView_runnerCheckpoints);
-            groupBox_checkpoints.Location = new Point(335, 6);
+            groupBox_checkpoints.Location = new Point(335, 109);
             groupBox_checkpoints.Name = "groupBox_checkpoints";
-            groupBox_checkpoints.Size = new Size(722, 180);
+            groupBox_checkpoints.Size = new Size(722, 193);
             groupBox_checkpoints.TabIndex = 1;
             groupBox_checkpoints.TabStop = false;
             groupBox_checkpoints.Text = "Stanoviště";
@@ -768,7 +980,7 @@
             dataGridView_runnerCheckpoints.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             dataGridView_runnerCheckpoints.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.DisplayedCells;
             dataGridView_runnerCheckpoints.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridView_runnerCheckpoints.Columns.AddRange(new DataGridViewColumn[] { checkpointDataGridViewTextBoxColumn, timeWaitedDataGridViewTextBoxColumn, penaltyDataGridViewTextBoxColumn, disqualifiedDataGridViewCheckBoxColumn1 });
+            dataGridView_runnerCheckpoints.Columns.AddRange(new DataGridViewColumn[] { checkpointDataGridViewTextBoxColumn, CheckpointRefereeName, timeWaitedDataGridViewTextBoxColumn, penaltyDataGridViewTextBoxColumn, disqualifiedDataGridViewCheckBoxColumn1 });
             dataGridView_runnerCheckpoints.DataSource = checkpointRunnerInfoBindingSource;
             dataGridView_runnerCheckpoints.Location = new Point(6, 22);
             dataGridView_runnerCheckpoints.MultiSelect = false;
@@ -776,12 +988,13 @@
             dataGridView_runnerCheckpoints.RowHeadersWidth = 50;
             dataGridView_runnerCheckpoints.RowTemplate.Height = 25;
             dataGridView_runnerCheckpoints.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dataGridView_runnerCheckpoints.Size = new Size(710, 152);
+            dataGridView_runnerCheckpoints.Size = new Size(710, 165);
             dataGridView_runnerCheckpoints.TabIndex = 0;
             dataGridView_runnerCheckpoints.CellBeginEdit += DataGridView_RunnerCheckpoints_CellBeginEdit;
             dataGridView_runnerCheckpoints.CellEndEdit += DataGridView_RunnerCheckpoints_CellEndEdit;
             dataGridView_runnerCheckpoints.DataError += DataGridView_RunnerCheckpoints_DataError;
             dataGridView_runnerCheckpoints.RowsAdded += DataGridView_RunnerCheckpoints_RowsAdded;
+            dataGridView_runnerCheckpoints.KeyUp += DataGridView_RunnerCheckpoints_KeyUp;
             // 
             // checkpointDataGridViewTextBoxColumn
             // 
@@ -789,6 +1002,14 @@
             checkpointDataGridViewTextBoxColumn.HeaderText = "Název";
             checkpointDataGridViewTextBoxColumn.Name = "checkpointDataGridViewTextBoxColumn";
             checkpointDataGridViewTextBoxColumn.ReadOnly = true;
+            checkpointDataGridViewTextBoxColumn.Resizable = DataGridViewTriState.True;
+            // 
+            // CheckpointRefereeName
+            // 
+            CheckpointRefereeName.DataPropertyName = "CheckpointRefereeName";
+            CheckpointRefereeName.HeaderText = "Rozhodčí";
+            CheckpointRefereeName.Name = "CheckpointRefereeName";
+            CheckpointRefereeName.ReadOnly = true;
             // 
             // timeWaitedDataGridViewTextBoxColumn
             // 
@@ -828,9 +1049,9 @@
             groupBox_filter.Controls.Add(label_team_filter);
             groupBox_filter.Controls.Add(comboBox_filter_category);
             groupBox_filter.Controls.Add(comboBox_filter_team);
-            groupBox_filter.Location = new Point(6, 6);
+            groupBox_filter.Location = new Point(6, 109);
             groupBox_filter.Name = "groupBox_filter";
-            groupBox_filter.Size = new Size(323, 180);
+            groupBox_filter.Size = new Size(323, 193);
             groupBox_filter.TabIndex = 0;
             groupBox_filter.TabStop = false;
             groupBox_filter.Text = "Filtr";
@@ -838,7 +1059,7 @@
             // checkBox_filter_category
             // 
             checkBox_filter_category.AutoSize = true;
-            checkBox_filter_category.Location = new Point(267, 105);
+            checkBox_filter_category.Location = new Point(267, 114);
             checkBox_filter_category.Name = "checkBox_filter_category";
             checkBox_filter_category.Size = new Size(15, 14);
             checkBox_filter_category.TabIndex = 5;
@@ -848,7 +1069,7 @@
             // checkBox_filter_team
             // 
             checkBox_filter_team.AutoSize = true;
-            checkBox_filter_team.Location = new Point(267, 67);
+            checkBox_filter_team.Location = new Point(267, 76);
             checkBox_filter_team.Name = "checkBox_filter_team";
             checkBox_filter_team.Size = new Size(15, 14);
             checkBox_filter_team.TabIndex = 4;
@@ -858,7 +1079,7 @@
             // label_category_filter
             // 
             label_category_filter.AutoSize = true;
-            label_category_filter.Location = new Point(30, 103);
+            label_category_filter.Location = new Point(30, 112);
             label_category_filter.Name = "label_category_filter";
             label_category_filter.Size = new Size(96, 15);
             label_category_filter.TabIndex = 3;
@@ -867,7 +1088,7 @@
             // label_team_filter
             // 
             label_team_filter.AutoSize = true;
-            label_team_filter.Location = new Point(90, 65);
+            label_team_filter.Location = new Point(90, 74);
             label_team_filter.Name = "label_team_filter";
             label_team_filter.Size = new Size(36, 15);
             label_team_filter.TabIndex = 2;
@@ -878,7 +1099,7 @@
             comboBox_filter_category.DropDownStyle = ComboBoxStyle.DropDownList;
             comboBox_filter_category.Enabled = false;
             comboBox_filter_category.FormattingEnabled = true;
-            comboBox_filter_category.Location = new Point(132, 100);
+            comboBox_filter_category.Location = new Point(132, 109);
             comboBox_filter_category.Name = "comboBox_filter_category";
             comboBox_filter_category.Size = new Size(121, 23);
             comboBox_filter_category.TabIndex = 1;
@@ -889,7 +1110,7 @@
             comboBox_filter_team.DropDownStyle = ComboBoxStyle.DropDownList;
             comboBox_filter_team.Enabled = false;
             comboBox_filter_team.FormattingEnabled = true;
-            comboBox_filter_team.Location = new Point(132, 62);
+            comboBox_filter_team.Location = new Point(132, 71);
             comboBox_filter_team.Name = "comboBox_filter_team";
             comboBox_filter_team.Size = new Size(121, 23);
             comboBox_filter_team.TabIndex = 0;
@@ -907,25 +1128,20 @@
             // 
             // FirstName
             // 
-            FirstName.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
             FirstName.DataPropertyName = "FirstName";
             FirstName.HeaderText = "Jméno";
             FirstName.Name = "FirstName";
             FirstName.ReadOnly = true;
-            FirstName.Width = 123;
             // 
             // LastName
             // 
-            LastName.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
             LastName.DataPropertyName = "LastName";
             LastName.HeaderText = "Příjmení";
             LastName.Name = "LastName";
             LastName.ReadOnly = true;
-            LastName.Width = 124;
             // 
             // Birthdate
             // 
-            Birthdate.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
             Birthdate.DataPropertyName = "Birthdate";
             dataGridViewCellStyle1.Format = "d";
             dataGridViewCellStyle1.NullValue = "-";
@@ -933,7 +1149,6 @@
             Birthdate.HeaderText = "Datum narození";
             Birthdate.Name = "Birthdate";
             Birthdate.ReadOnly = true;
-            Birthdate.Width = 123;
             // 
             // Team
             // 
@@ -996,11 +1211,13 @@
             Controls.Add(statusStrip1);
             Controls.Add(menuStrip1);
             ForeColor = SystemColors.ControlText;
+            Icon = (Icon)resources.GetObject("$this.Icon");
             MainMenuStrip = menuStrip1;
             MinimumSize = new Size(1111, 750);
             Name = "MainWindow";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Turistický závod";
+            FormClosing += MainWindow_FormClosing;
             statusStrip1.ResumeLayout(false);
             statusStrip1.PerformLayout();
             menuStrip1.ResumeLayout(false);
@@ -1014,6 +1231,8 @@
             tabControl.ResumeLayout(false);
             tabPage_start.ResumeLayout(false);
             tabPage_results.ResumeLayout(false);
+            groupBox1.ResumeLayout(false);
+            groupBox1.PerformLayout();
             groupBox_runners_results.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)dataGridView_runners_results).EndInit();
             groupBox_checkpoints.ResumeLayout(false);
@@ -1077,10 +1296,6 @@
         private CheckBox checkBox_filter_team;
         private DataGridView dataGridView_runnerCheckpoints;
         private BindingSource checkpointRunnerInfoBindingSource;
-        private DataGridViewTextBoxColumn checkpointDataGridViewTextBoxColumn;
-        private DataGridViewTextBoxColumn timeWaitedDataGridViewTextBoxColumn;
-        private DataGridViewTextBoxColumn penaltyDataGridViewTextBoxColumn;
-        private DataGridViewCheckBoxColumn disqualifiedDataGridViewCheckBoxColumn1;
         private DateTimePicker dateTimePicker_birthdate;
         private DateTimePicker dateTimePicker_birthdate_partner;
         private Label label_birthdate_partner;
@@ -1101,6 +1316,29 @@
         private DataGridViewTextBoxColumn finalRunTimeDataGridViewTextBoxColumn;
         private DataGridViewTextBoxColumn totalWaitTimeDataGridViewTextBoxColumn;
         private DataGridViewTextBoxColumn totalPenaltyTimeDataGridViewTextBoxColumn;
+        private ToolStripMenuItem toolStripMenuItem_reset;
+        private GroupBox groupBox1;
+        private Label label_team_checkpointInfo;
+        private TextBox textBox_team_checkpointInfo;
+        private Label label_name_checkpointInfo;
+        private TextBox textBox_name_checkpointInfo;
+        private Label label_startNumber_checkpointInfo;
+        private DataGridViewTextBoxColumn checkpointDataGridViewTextBoxColumn;
+        private DataGridViewTextBoxColumn CheckpointRefereeName;
+        private DataGridViewTextBoxColumn timeWaitedDataGridViewTextBoxColumn;
+        private DataGridViewTextBoxColumn penaltyDataGridViewTextBoxColumn;
+        private DataGridViewCheckBoxColumn disqualifiedDataGridViewCheckBoxColumn1;
+        private Label label_checkpoints_checkpointInfo;
+        private ComboBox comboBox_checkpoints_checkpointInfo;
+        private Label label_ageCategory_checkpointInfo;
+        private TextBox textBox_ageCategory_checkpointInfo;
+        private Button button_add_checkpointInfo;
+        private CheckBox checkBox_disqualified_checkpointInfo;
+        private Label label_penalty;
+        private MaskedTextBox maskedTextBox_penalty;
+        private Label label_timeWaited;
+        private MaskedTextBox maskedTextBox_timeWaited;
+        private TextBox textBox_startNumber_checkpointInfo;
         private DataGridViewTextBoxColumn StartNumber;
         private DataGridViewTextBoxColumn FirstName;
         private DataGridViewTextBoxColumn LastName;

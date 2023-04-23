@@ -1,5 +1,4 @@
-﻿using ClosedXML.Excel;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace turisticky_zavod.Data
 {
@@ -82,155 +81,144 @@ namespace turisticky_zavod.Data
         {
             var allData = FileHelper.LoadEverythingFromJSON(filePath);
 
-            using var transaction = await instance.Database.BeginTransactionAsync();
-
-            try
+            foreach (var entity in instance.AgeCategory)
             {
-                foreach (var entity in instance.AgeCategory)
+                var newDataItem = allData.AgeCategories.FirstOrDefault(x => x.ID == entity.ID);
+                if (newDataItem != null)
                 {
-                    var newDataItem = allData.AgeCategories.FirstOrDefault(x => x.ID == entity.ID);
-                    if (newDataItem != null)
-                    {
-                        instance.Entry(entity).CurrentValues.SetValues(newDataItem);
-                    }
-                    else
-                    {
-                        instance.AgeCategory.Remove(entity);
-                    }
+                    instance.Entry(entity).CurrentValues.SetValues(newDataItem);
                 }
-
-                foreach (var newDataItem in allData.AgeCategories.Where(x => !instance.AgeCategory.Any(y => y.ID == x.ID)))
+                else
                 {
-                    instance.AgeCategory.Add(newDataItem);
+                    instance.AgeCategory.Remove(entity);
                 }
+            }
 
-                foreach (var entity in instance.Referee)
+            foreach (var newDataItem in allData.AgeCategories.Where(x => !instance.AgeCategory.Any(y => y.ID == x.ID)))
+            {
+                instance.AgeCategory.Add(newDataItem);
+            }
+
+            foreach (var entity in instance.Referee)
+            {
+                var newDataItem = allData.Referees.FirstOrDefault(x => x.ID == entity.ID);
+                if (newDataItem != null)
                 {
-                    var newDataItem = allData.Referees.FirstOrDefault(x => x.ID == entity.ID);
-                    if (newDataItem != null)
-                    {
-                        instance.Entry(entity).CurrentValues.SetValues(newDataItem);
-                    }
-                    else
-                    {
-                        instance.Referee.Remove(entity);
-                    }
+                    instance.Entry(entity).CurrentValues.SetValues(newDataItem);
                 }
-
-                foreach (var newDataItem in allData.Referees.Where(x => !instance.Referee.Any(y => y.ID == x.ID)))
+                else
                 {
-                    instance.Referee.Add(newDataItem);
+                    instance.Referee.Remove(entity);
                 }
+            }
 
-                foreach (var entity in instance.Checkpoint)
+            foreach (var newDataItem in allData.Referees.Where(x => !instance.Referee.Any(y => y.ID == x.ID)))
+            {
+                instance.Referee.Add(newDataItem);
+            }
+
+            foreach (var entity in instance.Checkpoint)
+            {
+                var newDataItem = allData.Checkpoints.FirstOrDefault(x => x.ID == entity.ID);
+                if (newDataItem != null)
                 {
-                    var newDataItem = allData.Checkpoints.FirstOrDefault(x => x.ID == entity.ID);
-                    if (newDataItem != null)
-                    {
-                        instance.Entry(entity).CurrentValues.SetValues(newDataItem);
-                    }
-                    else
-                    {
-                        instance.Checkpoint.Remove(entity);
-                    }
+                    instance.Entry(entity).CurrentValues.SetValues(newDataItem);
                 }
-
-                foreach (var newDataItem in allData.Checkpoints.Where(x => !instance.Checkpoint.Any(y => y.ID == x.ID)))
+                else
                 {
-                    instance.Checkpoint.Add(newDataItem);
+                    instance.Checkpoint.Remove(entity);
                 }
+            }
 
-                foreach (var entity in instance.CheckpointAgeCategoryParticipation)
+            foreach (var newDataItem in allData.Checkpoints.Where(x => !instance.Checkpoint.Any(y => y.ID == x.ID)))
+            {
+                instance.Checkpoint.Add(newDataItem);
+            }
+
+            foreach (var entity in instance.CheckpointAgeCategoryParticipation)
+            {
+                var newDataItem = allData.CheckpointAgeCategoryParticipations
+                                         .FirstOrDefault(x => x.AgeCategoryID == entity.AgeCategoryID && x.CheckpointID == entity.CheckpointID);
+                if (newDataItem != null)
                 {
-                    var newDataItem = allData.CheckpointAgeCategoryParticipations
-                                             .FirstOrDefault(x => x.AgeCategoryID == entity.AgeCategoryID && x.CheckpointID == entity.CheckpointID);
-                    if (newDataItem != null)
-                    {
-                        instance.Entry(entity).CurrentValues.SetValues(newDataItem);
-                    }
-                    else
-                    {
-                        instance.CheckpointAgeCategoryParticipation.Remove(entity);
-                    }
+                    instance.Entry(entity).CurrentValues.SetValues(newDataItem);
                 }
-
-                foreach (var newDataItem in allData.CheckpointAgeCategoryParticipations
-                                                   .Where(x => !instance.CheckpointAgeCategoryParticipation
-                                                                        .Any(y => y.AgeCategoryID == x.AgeCategoryID && y.CheckpointID == x.CheckpointID)))
+                else
                 {
-                    instance.CheckpointAgeCategoryParticipation.Add(newDataItem);
+                    instance.CheckpointAgeCategoryParticipation.Remove(entity);
                 }
+            }
 
-                foreach (var entity in instance.Team)
+            foreach (var newDataItem in allData.CheckpointAgeCategoryParticipations
+                                               .Where(x => !instance.CheckpointAgeCategoryParticipation
+                                                                    .Any(y => y.AgeCategoryID == x.AgeCategoryID && y.CheckpointID == x.CheckpointID)))
+            {
+                instance.CheckpointAgeCategoryParticipation.Add(newDataItem);
+            }
+
+            foreach (var entity in instance.Team)
+            {
+                var newDataItem = allData.Teams.FirstOrDefault(x => x.ID == entity.ID);
+                if (newDataItem != null)
                 {
-                    var newDataItem = allData.Teams.FirstOrDefault(x => x.ID == entity.ID);
-                    if (newDataItem != null)
-                    {
-                        instance.Entry(entity).CurrentValues.SetValues(newDataItem);
-                    }
-                    else
-                    {
-                        instance.Team.Remove(entity);
-                    }
+                    instance.Entry(entity).CurrentValues.SetValues(newDataItem);
                 }
-
-                foreach (var newDataItem in allData.Teams.Where(x => !instance.Team.Any(y => y.ID == x.ID)))
+                else
                 {
-                    instance.Team.Add(newDataItem);
+                    instance.Team.Remove(entity);
                 }
+            }
 
-                foreach (var entity in instance.Partner)
+            foreach (var newDataItem in allData.Teams.Where(x => !instance.Team.Any(y => y.ID == x.ID)))
+            {
+                instance.Team.Add(newDataItem);
+            }
+
+            foreach (var entity in instance.Partner)
+            {
+                var newDataItem = allData.Partners.FirstOrDefault(x => x.ID == entity.ID);
+                if (newDataItem != null)
                 {
-                    var newDataItem = allData.Partners.FirstOrDefault(x => x.ID == entity.ID);
-                    if (newDataItem != null)
-                    {
-                        instance.Entry(entity).CurrentValues.SetValues(newDataItem);
-                    }
-                    else
-                    {
-                        instance.Partner.Remove(entity);
-                    }
+                    instance.Entry(entity).CurrentValues.SetValues(newDataItem);
                 }
-
-                foreach (var newDataItem in allData.Partners.Where(x => !instance.Partner.Any(y => y.ID == x.ID)))
+                else
                 {
-                    instance.Partner.Add(newDataItem);
+                    instance.Partner.Remove(entity);
                 }
+            }
 
-                foreach (var entity in instance.Runner)
+            foreach (var newDataItem in allData.Partners.Where(x => !instance.Partner.Any(y => y.ID == x.ID)))
+            {
+                instance.Partner.Add(newDataItem);
+            }
+
+            foreach (var entity in instance.Runner)
+            {
+                var newDataItem = allData.Runners.FirstOrDefault(x => x.ID == entity.ID);
+                if (newDataItem != null)
                 {
-                    var newDataItem = allData.Runners.FirstOrDefault(x => x.ID == entity.ID);
-                    if (newDataItem != null)
-                    {
-                        instance.Entry(entity).CurrentValues.SetValues(newDataItem);
-                    }
-                    else
-                    {
-                        instance.Runner.Remove(entity);
-                    }
+                    instance.Entry(entity).CurrentValues.SetValues(newDataItem);
                 }
-
-                foreach (var newDataItem in allData.Runners.Where(x => !instance.Runner.Any(y => y.ID == x.ID)))
+                else
                 {
-                    instance.Runner.Add(newDataItem);
-
-                    await instance.SaveChangesAsync();
+                    instance.Runner.Remove(entity);
                 }
+            }
+
+            foreach (var newDataItem in allData.Runners.Where(x => !instance.Runner.Any(y => y.ID == x.ID)))
+            {
+                instance.Runner.Add(newDataItem);
 
                 await instance.SaveChangesAsync();
+            }
 
-                await transaction.CommitAsync();
-            }
-            catch (Exception)
-            {
-                await transaction.RollbackAsync();
-            }
+            await instance.SaveChangesAsync();
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder
-                .UseSqlite(@$"Data Source={Path.GetFullPath("../../../../Data/tz.db")}") // TODO
+                .UseSqlite(@$"Data Source={Directory.GetCurrentDirectory()}\tz.db")
                 .EnableSensitiveDataLogging()
                 .ConfigureWarnings(b => b.Ignore());
         }

@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(PINDialog));
             textBox_pin = new TextBox();
             button_ok = new Button();
             label1 = new Label();
@@ -82,6 +83,7 @@
             Controls.Add(label1);
             Controls.Add(button_ok);
             Controls.Add(textBox_pin);
+            Icon = (Icon)resources.GetObject("$this.Icon");
             MaximizeBox = false;
             MaximumSize = new Size(255, 240);
             MinimizeBox = false;

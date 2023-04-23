@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(LogWindow));
             listBox_log = new ListBox();
             SuspendLayout();
             // 
@@ -49,9 +50,11 @@
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(459, 561);
             Controls.Add(listBox_log);
+            Icon = (Icon)resources.GetObject("$this.Icon");
             Name = "LogWindow";
             Text = "Log";
             FormClosing += Log_FormClosing;
+            Shown += LogWindow_Shown;
             ResumeLayout(false);
         }
 

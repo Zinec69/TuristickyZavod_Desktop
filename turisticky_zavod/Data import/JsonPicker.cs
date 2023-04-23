@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
+﻿using System.ComponentModel;
 using turisticky_zavod.Data;
 
 namespace turisticky_zavod.Forms
@@ -12,7 +12,7 @@ namespace turisticky_zavod.Forms
             InitializeComponent();
             Runners = runners;
             Program.SetDoubleBuffer(dataGridView1, true);
-            dataGridView1.DataSource = new SortableBindingList<Runner>(Runners);
+            dataGridView1.DataSource = new BindingList<Runner>(Runners);
         }
 
         private void button_save_Click(object sender, EventArgs e)

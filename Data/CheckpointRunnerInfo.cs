@@ -13,21 +13,15 @@ namespace turisticky_zavod.Data
 
         [ForeignKey(nameof(CheckpointID))]
         [DeleteBehavior(DeleteBehavior.Cascade)]
-        [JsonPropertyName("checkpointId")]
         public virtual Checkpoint Checkpoint { get; set; }
 
         public DateTime TimeArrived { get; set; }
         public DateTime? TimeDeparted { get; set; }
-
-        [JsonPropertyName("timeWaitedSeconds")]
         public TimeSpan TimeWaited { get; set; }
-
-        [JsonPropertyName("penaltySeconds")]
         public TimeSpan Penalty { get; set; }
 
-        [JsonPropertyName("refereeName")]
-        public Referee RefereeJsonDeserializing { set => Checkpoint.Referee = value; }
-
         public bool Disqualified { get; set; }
+
+        public string CheckpointRefereeName { get => Checkpoint.Referee?.Name ?? "-"; }
     }
 }

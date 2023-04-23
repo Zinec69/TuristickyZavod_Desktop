@@ -1,6 +1,5 @@
 ﻿using PCSC;
 using PCSC.Monitoring;
-using System.Reflection.PortableExecutable;
 using System.Text;
 using turisticky_zavod.Data;
 using Usb.Events;
@@ -186,7 +185,6 @@ namespace turisticky_zavod.Logic
                                           .DateTime.ToLocalTime(),
                 FinishTime = runner_split[4] == "0" ? null : DateTimeOffset.FromUnixTimeSeconds(long.Parse(runner_split[4]))
                                                                            .DateTime.ToLocalTime(),
-                Disqualified = runner_split[5] == "1",
                 CheckpointInfo = checkpointInfos
             };
         }

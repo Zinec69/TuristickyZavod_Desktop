@@ -128,8 +128,7 @@ namespace turisticky_zavod.Logic
                 Name = runner_split[1],
                 Team = new() { Name = runner_split[2] },
                 StartTime = new DateTime().AddSeconds(long.Parse(runner_split[3])),
-                FinishTime = runner_split[4] == "0" ? null : new DateTime().AddSeconds(long.Parse(runner_split[4])),
-                Disqualified = runner_split[5] == "1"
+                FinishTime = runner_split[4] == "0" ? null : new DateTime().AddSeconds(long.Parse(runner_split[4]))
             };
         }
 

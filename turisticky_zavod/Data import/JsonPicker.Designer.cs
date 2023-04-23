@@ -31,13 +31,8 @@
             components = new System.ComponentModel.Container();
             DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
             DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(JsonPicker));
             dataGridView1 = new DataGridView();
-            runnerBindingSource = new BindingSource(components);
-            button_cancel = new Button();
-            button_save = new Button();
-            groupBox1 = new GroupBox();
-            label_title = new Label();
-            label_hint = new Label();
             StartNumber = new DataGridViewTextBoxColumn();
             FirstName = new DataGridViewTextBoxColumn();
             LastName = new DataGridViewTextBoxColumn();
@@ -45,6 +40,12 @@
             StartTime = new DataGridViewTextBoxColumn();
             FinishTime = new DataGridViewTextBoxColumn();
             disqualifiedDataGridViewCheckBoxColumn = new DataGridViewCheckBoxColumn();
+            runnerBindingSource = new BindingSource(components);
+            button_cancel = new Button();
+            button_save = new Button();
+            groupBox1 = new GroupBox();
+            label_title = new Label();
+            label_hint = new Label();
             ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)runnerBindingSource).BeginInit();
             groupBox1.SuspendLayout();
@@ -71,6 +72,61 @@
             dataGridView1.Size = new Size(780, 311);
             dataGridView1.TabIndex = 0;
             dataGridView1.RowsAdded += dataGridView1_RowsAdded;
+            // 
+            // StartNumber
+            // 
+            StartNumber.DataPropertyName = "StartNumber";
+            StartNumber.HeaderText = "Startovní číslo";
+            StartNumber.Name = "StartNumber";
+            StartNumber.ReadOnly = true;
+            // 
+            // FirstName
+            // 
+            FirstName.DataPropertyName = "FirstName";
+            FirstName.HeaderText = "Jméno";
+            FirstName.Name = "FirstName";
+            FirstName.ReadOnly = true;
+            // 
+            // LastName
+            // 
+            LastName.DataPropertyName = "LastName";
+            LastName.HeaderText = "Příjmení";
+            LastName.Name = "LastName";
+            LastName.ReadOnly = true;
+            // 
+            // teamDataGridViewTextBoxColumn
+            // 
+            teamDataGridViewTextBoxColumn.DataPropertyName = "Team";
+            teamDataGridViewTextBoxColumn.HeaderText = "Oddíl";
+            teamDataGridViewTextBoxColumn.Name = "teamDataGridViewTextBoxColumn";
+            teamDataGridViewTextBoxColumn.ReadOnly = true;
+            // 
+            // StartTime
+            // 
+            StartTime.DataPropertyName = "StartTime";
+            dataGridViewCellStyle1.Format = "T";
+            dataGridViewCellStyle1.NullValue = "-";
+            StartTime.DefaultCellStyle = dataGridViewCellStyle1;
+            StartTime.HeaderText = "Čas startu";
+            StartTime.Name = "StartTime";
+            StartTime.ReadOnly = true;
+            // 
+            // FinishTime
+            // 
+            FinishTime.DataPropertyName = "FinishTime";
+            dataGridViewCellStyle2.Format = "T";
+            dataGridViewCellStyle2.NullValue = "-";
+            FinishTime.DefaultCellStyle = dataGridViewCellStyle2;
+            FinishTime.HeaderText = "Čas konce";
+            FinishTime.Name = "FinishTime";
+            FinishTime.ReadOnly = true;
+            // 
+            // disqualifiedDataGridViewCheckBoxColumn
+            // 
+            disqualifiedDataGridViewCheckBoxColumn.DataPropertyName = "Disqualified";
+            disqualifiedDataGridViewCheckBoxColumn.HeaderText = "Diskvalifikován/a";
+            disqualifiedDataGridViewCheckBoxColumn.Name = "disqualifiedDataGridViewCheckBoxColumn";
+            disqualifiedDataGridViewCheckBoxColumn.ReadOnly = true;
             // 
             // runnerBindingSource
             // 
@@ -129,61 +185,6 @@
             label_hint.TabIndex = 5;
             label_hint.Text = "(Více řádků zvolíte kliknutím se zmáčknutou klávesou ctrl, popř. kliknutím a tažením přes řádky)";
             // 
-            // StartNumber
-            // 
-            StartNumber.DataPropertyName = "StartNumber";
-            StartNumber.HeaderText = "Startovní číslo";
-            StartNumber.Name = "StartNumber";
-            StartNumber.ReadOnly = true;
-            // 
-            // FirstName
-            // 
-            FirstName.DataPropertyName = "FirstName";
-            FirstName.HeaderText = "Jméno";
-            FirstName.Name = "FirstName";
-            FirstName.ReadOnly = true;
-            // 
-            // LastName
-            // 
-            LastName.DataPropertyName = "LastName";
-            LastName.HeaderText = "Příjmení";
-            LastName.Name = "LastName";
-            LastName.ReadOnly = true;
-            // 
-            // teamDataGridViewTextBoxColumn
-            // 
-            teamDataGridViewTextBoxColumn.DataPropertyName = "Team";
-            teamDataGridViewTextBoxColumn.HeaderText = "Oddíl";
-            teamDataGridViewTextBoxColumn.Name = "teamDataGridViewTextBoxColumn";
-            teamDataGridViewTextBoxColumn.ReadOnly = true;
-            // 
-            // StartTime
-            // 
-            StartTime.DataPropertyName = "StartTime";
-            dataGridViewCellStyle1.Format = "T";
-            dataGridViewCellStyle1.NullValue = "-";
-            StartTime.DefaultCellStyle = dataGridViewCellStyle1;
-            StartTime.HeaderText = "Čas startu";
-            StartTime.Name = "StartTime";
-            StartTime.ReadOnly = true;
-            // 
-            // FinishTime
-            // 
-            FinishTime.DataPropertyName = "FinishTime";
-            dataGridViewCellStyle2.Format = "T";
-            dataGridViewCellStyle2.NullValue = "-";
-            FinishTime.DefaultCellStyle = dataGridViewCellStyle2;
-            FinishTime.HeaderText = "Čas konce";
-            FinishTime.Name = "FinishTime";
-            FinishTime.ReadOnly = true;
-            // 
-            // disqualifiedDataGridViewCheckBoxColumn
-            // 
-            disqualifiedDataGridViewCheckBoxColumn.DataPropertyName = "Disqualified";
-            disqualifiedDataGridViewCheckBoxColumn.HeaderText = "Diskvalifikován/a";
-            disqualifiedDataGridViewCheckBoxColumn.Name = "disqualifiedDataGridViewCheckBoxColumn";
-            disqualifiedDataGridViewCheckBoxColumn.ReadOnly = true;
-            // 
             // JsonPicker
             // 
             AcceptButton = button_save;
@@ -197,6 +198,7 @@
             Controls.Add(button_save);
             Controls.Add(button_cancel);
             DoubleBuffered = true;
+            Icon = (Icon)resources.GetObject("$this.Icon");
             MinimumSize = new Size(830, 240);
             Name = "JsonPicker";
             StartPosition = FormStartPosition.CenterScreen;

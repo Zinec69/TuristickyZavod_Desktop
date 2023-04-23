@@ -7,16 +7,28 @@
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
     <PackageIcon>logo.png</PackageIcon>
-    <ApplicationIcon>Resources\logo.ico</ApplicationIcon>
     <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
     <RootNamespace>$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
     <AssemblyName>turisticky_zavod</AssemblyName>
     <StartupObject>turisticky_zavod.Forms.Program</StartupObject>
     <SupportedOSPlatformVersion>10.0.19041.0</SupportedOSPlatformVersion>
+    <ApplicationIcon>Resources\icon_rounded.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DebugType>full</DebugType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DebugType>full</DebugType>
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="Resources\logo.ico" />
+    <AdditionalFiles Remove="app.manifest" />
+  </ItemGroup>
+
+	<ItemGroup>
+    <Content Include="Resources\icon_rounded.ico" />
   </ItemGroup>
 
   <ItemGroup>

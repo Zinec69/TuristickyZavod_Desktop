@@ -172,7 +172,19 @@ namespace turisticky_zavod.Forms
                 errorProvider_category.SetError(textBox_name_category, "Kategorie s tímto názvem již existuje");
             }
             else
+            {
+                foreach (var ch in name)
+                {
+                    if (!char.IsLetter(ch) && ch != ' ' & ch != '-')
+                    {
+                        isValidated = false;
+                        errorProvider_category.SetError(textBox_name_category, $"Název kategorie obsahuje nepovolené znaky: {ch}");
+                        break;
+                    }
+                }
+
                 errorProvider_category.SetError(textBox_name_category, string.Empty);
+            }
 
             if (string.IsNullOrEmpty(code))
             {
@@ -185,7 +197,19 @@ namespace turisticky_zavod.Forms
                 errorProvider_category.SetError(textBox_code, "Kategorie s touto zkratkou již existuje");
             }
             else
+            {
+                foreach (var ch in code)
+                {
+                    if (!char.IsLetter(ch) && ch != ' ' & ch != '-')
+                    {
+                        isValidated = false;
+                        errorProvider_category.SetError(textBox_code, $"Zkratka kategorie obsahuje nepovolené znaky: {ch}");
+                        break;
+                    }
+                }
+
                 errorProvider_category.SetError(textBox_code, string.Empty);
+            }
 
             if (string.IsNullOrEmpty(ageMin))
             {
@@ -209,7 +233,19 @@ namespace turisticky_zavod.Forms
                 errorProvider_category.SetError(textBox_color, "Barva je povinná položka");
             }
             else
+            {
+                foreach (var ch in code)
+                {
+                    if (!char.IsLetter(ch) && ch != ' ')
+                    {
+                        isValidated = false;
+                        errorProvider_category.SetError(textBox_color, $"Barva obsahuje nepovolené znaky: {ch}");
+                        break;
+                    }
+                }
+
                 errorProvider_category.SetError(textBox_color, string.Empty);
+            }
 
             if (comboBox_type.SelectedIndex == -1)
             {

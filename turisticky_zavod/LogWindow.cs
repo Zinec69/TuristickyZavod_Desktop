@@ -9,13 +9,17 @@ namespace turisticky_zavod.Forms
             InitializeComponent();
 
             listBox_log.DataSource = Database.Instance.Log.Local.ToBindingList();
-            Database.Instance.Log.Local.CollectionChanged += (_, _) => Invoke(() => listBox_log.TopIndex = listBox_log.Items.Count - 1);
         }
 
         private void Log_FormClosing(object sender, FormClosingEventArgs e)
         {
             e.Cancel = true;
             Hide();
+        }
+
+        private void LogWindow_Shown(object sender, EventArgs e)
+        {
+            Database.Instance.Log.Local.CollectionChanged += (_, _) => Invoke(() => listBox_log.TopIndex = listBox_log.Items.Count - 1);
         }
     }
 }

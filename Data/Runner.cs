@@ -19,7 +19,7 @@ namespace turisticky_zavod.Data
 
         public DateTime? FinishTime { get; set; }
 
-        public bool Disqualified { get; set; }
+        public bool Disqualified { get => CheckpointInfo.Any(x => x.Disqualified); }
 
 
         public int? PartnerID { get; set; }
@@ -136,7 +136,7 @@ namespace turisticky_zavod.Data
         {
             get 
             {
-                var runners = Database.Instance.Runner.Local.Where(x => x.FinalRunTime != null)
+                var runners = Database.Instance.Runner.Local.Where(x => x.FinalRunTime != null && !x.Disqualified)
                                                             .OrderBy(x => x.FinalRunTime).ToList();
                 var placement = runners.FindIndex(x => x.ID == this.ID);
 

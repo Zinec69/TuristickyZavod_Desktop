@@ -1,6 +1,6 @@
-﻿using System.Text.Json;
+﻿using DocumentFormat.OpenXml.Wordprocessing;
+using System.Text.Json;
 using System.Text.Json.Serialization;
-using turisticky_zavod.Data;
 
 namespace turisticky_zavod.Data
 {
@@ -12,7 +12,7 @@ namespace turisticky_zavod.Data
             var referee = Database.Instance.Referee.ToList().FirstOrDefault(x => x.Name == name, null);
             referee ??= Database.Instance.ChangeTracker.Entries<Referee>()
                                                        .FirstOrDefault(x => x.Entity.Name == name, null)?.Entity
-                                                        ?? new() { Name = reader.GetString() };
+                                                        ?? new() { Name = name };
 
             return referee;
         }
@@ -21,15 +21,63 @@ namespace turisticky_zavod.Data
             => writer.WriteStringValue(value.Name);
     }
 
-    internal class CheckpointJsonConverter : JsonConverter<Checkpoint>
+    internal class CheckpointInfoJsonConverter : JsonConverter<CheckpointRunnerInfo>
     {
-        public override Checkpoint Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        public override CheckpointRunnerInfo Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
+            var info = new CheckpointRunnerInfo();
+
+            while (reader.Read())
+            {
+                if (reader.TokenType == JsonTokenType.StartObject)
+                    continue;
+                if (reader.TokenType == JsonTokenType.PropertyName)
+                    break;
+            }
+            reader.Read();
             var id = reader.GetInt32();
-            return Database.Instance.Checkpoint.Single(c => c.ID == id);
+            reader.Read();
+            reader.Read();
+            var refereeName = reader.GetString();
+            reader.Read();
+            reader.Read();
+            var timeArrived = reader.GetInt64();
+            reader.Read();
+            reader.Read();
+            var timeDeparted = reader.GetInt64();
+            reader.Read();
+            reader.Read();
+            var timeWaited = reader.GetInt32();
+            reader.Read();
+            reader.Read();
+            var penalty = reader.GetInt32();
+            reader.Read();
+            reader.Read();
+            var disqualified = reader.GetBoolean();
+            reader.Read();
+
+            var checkpoint = Database.Instance.Checkpoint.Single(x => x.ID == id);
+
+            var referee = Database.Instance.Referee.ToList().FirstOrDefault(x => x.Name == refereeName, null);
+            referee ??= Database.Instance.ChangeTracker.Entries<Referee>()
+                                                       .FirstOrDefault(x => x.Entity.Name == refereeName, null)?.Entity
+                                                        ?? new() { Name = refereeName };
+
+            checkpoint.Referee = referee;
+
+            return new CheckpointRunnerInfo
+            {
+                CheckpointID = id,
+                Checkpoint = checkpoint,
+                TimeArrived = DateTimeOffset.FromUnixTimeMilliseconds(timeArrived).DateTime.ToLocalTime(),
+                TimeDeparted = DateTimeOffset.FromUnixTimeMilliseconds(timeDeparted).DateTime.ToLocalTime(),
+                TimeWaited = new TimeSpan(0, 0, timeWaited),
+                Penalty = new TimeSpan(0, 0, penalty),
+                Disqualified = disqualified
+            };
         }
 
-        public override void Write(Utf8JsonWriter writer, Checkpoint value, JsonSerializerOptions options) { }
+        public override void Write(Utf8JsonWriter writer, CheckpointRunnerInfo value, JsonSerializerOptions options) { }
     }
 
     internal class TeamJsonConverter : JsonConverter<Team>

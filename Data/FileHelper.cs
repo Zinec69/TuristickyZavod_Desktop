@@ -28,8 +28,15 @@ namespace turisticky_zavod.Data
                             StartNumber = !string.IsNullOrEmpty(startNumber) ? int.Parse(startNumber) : null,
                             LastName = line[1].Trim(),
                             FirstName = line[2].Trim(),
-                            Gender = line[3].Trim().ToLower()[0] == 'm' ? Gender.MALE : Gender.FEMALE,
-                            Birthdate = DateTime.TryParse(line[4].Trim(), out DateTime birthday) ? birthday : null
+                            Gender = line[3].Trim().ToLower()[0] switch
+                            {
+                                'm' => Gender.MALE,
+                                'f' or 'z' or 'ž' => Gender.FEMALE,
+                                _ => throw new CsvException("Nepodařilo se přečíst pohlaví běžce z csv souboru")
+                            },
+                            Birthdate = DateTime.TryParse(line[4].Trim(), out DateTime birthday)
+                                        ? birthday
+                                        : throw new CsvException("Nepodařilo se přečíst datum narození běžce z csv souboru")
                         };
 
                         var teamName = line[5].Trim();
@@ -47,8 +54,15 @@ namespace turisticky_zavod.Data
                         {
                             LastName = partnerLastName,
                             FirstName = line[7].Trim(),
-                            Gender = line[8].Trim().ToLower()[0] == 'm' ? Gender.MALE : Gender.FEMALE,
-                            Birthdate = DateTime.TryParse(line[9].Trim(), out DateTime birthday2) ? birthday2 : null
+                            Gender = line[8].Trim().ToLower()[0] switch
+                            {
+                                'm' => Gender.MALE,
+                                'f' or 'z' or 'ž' => Gender.FEMALE,
+                                _ => throw new CsvException("Nepodařilo se přečíst pohlaví běžce z csv souboru")
+                            },
+                            Birthdate = DateTime.TryParse(line[9].Trim(), out DateTime birthday2)
+                                        ? birthday2
+                                        : throw new CsvException("Nepodařilo se přečíst datum narození běžce z csv souboru")
                         };
 
                         runner.AgeCategory = runner.Birthdate.HasValue
@@ -60,6 +74,8 @@ namespace turisticky_zavod.Data
 
                         runners.Add(runner);
                     }
+                    else
+                        throw new CsvException("Nastala neočekávaná chyba při načítání csv souboru");
                 }
             }
 
@@ -240,8 +256,8 @@ namespace turisticky_zavod.Data
                 PropertyNameCaseInsensitive = true,
                 Converters =
                 {
+                    new CheckpointInfoJsonConverter(),
                     new RefereeJsonConverter(),
-                    new CheckpointJsonConverter(),
                     new DateTimeJsonConverter(),
                     new TimeSpanJsonConverter(),
                     new TeamJsonConverter()
@@ -273,5 +289,10 @@ namespace turisticky_zavod.Data
 
             writer.Write(JsonSerializer.Serialize(allData, options));
         }
+    }
+
+    public class CsvException : Exception
+    {
+        public CsvException(string message) : base(message) { }
     }
 }

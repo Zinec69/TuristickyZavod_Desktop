@@ -28,11 +28,11 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(NFCScanning));
             statusStrip1 = new StatusStrip();
             toolStripStatusLabel = new ToolStripStatusLabel();
             readerStatusText = new Label();
             readerStatusTextVar = new Label();
-            button_scanSerialPort = new Button();
             pictureBox_nfcIcon = new PictureBox();
             statusStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox_nfcIcon).BeginInit();
@@ -69,24 +69,12 @@
             readerStatusTextVar.Size = new Size(0, 15);
             readerStatusTextVar.TabIndex = 2;
             // 
-            // button_scanSerialPort
-            // 
-            button_scanSerialPort.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            button_scanSerialPort.Enabled = false;
-            button_scanSerialPort.Location = new Point(162, 12);
-            button_scanSerialPort.Name = "button_scanSerialPort";
-            button_scanSerialPort.Size = new Size(101, 38);
-            button_scanSerialPort.TabIndex = 3;
-            button_scanSerialPort.Text = "Přečíst ze sériového portu";
-            button_scanSerialPort.UseVisualStyleBackColor = true;
-            button_scanSerialPort.Click += Button_ScanSerialPort_Click;
-            // 
             // pictureBox_nfcIcon
             // 
             pictureBox_nfcIcon.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            pictureBox_nfcIcon.Location = new Point(90, 69);
+            pictureBox_nfcIcon.Location = new Point(96, 75);
             pictureBox_nfcIcon.Name = "pictureBox_nfcIcon";
-            pictureBox_nfcIcon.Size = new Size(100, 100);
+            pictureBox_nfcIcon.Size = new Size(90, 90);
             pictureBox_nfcIcon.SizeMode = PictureBoxSizeMode.Zoom;
             pictureBox_nfcIcon.TabIndex = 5;
             pictureBox_nfcIcon.TabStop = false;
@@ -97,17 +85,17 @@
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(284, 241);
             Controls.Add(pictureBox_nfcIcon);
-            Controls.Add(button_scanSerialPort);
             Controls.Add(readerStatusTextVar);
             Controls.Add(readerStatusText);
             Controls.Add(statusStrip1);
+            Icon = (Icon)resources.GetObject("$this.Icon");
             MaximizeBox = false;
             MinimizeBox = false;
             MinimumSize = new Size(300, 280);
             Name = "NFCScanning";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Načítání dat z NFC čipů";
-            FormClosed += NFCScanning_FormClosed;
+            FormClosing += NFCScanning_FormClosing;
             statusStrip1.ResumeLayout(false);
             statusStrip1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox_nfcIcon).EndInit();
@@ -121,7 +109,6 @@
         private ToolStripStatusLabel toolStripStatusLabel;
         private Label readerStatusText;
         private Label readerStatusTextVar;
-        private Button button_scanSerialPort;
         private PictureBox pictureBox_nfcIcon;
     }
 }

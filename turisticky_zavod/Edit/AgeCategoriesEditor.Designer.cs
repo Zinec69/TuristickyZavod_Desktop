@@ -30,6 +30,7 @@
         {
             components = new System.ComponentModel.Container();
             DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(AgeCategoriesEditor));
             dataGridView_categories = new DataGridView();
             dataGridViewTextBoxColumn6 = new DataGridViewTextBoxColumn();
             dataGridViewTextBoxColumn7 = new DataGridViewTextBoxColumn();
@@ -63,6 +64,9 @@
             textBox_name_checkpoint = new TextBox();
             groupBox_checkpoints = new GroupBox();
             dataGridView_checkpoints = new DataGridView();
+            Checkpoint = new DataGridViewTextBoxColumn();
+            dataGridViewCheckBoxColumn3 = new DataGridViewCheckBoxColumn();
+            CheckpointDisqualifiable = new DataGridViewCheckBoxColumn();
             checkpointAgeCategoryParticipationBindingSource = new BindingSource(components);
             statusStrip1 = new StatusStrip();
             toolStripStatusLabel = new ToolStripStatusLabel();
@@ -71,9 +75,6 @@
             label_name_checkpoint = new Label();
             button_save_checkpoint = new Button();
             errorProvider_checkpoint = new ErrorProvider(components);
-            Checkpoint = new DataGridViewTextBoxColumn();
-            dataGridViewCheckBoxColumn3 = new DataGridViewCheckBoxColumn();
-            CheckpointDisqualifiable = new DataGridViewCheckBoxColumn();
             ((System.ComponentModel.ISupportInitialize)dataGridView_categories).BeginInit();
             ((System.ComponentModel.ISupportInitialize)ageCategoryBindingSource).BeginInit();
             groupBox_categories.SuspendLayout();
@@ -398,6 +399,28 @@
             dataGridView_checkpoints.UserDeletingRow += DataGridView_Checkpoints_UserDeletingRow;
             dataGridView_checkpoints.KeyDown += DataGridView_Checkpoints_KeyDown;
             // 
+            // Checkpoint
+            // 
+            Checkpoint.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            Checkpoint.DataPropertyName = "Checkpoint";
+            Checkpoint.HeaderText = "Název";
+            Checkpoint.Name = "Checkpoint";
+            Checkpoint.ReadOnly = true;
+            // 
+            // dataGridViewCheckBoxColumn3
+            // 
+            dataGridViewCheckBoxColumn3.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
+            dataGridViewCheckBoxColumn3.DataPropertyName = "IsParticipating";
+            dataGridViewCheckBoxColumn3.HeaderText = "Účast";
+            dataGridViewCheckBoxColumn3.MinimumWidth = 100;
+            dataGridViewCheckBoxColumn3.Name = "dataGridViewCheckBoxColumn3";
+            // 
+            // CheckpointDisqualifiable
+            // 
+            CheckpointDisqualifiable.DataPropertyName = "CheckpointDisqualifiable";
+            CheckpointDisqualifiable.HeaderText = "Diskvalifikační";
+            CheckpointDisqualifiable.Name = "CheckpointDisqualifiable";
+            // 
             // checkpointAgeCategoryParticipationBindingSource
             // 
             checkpointAgeCategoryParticipationBindingSource.DataSource = typeof(Data.CheckpointAgeCategoryParticipation);
@@ -465,28 +488,6 @@
             errorProvider_checkpoint.BlinkStyle = ErrorBlinkStyle.NeverBlink;
             errorProvider_checkpoint.ContainerControl = this;
             // 
-            // Checkpoint
-            // 
-            Checkpoint.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            Checkpoint.DataPropertyName = "Checkpoint";
-            Checkpoint.HeaderText = "Název";
-            Checkpoint.Name = "Checkpoint";
-            Checkpoint.ReadOnly = true;
-            // 
-            // dataGridViewCheckBoxColumn3
-            // 
-            dataGridViewCheckBoxColumn3.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
-            dataGridViewCheckBoxColumn3.DataPropertyName = "IsParticipating";
-            dataGridViewCheckBoxColumn3.HeaderText = "Účast";
-            dataGridViewCheckBoxColumn3.MinimumWidth = 100;
-            dataGridViewCheckBoxColumn3.Name = "dataGridViewCheckBoxColumn3";
-            // 
-            // CheckpointDisqualifiable
-            // 
-            CheckpointDisqualifiable.DataPropertyName = "CheckpointDisqualifiable";
-            CheckpointDisqualifiable.HeaderText = "Diskvalifikační";
-            CheckpointDisqualifiable.Name = "CheckpointDisqualifiable";
-            // 
             // AgeCategoriesEditor
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -499,6 +500,7 @@
             Controls.Add(groupBox_edit_category);
             Controls.Add(groupBox_categories);
             HelpButton = true;
+            Icon = (Icon)resources.GetObject("$this.Icon");
             MinimumSize = new Size(1300, 530);
             Name = "AgeCategoriesEditor";
             StartPosition = FormStartPosition.CenterScreen;

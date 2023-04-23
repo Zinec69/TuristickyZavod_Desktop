@@ -25,10 +25,11 @@ namespace turisticky_zavod.Forms
             InitDatabase();
         }
 
-        protected override void OnClosing(CancelEventArgs e)
+        private void MainWindow_FormClosing(object sender, FormClosingEventArgs e)
         {
             if (HandleClosing())
             {
+                e.Cancel = false;
                 base.OnClosing(e);
 
                 database.Dispose();
@@ -50,7 +51,6 @@ namespace turisticky_zavod.Forms
 
                 try
                 {
-                    // TODO
                     //database.Database.EnsureDeleted();
                     database.Database.EnsureCreated();
 
@@ -75,8 +75,6 @@ namespace turisticky_zavod.Forms
                         await database.Log.LoadAsync();
 
                         logWindow = new LogWindow();
-                        logWindow.Show(); // TODO
-                        Activate();
 
                         dataGridView_runners.DataSource = database.Runner.Local.ToBindingList();
                         comboBox_team.DataSource = database.Team.Local.ToBindingList();
@@ -161,6 +159,12 @@ namespace turisticky_zavod.Forms
                 timer.Stop();
                 Log($"Csv loaded and saved to database in {timer.ElapsedMilliseconds}ms", "Files");
             }
+            catch (CsvException e)
+            {
+                Log($"Failed loading csv: {e.Message}", "Files");
+                MessageBox.Show(e.Message,
+                    "Chyba", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
             catch (Exception e)
             {
                 Log($"Failed loading csv: {e.Message}", "Files");
@@ -184,7 +188,6 @@ namespace turisticky_zavod.Forms
                     var current = database.Runner.Local.Where(r => r.StartNumber == runner.StartNumber).FirstOrDefault();
                     if (current != default)
                     {
-                        current.Disqualified = runner.Disqualified;
                         current.FinishTime = runner.FinishTime;
                         current.StartTime = runner.StartTime;
                         foreach (var ci in runner.CheckpointInfo)
@@ -279,7 +282,7 @@ namespace turisticky_zavod.Forms
             }
         }
 
-        private void DetermineJsonLoadingWay(string filePath)
+        private async void DetermineJsonLoadingWay(string filePath)
         {
             try
             {
@@ -291,7 +294,22 @@ namespace turisticky_zavod.Forms
                     "Naèíst soubor", MessageBoxButtons.YesNo, MessageBoxIcon.Question
                     ) == DialogResult.Yes)
                 {
-                    Database.LoadFromJson(filePath);
+                    using var transaction = await database.Database.BeginTransactionAsync();
+
+                    try
+                    {
+                        Database.LoadFromJson(filePath);
+
+                        await transaction.CommitAsync();
+                    }
+                    catch (Exception e)
+                    {
+                        await transaction.RollbackAsync();
+
+                        Log($"Failed loading json: {e.Message}", "Files");
+                        MessageBox.Show("Nepodaøilo se naèíst data z JSON souboru",
+                            "Chyba", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
                 }
             }
             catch (Exception e)
@@ -453,7 +471,7 @@ namespace turisticky_zavod.Forms
             };
             if (fileDialog.ShowDialog() == DialogResult.OK)
             {
-                if (fileDialog.FileName[(fileDialog.FileName.LastIndexOf('.') + 1)..].ToLower() == "csv")
+                if (fileDialog.FileName[(fileDialog.FileName.LastIndexOf('.') + 1)..].ToLower() == "json")
                     DetermineJsonLoadingWay(fileDialog.FileName);
                 else
                     AddRunnersCSV(fileDialog.FileName);
@@ -502,9 +520,22 @@ namespace turisticky_zavod.Forms
 
         private void SaveAsToolStripMenuItem_Click(object sender, EventArgs e) => HandleSaving(forceNewFile: true);
 
+        private void ToolStripMenuItem_Reset_Click(object sender, EventArgs e)
+        {
+            if (MessageBox.Show("Opravdu chcete vymazat všechna data a uvést aplikaci do pùvodního stavu? Tento krok nelze vrátit",
+                "Resetovat aplikaci", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+            {
+                database.ChangeTracker.Clear();
+                database.Database.EnsureDeleted();
+
+                Application.Restart();
+                Environment.Exit(0);
+            }
+        }
+
         #endregion
 
-        #region Button events
+        #region Button Start events
 
         private void Button_Save_Click(object sender, EventArgs e)
         {
@@ -567,9 +598,85 @@ namespace turisticky_zavod.Forms
 
                 database.SaveChanges();
 
-                ClearInputs();
+                ClearInputs_Start();
                 dataGridView_runners.Refresh();
             }
+        }
+
+        #endregion
+
+        #region Button RunnerCheckpoints events
+
+        private void Button_CheckpointInfo_Add_Click(object sender, EventArgs e)
+        {
+            if (Validate_CheckpointInfo_Inputs() && dataGridView_runners_results.CurrentCell != null)
+            {
+                var timeWaited = TimeSpan.Parse($"00:{maskedTextBox_timeWaited.Text}");
+                var penalty = TimeSpan.Parse($"00:{maskedTextBox_penalty.Text}");
+                var disqualified = checkBox_disqualified_checkpointInfo.Checked;
+
+                var runner = (Runner)dataGridView_runners_results.CurrentRow.DataBoundItem;
+
+                var checkpoint = (Checkpoint)comboBox_checkpoints_checkpointInfo.SelectedItem;
+
+                runner.CheckpointInfo.Add(new CheckpointRunnerInfo()
+                {
+                    TimeWaited = timeWaited,
+                    Penalty = penalty,
+                    Disqualified = disqualified,
+                    CheckpointID = checkpoint.ID
+                });
+
+                database.Runner.Update(runner);
+                database.SaveChanges();
+
+                comboBox_checkpoints_checkpointInfo.DataSource = database.Checkpoint.Local.Except(runner.CheckpointInfo.Select(x => x.Checkpoint))
+                                                                                          .Where(
+                                                                                               x => x.ID != 1
+                                                                                               && (runner.AgeCategory == null
+                                                                                                    || database.CheckpointAgeCategoryParticipation.Local
+                                                                                                          .First(y => y.CheckpointID == x.ID
+                                                                                                                   && y.AgeCategoryID == runner.AgeCategoryID)
+                                                                                                          .IsParticipating)
+                                                                                           ).ToList();
+                maskedTextBox_timeWaited.Text = "0000";
+                maskedTextBox_penalty.Text = "0000";
+                checkBox_disqualified_checkpointInfo.Checked = false;
+
+                dataGridView_runnerCheckpoints.DataSource = runner.CheckpointInfo.Where(x => x.CheckpointID != 1).ToList();
+                dataGridView_runners_results.Refresh();
+            }
+        }
+
+        private bool Validate_CheckpointInfo_Inputs()
+        {
+            var validated = true;
+
+            if (!TimeSpan.TryParse($"00:{maskedTextBox_timeWaited.Text}", out _))
+            {
+                validated = false;
+                errorProvider.SetError(maskedTextBox_timeWaited, "Zdržný èas je ve špatném formátu");
+            }
+            else
+                errorProvider.SetError(maskedTextBox_timeWaited, string.Empty);
+
+            if (!TimeSpan.TryParse($"00:{maskedTextBox_penalty.Text}", out _))
+            {
+                validated = false;
+                errorProvider.SetError(maskedTextBox_penalty, "Trestný èas je ve špatném formátu");
+            }
+            else
+                errorProvider.SetError(maskedTextBox_penalty, string.Empty);
+
+            if (comboBox_checkpoints_checkpointInfo.SelectedIndex < 0)
+            {
+                validated = false;
+                errorProvider.SetError(comboBox_checkpoints_checkpointInfo, "Stanovištì je povinné");
+            }
+            else
+                errorProvider.SetError(comboBox_checkpoints_checkpointInfo, string.Empty);
+
+            return validated;
         }
 
         #endregion
@@ -603,7 +710,7 @@ namespace turisticky_zavod.Forms
             {
                 dataGridView_runners.ClearSelection();
                 dataGridView_runners.CurrentCell = null;
-                ClearInputs();
+                ClearInputs_Start();
                 ClearAllErrors();
             }
         }
@@ -614,7 +721,18 @@ namespace turisticky_zavod.Forms
             {
                 row.HeaderCell.Value = (row.Index + 1).ToString();
             }
-            ClearInputs();
+            ClearInputs_Start();
+        }
+
+        private void DataGridView_Runners_UserDeletingRow(object sender, DataGridViewRowCancelEventArgs e)
+        {
+            e.Cancel = MessageBox.Show("Opravdu chcete vymazat záznam tohoto bìžce? Tento krok nelze vrátit zpìt",
+                "Vymazat záznam", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.No;
+        }
+
+        private void DataGridView_Runners_UserDeletedRow(object sender, DataGridViewRowEventArgs e)
+        {
+            database.SaveChanges();
         }
 
         private void DataGridView_Runners_DragEnter(object sender, DragEventArgs e)
@@ -669,14 +787,38 @@ namespace turisticky_zavod.Forms
                 var placement = ((IList<Runner>)dataGridView_runners_results.DataSource)[row.Index].Placement;
                 row.HeaderCell.Value = placement?.ToString() ?? "-";
             }
-            ClearInputs();
+            ClearInputs_Start();
         }
 
         private void DataGridView_Runners_Results_CurrentCellChanged(object sender, EventArgs e)
         {
             if (dataGridView_runners_results.CurrentCell != null)
-                dataGridView_runnerCheckpoints.DataSource = ((Runner)dataGridView_runners_results.CurrentRow.DataBoundItem).CheckpointInfo
-                                                                                                 .Where(x => x.CheckpointID != 1).ToList();
+            {
+                var runner = (Runner)dataGridView_runners_results.CurrentRow.DataBoundItem;
+
+                textBox_startNumber_checkpointInfo.Text = runner.StartNumber.ToString();
+
+                textBox_name_checkpointInfo.Text = runner.Name;
+                if (runner.Partner != null)
+                    textBox_name_checkpointInfo.Text += $", {runner.Partner.Name}";
+
+                textBox_team_checkpointInfo.Text = runner.Team.Name;
+                textBox_ageCategory_checkpointInfo.Text = runner.AgeCategory?.Name ?? "-";
+
+                comboBox_checkpoints_checkpointInfo.DataSource = database.Checkpoint.Local.Except(runner.CheckpointInfo.Select(x => x.Checkpoint))
+                                                                                          .Where(
+                                                                                               x => x.ID != 1
+                                                                                               && (runner.AgeCategory == null
+                                                                                                    || database.CheckpointAgeCategoryParticipation.Local
+                                                                                                          .First(y => y.CheckpointID == x.ID
+                                                                                                                   && y.AgeCategoryID == runner.AgeCategoryID)
+                                                                                                          .IsParticipating)
+                                                                                           ).ToList();
+
+                checkBox_disqualified_checkpointInfo.Checked = false;
+
+                dataGridView_runnerCheckpoints.DataSource = runner.CheckpointInfo.Where(x => x.CheckpointID != 1).ToList();
+            }
             else
                 dataGridView_runnerCheckpoints.DataSource = null;
         }
@@ -704,7 +846,7 @@ namespace turisticky_zavod.Forms
 
         private void DataGridView_RunnerCheckpoints_CellBeginEdit(object sender, DataGridViewCellCancelEventArgs e)
         {
-            if (e.ColumnIndex == 3)
+            if (e.ColumnIndex == 4)
             {
                 e.Cancel = true;
 
@@ -723,13 +865,13 @@ namespace turisticky_zavod.Forms
                     checkpointInfo.Disqualified = !checkpointInfo.Disqualified;
                     database.CheckpointRunnerInfo.Update(checkpointInfo);
 
-                    var runnerDisqualified = runner.Disqualified;
-                    runner.Disqualified = checkpointInfo.Disqualified || checkpointInfos.Any(x => x.Disqualified);
-
-                    if (runnerDisqualified != runner.Disqualified)
-                        database.Runner.Update(runner);
-
                     database.SaveChanges();
+
+                    foreach (DataGridViewRow row in dataGridView_runners_results.Rows)
+                    {
+                        var placement = ((IList<Runner>)dataGridView_runners_results.DataSource)[row.Index].Placement;
+                        row.HeaderCell.Value = placement?.ToString() ?? "-";
+                    }
 
                     dataGridView_runners_results.Refresh();
                 }
@@ -758,6 +900,24 @@ namespace turisticky_zavod.Forms
             foreach (DataGridViewRow row in dataGridView_runnerCheckpoints.Rows)
             {
                 row.HeaderCell.Value = (row.Index + 1).ToString();
+            }
+        }
+
+        private void DataGridView_RunnerCheckpoints_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Delete && MessageBox.Show("Opravdu chcete vymazat záznam tohoto stanovištì pro tohoto bìžce? Tento krok nelze vrátit zpìt",
+                "Vymazat záznam", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
+            {
+                var runner = (Runner)dataGridView_runners_results.CurrentRow.DataBoundItem;
+                var checkpointInfo = (CheckpointRunnerInfo)dataGridView_runnerCheckpoints.CurrentRow.DataBoundItem;
+
+                runner.CheckpointInfo.Remove(checkpointInfo);
+
+                database.Runner.Update(runner);
+                database.SaveChanges();
+
+                dataGridView_runners_results.Refresh();
+                dataGridView_runnerCheckpoints.DataSource = runner.CheckpointInfo.Where(x => x.CheckpointID != 1).ToList();
             }
         }
 
@@ -797,24 +957,50 @@ namespace turisticky_zavod.Forms
                 e.Cancel = true;
                 errorProvider.SetError((TextBox)sender, "Jméno je povinná položka");
             }
-            else if (name.Split(' ').Length < 2)
+            else if (!name.Contains(' '))
             {
                 e.Cancel = true;
                 errorProvider.SetError((TextBox)sender, "Vyplòte jméno i pøíjmení, oddìlené mezerou");
             }
             else
+            {
+                foreach (var ch in name)
+                {
+                    if (!char.IsLetter(ch) && ch != ' ')
+                    {
+                        e.Cancel = true;
+                        errorProvider.SetError((TextBox)sender, $"Jméno obsahuje nepovolené znaky: {ch}");
+                        return;
+                    }
+                }
+
                 errorProvider.SetError((TextBox)sender, string.Empty);
+            }
         }
 
         private void ComboBox_Team_Validating(object sender, CancelEventArgs e)
         {
-            if (!(!string.IsNullOrEmpty(comboBox_team.Text) || comboBox_team.SelectedIndex > -1))
+            var team = comboBox_team.Text.Trim();
+
+            if (!(!string.IsNullOrEmpty(team) || comboBox_team.SelectedIndex > -1))
             {
                 e.Cancel = true;
                 errorProvider.SetError((ComboBox)sender, "Oddíl je povinná položka");
             }
             else
+            {
+                foreach (var ch in team)
+                {
+                    if (!char.IsLetter(ch) && ch != ' ')
+                    {
+                        e.Cancel = true;
+                        errorProvider.SetError((ComboBox)sender, $"Název oddílu obsahuje nepovolené znaky: {ch}");
+                        return;
+                    }
+                }
+
                 errorProvider.SetError((ComboBox)sender, string.Empty);
+            }
         }
 
         private void ComboBox_AgeCategory_Validating(object sender, CancelEventArgs e)
@@ -838,7 +1024,19 @@ namespace turisticky_zavod.Forms
                 errorProvider.SetError((TextBox)sender, "Vyplòte jméno i pøíjmení, oddìlené mezerou");
             }
             else
+            {
+                foreach (var ch in name)
+                {
+                    if (!char.IsLetter(ch) && ch != ' ')
+                    {
+                        e.Cancel = true;
+                        errorProvider.SetError((TextBox)sender, $"Jméno obsahuje nepovolené znaky: {ch}");
+                        return;
+                    }
+                }
+
                 errorProvider.SetError((TextBox)sender, string.Empty);
+            }
         }
 
         private void ComboBox_Gender_Validating(object sender, CancelEventArgs e)
@@ -1026,7 +1224,7 @@ namespace turisticky_zavod.Forms
 
         #endregion
 
-        private void ClearInputs()
+        private void ClearInputs_Start()
         {
             textBox_startNumber.Clear();
             textBox_name.Clear();

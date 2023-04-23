@@ -1,6 +1,7 @@
 ﻿using Forms.Properties;
 using PCSC.Monitoring;
 using System.Diagnostics;
+using System.ServiceProcess;
 using turisticky_zavod.Data;
 using turisticky_zavod.Logic;
 
@@ -8,8 +9,8 @@ namespace turisticky_zavod.Forms
 {
     public partial class NFCScanning : Form
     {
-        private readonly NFCReaderPCSC Reader = new();
-        private readonly NFCReaderSerial ReaderSerial = new();
+        private readonly NFCReaderPCSC Reader;
+        //private readonly NFCReaderSerial ReaderSerial = new();
 
         public event EventHandler<Runner> OnRunnerNotInDB;
 
@@ -26,16 +27,22 @@ namespace turisticky_zavod.Forms
 
             try
             {
+                Reader = new NFCReaderPCSC();
+
                 if (!Reader.Connect())
                 {
                     pictureBox_nfcIcon.Image = nfcOff;
                     readerStatusTextVar.Text = "Nenalezena";
+
+                    Log("Reader not found", "Nfc reader");
                 }
                 else
                 {
                     pictureBox_nfcIcon.Image = nfcOn;
                     readerStatusTextVar.Text = "Připravena";
                     Reader.OnCardDetected += OnTagDiscovered;
+
+                    Log("Reader ready", "Nfc reader");
                 }
                 Reader.OnReaderDisconnected += (_, _) =>
                 {
@@ -43,6 +50,8 @@ namespace turisticky_zavod.Forms
                     {
                         pictureBox_nfcIcon.Image = nfcOff;
                         readerStatusTextVar.Text = "Odpojena";
+
+                        Log("Reader disconnected", "Nfc reader");
                     });
                 };
                 Reader.OnReaderReconnected += (_, _) =>
@@ -52,21 +61,45 @@ namespace turisticky_zavod.Forms
                     {
                         pictureBox_nfcIcon.Image = nfcOn;
                         readerStatusTextVar.Text = "Připojena";
+
+                        Log("Reader reconnected", "Nfc reader");
                     });
                 };
             }
-            catch (Exception e)
+            catch (PCSC.Exceptions.NoServiceException)
             {
-                MessageBox.Show($"Nepodařila se spustit služba pro komunikaci s chytrými čtečkami. Podrobnosti:\n\n{e}",
-                    "Chyba", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Log("Reader drivers not found", "Nfc reader");
+
+                if (MessageBox.Show($"Nepodařila se spustit služba pro komunikaci s chytrými čtečkami. Chcete ji nyní nainstalovat?",
+                    "Chyba", MessageBoxButtons.YesNo, MessageBoxIcon.Error) == DialogResult.Yes)
+                {
+                    try
+                    {
+                        var setupProcess = Process.Start($"{Directory.GetCurrentDirectory()}/PCSC_Drivers/Setup.exe");
+                        setupProcess.WaitForExit();
+
+                        var scardService = new ServiceController("SCardSvr");
+                        if (scardService.Status != ServiceControllerStatus.Running)
+                        {
+                            MessageBox.Show("Není spuštěna služba pro komunikaci s chytrými čtečkami. " +
+                                "Zkuste vypnout aplikaci, přepojit čtečku a znovu spustit aplikaci.",
+                                "Chyba", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        MessageBox.Show("Nastala neočekávaná chyba při instalaci a spouštění služby",
+                            "Chyba", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+
                 Close();
             }
 
-            // TODO
-            if (ReaderSerial.Connect())
-                button_scanSerialPort.Enabled = true;
+            //if (ReaderSerial.Connect())
+            //    button_scanSerialPort.Enabled = true;
 
-            ReaderSerial.OnReaderReconnected += (_, _) => Invoke(() => button_scanSerialPort.Enabled = true);
+            //ReaderSerial.OnReaderReconnected += (_, _) => Invoke(() => button_scanSerialPort.Enabled = true);
         }
 
         private void OnTagDiscovered(object? sender, CardStatusEventArgs args)
@@ -85,9 +118,7 @@ namespace turisticky_zavod.Forms
                 var runner = Reader.ReadRunnerFromTag();
                 timer.Stop();
                 SaveRunner(runner);
-                toolStripStatusLabel.Text = $"Běžec č. {runner.StartNumber} úspěšně načten [{timer.ElapsedMilliseconds}ms]"; // TODO odebrat ms
-
-                DialogResult = DialogResult.OK;
+                toolStripStatusLabel.Text = $"Běžec č. {runner.StartNumber} úspěšně načten";
             }
             catch (NFCException ex)
             {
@@ -111,7 +142,6 @@ namespace turisticky_zavod.Forms
                 {
                     dbRunner.StartTime ??= runner.StartTime;
                     dbRunner.FinishTime ??= runner.FinishTime;
-                    dbRunner.Disqualified = runner.Disqualified;
                     foreach (var ci in runner.CheckpointInfo)
                     {
                         if (!dbRunner.CheckpointInfo.Any(c => c.Checkpoint.ID == ci.Checkpoint.ID))
@@ -125,31 +155,43 @@ namespace turisticky_zavod.Forms
             });
         }
 
-        private void NFCScanning_FormClosed(object sender, EventArgs e)
+        //private void Button_ScanSerialPort_Click(object sender, EventArgs e)
+        //{
+        //    var timer = Stopwatch.StartNew();
+
+        //    try
+        //    {
+        //        var runner = ReaderSerial.ReadRunner();
+        //        timer.Stop();
+        //        SaveRunner(runner);
+        //        toolStripStatusLabel.Text = $"Běžec č. {runner.StartNumber} úspěšně načten [{timer.ElapsedMilliseconds}ms]";
+        //    }
+        //    catch (NFCException ex)
+        //    {
+        //        toolStripStatusLabel.Text = ex.Message;
+        //    }
+        //    catch
+        //    {
+        //        toolStripStatusLabel.Text = $"Nastala neočekávaná chyba, zkuste to prosím znovu";
+        //    }
+        //}
+
+        private void NFCScanning_FormClosing(object sender, FormClosingEventArgs e)
         {
+            DialogResult = DialogResult.OK;
+
             Reader?.Dispose();
-            ReaderSerial?.Dispose();
+            //ReaderSerial?.Dispose();
         }
 
-        private void Button_ScanSerialPort_Click(object sender, EventArgs e)
+        private void Log(string message, string type)
         {
-            var timer = Stopwatch.StartNew();
-
-            try
+            database.Log.Add(new Log
             {
-                var runner = ReaderSerial.ReadRunner();
-                timer.Stop();
-                SaveRunner(runner);
-                toolStripStatusLabel.Text = $"Běžec č. {runner.StartNumber} úspěšně načten [{timer.ElapsedMilliseconds}ms]";
-            }
-            catch (NFCException ex)
-            {
-                toolStripStatusLabel.Text = ex.Message;
-            }
-            catch
-            {
-                toolStripStatusLabel.Text = $"Nastala neočekávaná chyba, zkuste to prosím znovu";
-            }
+                Message = message,
+                Type = type
+            });
+            database.SaveChanges();
         }
     }
 }
