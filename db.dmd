@@ -1,8 +1,0 @@
-<?xml version = '1.0' encoding = 'UTF-8'?>
-<OSDM_Design class="oracle.dbtools.crest.model.design.Design" name="db" id="E6FC6342-D312-ED9F-CD73-D2D9711FFA88" version="3.5">
-<createdBy>Zinec</createdBy>
-<createdTime>2023-04-20 15:24:34 UTC</createdTime>
-<ownerDesignName>db</ownerDesignName>
-<capitalNames>false</capitalNames>
-<designId>E6FC6342-D312-ED9F-CD73-D2D9711FFA88</designId>
-</OSDM_Design>
