@@ -15,7 +15,7 @@ namespace turisticky_zavod.Data
         [DeleteBehavior(DeleteBehavior.Cascade)]
         public virtual Checkpoint Checkpoint { get; set; }
 
-        public DateTime TimeArrived { get; set; }
+        public DateTime? TimeArrived { get; set; }
         public DateTime? TimeDeparted { get; set; }
         public TimeSpan TimeWaited { get; set; }
         public TimeSpan Penalty { get; set; }

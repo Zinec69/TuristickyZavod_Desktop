@@ -150,7 +150,9 @@ namespace turisticky_zavod.Data
                                                                     : string.Empty;
                 worksheet.Cell($"{cellColumn++}{cellRow}").Value = @$"{runner.TotalWaitTime:hh\:mm\:ss}";
                 worksheet.Cell($"{cellColumn++}{cellRow}").Value = @$"{runner.TotalPenaltyTime:hh\:mm\:ss}";
-                worksheet.Cell($"{cellColumn++}{cellRow}").Value = @$"{runner.AverageTimeBetweenCheckpoints:hh\:mm\:ss}";
+                worksheet.Cell($"{cellColumn++}{cellRow}").Value = runner.AverageTimeBetweenCheckpoints.HasValue && runner.AverageTimeBetweenCheckpoints.Value.TotalSeconds > 0
+                                                                    ? @$"{runner.AverageTimeBetweenCheckpoints:hh\:mm\:ss)}"
+                                                                    : "-";
 
                 if (runner.Disqualified)
                 {

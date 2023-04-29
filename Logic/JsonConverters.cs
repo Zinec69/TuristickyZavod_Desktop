@@ -169,7 +169,11 @@ namespace turisticky_zavod.Data
 
                 writer.WriteNumber(nameof(item.ID), item.ID);
                 writer.WriteNumber(nameof(item.CheckpointID), item.CheckpointID);
-                writer.WriteString(nameof(item.TimeArrived), item.TimeArrived);
+
+                if (item.TimeArrived.HasValue)
+                    writer.WriteString(nameof(item.TimeArrived), item.TimeArrived.Value);
+                else
+                    writer.WriteNull(nameof(item.TimeArrived));
 
                 if (item.TimeDeparted.HasValue)
                     writer.WriteString(nameof(item.TimeDeparted), item.TimeDeparted.Value);

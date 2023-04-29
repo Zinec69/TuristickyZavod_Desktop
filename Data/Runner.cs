@@ -109,10 +109,12 @@ namespace turisticky_zavod.Data
 
         [NotMapped]
         [JsonIgnore]
-        public TimeSpan AverageTimeBetweenCheckpoints
+        public TimeSpan? AverageTimeBetweenCheckpoints
         {
             get
             {
+                if (CheckpointInfo.Count == 0) return null;
+
                 var time = new TimeSpan();
 
                 var checkpoints = CheckpointInfo.SkipWhile(x => x.ID == 1);
@@ -120,7 +122,8 @@ namespace turisticky_zavod.Data
                 {
                     foreach (var c in checkpoints)
                     {
-                        time += c.TimeDeparted!.Value - c.TimeArrived;
+                        if (c.TimeDeparted.HasValue && c.TimeArrived.HasValue)
+                            time += c.TimeDeparted.Value - c.TimeArrived.Value;
                     }
                     
                     if (time.TotalSeconds > 0)

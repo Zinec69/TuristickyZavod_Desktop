@@ -389,7 +389,7 @@
             dateTimePicker_birthdate_partner.Name = "dateTimePicker_birthdate_partner";
             dateTimePicker_birthdate_partner.Size = new Size(174, 23);
             dateTimePicker_birthdate_partner.TabIndex = 29;
-            dateTimePicker_birthdate_partner.Value = new DateTime(2023, 4, 19, 0, 0, 0, 0);
+            dateTimePicker_birthdate_partner.Value = new DateTime(2000, 1, 1);
             dateTimePicker_birthdate_partner.ValueChanged += DateTimePicker_Birthdate_Partner_ValueChanged;
             // 
             // label_birthdate_partner
@@ -457,7 +457,7 @@
             dateTimePicker_birthdate.Name = "dateTimePicker_birthdate";
             dateTimePicker_birthdate.Size = new Size(174, 23);
             dateTimePicker_birthdate.TabIndex = 23;
-            dateTimePicker_birthdate.Value = new DateTime(2023, 4, 19, 0, 0, 0, 0);
+            dateTimePicker_birthdate.Value = new DateTime(2000, 1, 1);
             dateTimePicker_birthdate.ValueChanged += DateTimePicker_Birthdate_ValueChanged;
             // 
             // label_ageCategory

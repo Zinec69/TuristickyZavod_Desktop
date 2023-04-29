@@ -58,6 +58,19 @@ namespace turisticky_zavod.Data
                 _ => "-"
             };
         }
+
+        [NotMapped]
+        [JsonIgnore]
+        public string GenderString
+        {
+            get => Gender switch
+            {
+                Gender.MALE => "Muži",
+                Gender.FEMALE => "Ženy",
+                Gender.IRRELEVANT => "Nezáleží",
+                _ => "-"
+            };
+        }
     }
 
     public enum CategoryType { DEFAULT, DUOS, RELAY }

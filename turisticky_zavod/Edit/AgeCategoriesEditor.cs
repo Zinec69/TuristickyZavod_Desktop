@@ -40,6 +40,12 @@ namespace turisticky_zavod.Forms
                     1 => CategoryType.DUOS,
                     2 => CategoryType.RELAY
                 };
+                var gender = comboBox_gender.SelectedIndex switch
+                {
+                    0 => Gender.MALE,
+                    1 => Gender.FEMALE,
+                    2 => Gender.IRRELEVANT
+                };
 
                 var category = database.AgeCategory.Local.FirstOrDefault(x => x.Name == name || x.Code == code, null);
 
@@ -49,6 +55,7 @@ namespace turisticky_zavod.Forms
                     category.Code = code;
                     category.AgeMin = int.Parse(ageMin);
                     category.AgeMax = !string.IsNullOrEmpty(ageMax) ? int.Parse(ageMax) : null;
+                    category.Gender = gender;
                     category.Type = type;
                     category.Color = color;
                     database.AgeCategory.Update(category);
@@ -71,6 +78,7 @@ namespace turisticky_zavod.Forms
                         Code = code,
                         AgeMin = int.Parse(ageMin),
                         AgeMax = !string.IsNullOrEmpty(ageMax) ? int.Parse(ageMax) : null,
+                        Gender = gender,
                         Type = type,
                         Color = color
                     };
@@ -255,7 +263,28 @@ namespace turisticky_zavod.Forms
             else
                 errorProvider_category.SetError(comboBox_type, string.Empty);
 
+            if (comboBox_gender.SelectedIndex == -1)
+            {
+                isValidated = false;
+                errorProvider_category.SetError(comboBox_gender, "Pohlaví je povinnná položka");
+            }
+            else
+                errorProvider_category.SetError(comboBox_gender, string.Empty);
+
             return isValidated;
+        }
+
+        private void ComboBox_Type_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (comboBox_type.SelectedIndex == 1)
+            {
+                comboBox_gender.SelectedIndex = 2;
+                comboBox_gender.Enabled = false;
+            }
+            else
+            {
+                comboBox_gender.Enabled = true;
+            }
         }
 
         private void TextBox_AgeCategory_AgeMin_KeyDown(object sender, KeyEventArgs e)
@@ -380,6 +409,7 @@ namespace turisticky_zavod.Forms
                 textBox_ageMin.Text = category.AgeMin.ToString();
                 textBox_ageMax.Text = category.AgeMax.HasValue ? category.AgeMax.Value.ToString() : string.Empty;
                 textBox_color.Text = category.Color;
+                comboBox_gender.SelectedIndex = (int)category.Gender;
                 comboBox_type.SelectedIndex = (int)category.Type;
                 button_save_category.Text = "Upravit";
 
@@ -557,6 +587,7 @@ namespace turisticky_zavod.Forms
             textBox_ageMin.Clear();
             textBox_ageMax.Clear();
             textBox_color.Clear();
+            comboBox_gender.SelectedIndex = -1;
             comboBox_type.SelectedIndex = -1;
             button_save_category.Text = "Přidat";
 
@@ -572,6 +603,7 @@ namespace turisticky_zavod.Forms
             errorProvider_category.SetError(textBox_ageMin, string.Empty);
             errorProvider_category.SetError(textBox_ageMax, string.Empty);
             errorProvider_category.SetError(textBox_color, string.Empty);
+            errorProvider_category.SetError(comboBox_gender, string.Empty);
             errorProvider_category.SetError(comboBox_type, string.Empty);
 
             errorProvider_checkpoint.SetError(textBox_name_checkpoint, string.Empty);

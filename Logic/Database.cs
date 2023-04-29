@@ -243,8 +243,8 @@ namespace turisticky_zavod.Data
 
             modelBuilder.Entity<AgeCategory>().HasIndex(x => x.Code).IsUnique();
             modelBuilder.Entity<AgeCategory>().HasData(
-                new AgeCategory() { ID = 1,  AgeMin = 0,  AgeMax = 10,   Name = "Nejmladší žáci",         Code = "NŽH",   Gender = Gender.MALE,       Color = "Bílá" },
-                new AgeCategory() { ID = 2,  AgeMin = 0,  AgeMax = 10,   Name = "Nejmladší žákyně",       Code = "NŽD",   Gender = Gender.FEMALE,     Color = "Bílá" },
+                new AgeCategory() { ID = 1,  AgeMin = 0,  AgeMax = 10,   Name = "Nejmladší žáci",         Code = "NŽH",   Gender = Gender.MALE,       Color = "Modrá" },
+                new AgeCategory() { ID = 2,  AgeMin = 0,  AgeMax = 10,   Name = "Nejmladší žákyně",       Code = "NŽD",   Gender = Gender.FEMALE,     Color = "Modrá" },
                 new AgeCategory() { ID = 3,  AgeMin = 11, AgeMax = 12,   Name = "Mladší žáci",            Code = "MŽH",   Gender = Gender.MALE,       Color = "Bílá" },
                 new AgeCategory() { ID = 4,  AgeMin = 11, AgeMax = 12,   Name = "Mladší žákyně",          Code = "MŽD",   Gender = Gender.FEMALE,     Color = "Bílá" },
                 new AgeCategory() { ID = 5,  AgeMin = 13, AgeMax = 14,   Name = "Starší žáci",            Code = "SŽH",   Gender = Gender.MALE,       Color = "Bílá" },

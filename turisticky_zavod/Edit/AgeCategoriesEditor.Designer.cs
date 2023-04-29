@@ -36,6 +36,7 @@
             dataGridViewTextBoxColumn7 = new DataGridViewTextBoxColumn();
             dataGridViewTextBoxColumn8 = new DataGridViewTextBoxColumn();
             dataGridViewTextBoxColumn9 = new DataGridViewTextBoxColumn();
+            GenderString = new DataGridViewTextBoxColumn();
             TypeString = new DataGridViewTextBoxColumn();
             dataGridViewTextBoxColumn10 = new DataGridViewTextBoxColumn();
             ageCategoryBindingSource = new BindingSource(components);
@@ -47,6 +48,8 @@
             dataGridViewCheckBoxColumn1 = new DataGridViewCheckBoxColumn();
             groupBox_categories = new GroupBox();
             groupBox_edit_category = new GroupBox();
+            label_gender = new Label();
+            comboBox_gender = new ComboBox();
             label_type = new Label();
             comboBox_type = new ComboBox();
             textBox_color = new TextBox();
@@ -96,7 +99,7 @@
             dataGridView_categories.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             dataGridView_categories.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.DisplayedCells;
             dataGridView_categories.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridView_categories.Columns.AddRange(new DataGridViewColumn[] { dataGridViewTextBoxColumn6, dataGridViewTextBoxColumn7, dataGridViewTextBoxColumn8, dataGridViewTextBoxColumn9, TypeString, dataGridViewTextBoxColumn10 });
+            dataGridView_categories.Columns.AddRange(new DataGridViewColumn[] { dataGridViewTextBoxColumn6, dataGridViewTextBoxColumn7, dataGridViewTextBoxColumn8, dataGridViewTextBoxColumn9, GenderString, TypeString, dataGridViewTextBoxColumn10 });
             dataGridView_categories.DataSource = ageCategoryBindingSource;
             dataGridView_categories.Location = new Point(6, 22);
             dataGridView_categories.MultiSelect = false;
@@ -145,6 +148,13 @@
             dataGridViewTextBoxColumn9.HeaderText = "Věk do";
             dataGridViewTextBoxColumn9.Name = "dataGridViewTextBoxColumn9";
             dataGridViewTextBoxColumn9.ReadOnly = true;
+            // 
+            // GenderString
+            // 
+            GenderString.DataPropertyName = "GenderString";
+            GenderString.HeaderText = "Pohlaví";
+            GenderString.Name = "GenderString";
+            GenderString.ReadOnly = true;
             // 
             // TypeString
             // 
@@ -202,6 +212,8 @@
             // groupBox_edit_category
             // 
             groupBox_edit_category.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            groupBox_edit_category.Controls.Add(label_gender);
+            groupBox_edit_category.Controls.Add(comboBox_gender);
             groupBox_edit_category.Controls.Add(label_type);
             groupBox_edit_category.Controls.Add(comboBox_type);
             groupBox_edit_category.Controls.Add(textBox_color);
@@ -222,10 +234,31 @@
             groupBox_edit_category.TabStop = false;
             groupBox_edit_category.Text = "Přidat/upravit kategorii";
             // 
+            // label_gender
+            // 
+            label_gender.AutoSize = true;
+            label_gender.Location = new Point(376, 26);
+            label_gender.Name = "label_gender";
+            label_gender.Size = new Size(51, 15);
+            label_gender.TabIndex = 20;
+            label_gender.Text = "Pohlaví*";
+            // 
+            // comboBox_gender
+            // 
+            comboBox_gender.DropDownStyle = ComboBoxStyle.DropDownList;
+            comboBox_gender.FormattingEnabled = true;
+            errorProvider_category.SetIconAlignment(comboBox_gender, ErrorIconAlignment.MiddleLeft);
+            comboBox_gender.Items.AddRange(new object[] { "Muži", "Ženy", "Nezáleží" });
+            comboBox_gender.Location = new Point(376, 44);
+            comboBox_gender.Margin = new Padding(3, 3, 16, 3);
+            comboBox_gender.Name = "comboBox_gender";
+            comboBox_gender.Size = new Size(91, 23);
+            comboBox_gender.TabIndex = 19;
+            // 
             // label_type
             // 
             label_type.AutoSize = true;
-            label_type.Location = new Point(536, 26);
+            label_type.Location = new Point(486, 26);
             label_type.Name = "label_type";
             label_type.Size = new Size(30, 15);
             label_type.TabIndex = 18;
@@ -237,25 +270,27 @@
             comboBox_type.FormattingEnabled = true;
             errorProvider_category.SetIconAlignment(comboBox_type, ErrorIconAlignment.MiddleLeft);
             comboBox_type.Items.AddRange(new object[] { "Klasický", "Dvojice", "Štafety" });
-            comboBox_type.Location = new Point(536, 44);
+            comboBox_type.Location = new Point(486, 44);
+            comboBox_type.Margin = new Padding(3, 3, 16, 3);
             comboBox_type.Name = "comboBox_type";
-            comboBox_type.Size = new Size(114, 23);
+            comboBox_type.Size = new Size(94, 23);
             comboBox_type.TabIndex = 5;
+            comboBox_type.SelectedIndexChanged += ComboBox_Type_SelectedIndexChanged;
             // 
             // textBox_color
             // 
             errorProvider_category.SetIconAlignment(textBox_color, ErrorIconAlignment.MiddleLeft);
-            textBox_color.Location = new Point(449, 44);
+            textBox_color.Location = new Point(599, 44);
             textBox_color.Margin = new Padding(3, 3, 16, 3);
             textBox_color.Name = "textBox_color";
-            textBox_color.Size = new Size(68, 23);
+            textBox_color.Size = new Size(60, 23);
             textBox_color.TabIndex = 4;
             textBox_color.KeyPress += TextBox_AgeCategory_Color_KeyPress;
             // 
             // label_color
             // 
             label_color.AutoSize = true;
-            label_color.Location = new Point(449, 26);
+            label_color.Location = new Point(599, 26);
             label_color.Name = "label_color";
             label_color.Size = new Size(41, 15);
             label_color.TabIndex = 16;
@@ -264,7 +299,7 @@
             // label_ageMax
             // 
             label_ageMax.AutoSize = true;
-            label_ageMax.Location = new Point(376, 26);
+            label_ageMax.Location = new Point(315, 26);
             label_ageMax.Name = "label_ageMax";
             label_ageMax.Size = new Size(42, 15);
             label_ageMax.TabIndex = 13;
@@ -273,10 +308,10 @@
             // textBox_ageMax
             // 
             errorProvider_category.SetIconAlignment(textBox_ageMax, ErrorIconAlignment.MiddleLeft);
-            textBox_ageMax.Location = new Point(376, 44);
+            textBox_ageMax.Location = new Point(315, 44);
             textBox_ageMax.Margin = new Padding(3, 3, 16, 3);
             textBox_ageMax.Name = "textBox_ageMax";
-            textBox_ageMax.Size = new Size(54, 23);
+            textBox_ageMax.Size = new Size(42, 23);
             textBox_ageMax.TabIndex = 3;
             textBox_ageMax.KeyDown += TextBox_AgeCategory_AgeMax_KeyDown;
             textBox_ageMax.KeyPress += TextBox_AgeCategory_AgeMax_KeyPress;
@@ -284,7 +319,7 @@
             // label_ageMin
             // 
             label_ageMin.AutoSize = true;
-            label_ageMin.Location = new Point(303, 26);
+            label_ageMin.Location = new Point(249, 26);
             label_ageMin.Name = "label_ageMin";
             label_ageMin.Size = new Size(47, 15);
             label_ageMin.TabIndex = 11;
@@ -293,7 +328,7 @@
             // label_code
             // 
             label_code.AutoSize = true;
-            label_code.Location = new Point(191, 26);
+            label_code.Location = new Point(179, 26);
             label_code.Name = "label_code";
             label_code.Size = new Size(51, 15);
             label_code.TabIndex = 4;
@@ -302,10 +337,10 @@
             // textBox_ageMin
             // 
             errorProvider_category.SetIconAlignment(textBox_ageMin, ErrorIconAlignment.MiddleLeft);
-            textBox_ageMin.Location = new Point(303, 44);
+            textBox_ageMin.Location = new Point(249, 44);
             textBox_ageMin.Margin = new Padding(3, 3, 16, 3);
             textBox_ageMin.Name = "textBox_ageMin";
-            textBox_ageMin.Size = new Size(54, 23);
+            textBox_ageMin.Size = new Size(47, 23);
             textBox_ageMin.TabIndex = 2;
             textBox_ageMin.KeyDown += TextBox_AgeCategory_AgeMin_KeyDown;
             textBox_ageMin.KeyPress += TextBox_AgeCategory_AgeMin_KeyPress;
@@ -313,10 +348,10 @@
             // textBox_code
             // 
             errorProvider_category.SetIconAlignment(textBox_code, ErrorIconAlignment.MiddleLeft);
-            textBox_code.Location = new Point(191, 44);
+            textBox_code.Location = new Point(179, 44);
             textBox_code.Margin = new Padding(3, 3, 16, 3);
             textBox_code.Name = "textBox_code";
-            textBox_code.Size = new Size(93, 23);
+            textBox_code.Size = new Size(51, 23);
             textBox_code.TabIndex = 1;
             textBox_code.KeyPress += TextBox_AgeCategory_Code_KeyPress;
             // 
@@ -335,7 +370,7 @@
             textBox_name_category.Location = new Point(20, 44);
             textBox_name_category.Margin = new Padding(3, 3, 16, 3);
             textBox_name_category.Name = "textBox_name_category";
-            textBox_name_category.Size = new Size(152, 23);
+            textBox_name_category.Size = new Size(140, 23);
             textBox_name_category.TabIndex = 0;
             textBox_name_category.KeyPress += TextBox_AgeCategory_Name_KeyPress;
             // 
@@ -571,15 +606,18 @@
         private TextBox textBox_name_checkpoint;
         private ErrorProvider errorProvider_checkpoint;
         private DataGridViewCheckBoxColumn dataGridViewCheckBoxColumn4;
-        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn6;
-        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn7;
-        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn8;
-        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn9;
-        private DataGridViewTextBoxColumn TypeString;
-        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn10;
         private CheckBox checkBox_disqualifiable;
         private DataGridViewTextBoxColumn Checkpoint;
         private DataGridViewCheckBoxColumn dataGridViewCheckBoxColumn3;
         private DataGridViewCheckBoxColumn CheckpointDisqualifiable;
+        private Label label_gender;
+        private ComboBox comboBox_gender;
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn6;
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn7;
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn8;
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn9;
+        private DataGridViewTextBoxColumn GenderString;
+        private DataGridViewTextBoxColumn TypeString;
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn10;
     }
 }
