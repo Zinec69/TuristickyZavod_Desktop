@@ -263,8 +263,8 @@
             // toolStripMenuItem_ageCategories
             // 
             toolStripMenuItem_ageCategories.Name = "toolStripMenuItem_ageCategories";
-            toolStripMenuItem_ageCategories.Size = new Size(163, 22);
-            toolStripMenuItem_ageCategories.Text = "Věkové kategorie";
+            toolStripMenuItem_ageCategories.Size = new Size(228, 22);
+            toolStripMenuItem_ageCategories.Text = "Věkové kategorie a stanoviště";
             toolStripMenuItem_ageCategories.Click += AgeCategoriesToolStripMenuItem_Click;
             // 
             // nápovědaToolStripMenuItem
@@ -279,6 +279,7 @@
             toolStripMenuItem_about.Name = "toolStripMenuItem_about";
             toolStripMenuItem_about.Size = new Size(126, 22);
             toolStripMenuItem_about.Text = "O aplikaci";
+            toolStripMenuItem_about.Click += AboutToolStripMenuItem_Click;
             // 
             // toolStripMenuItem_debug
             // 

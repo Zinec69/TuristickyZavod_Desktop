@@ -115,7 +115,8 @@ namespace turisticky_zavod.Data
 
             worksheet.Range($"B2:{cellColumn}2").Merge();
 
-            runners = runners.Where(x => !x.Disqualified && x.FinalRunTime.HasValue).OrderBy(x => x.FinalRunTime.Value).ToList()
+            runners = runners.Where(x => !x.Disqualified && x.FinalRunTime.HasValue)
+                             .OrderBy(x => x.FinalRunTime.Value).ToList()
                              .Concat(runners.Where(x => x.Disqualified || !x.FinalRunTime.HasValue)).ToList();
 
             var place = 1;

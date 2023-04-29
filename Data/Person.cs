@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 namespace turisticky_zavod.Data
 {
     [NotMapped]
-    public class Person
+    public abstract class Person
     {
         private string firstName;
 

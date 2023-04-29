@@ -1,5 +1,4 @@
 using System.ComponentModel;
-using turisticky_zavod.Data;
 using turisticky_zavod.Logic;
 using Microsoft.EntityFrameworkCore;
 using Windows.Devices.WiFiDirect;
@@ -7,6 +6,7 @@ using System.Diagnostics;
 using Windows.Devices.Enumeration;
 using Forms;
 using System.Text.Json;
+using turisticky_zavod.Data;
 
 namespace turisticky_zavod.Forms
 {
@@ -514,6 +514,8 @@ namespace turisticky_zavod.Forms
 
         private void LogToolStripMenuItem_Click(object sender, EventArgs e) => logWindow.Show();
 
+        private void AboutToolStripMenuItem_Click(object sender, EventArgs e) => new About().ShowDialog();
+
         private void CloseToolStripMenuItem_Click(object sender, EventArgs e) => Close();
 
         private void SaveToolStripMenuItem_Click(object sender, EventArgs e) => HandleSaving();
@@ -784,7 +786,7 @@ namespace turisticky_zavod.Forms
         {
             foreach (DataGridViewRow row in dataGridView_runners_results.Rows)
             {
-                var placement = ((IList<Runner>)dataGridView_runners_results.DataSource)[row.Index].Placement;
+                var placement = ((IList<Runner>)dataGridView_runners_results.DataSource)[row.Index].GetPlacement(database.Runner.Local);
                 row.HeaderCell.Value = placement?.ToString() ?? "-";
             }
             ClearInputs_Start();
@@ -869,7 +871,7 @@ namespace turisticky_zavod.Forms
 
                     foreach (DataGridViewRow row in dataGridView_runners_results.Rows)
                     {
-                        var placement = ((IList<Runner>)dataGridView_runners_results.DataSource)[row.Index].Placement;
+                        var placement = ((IList<Runner>)dataGridView_runners_results.DataSource)[row.Index].GetPlacement(database.Runner.Local);
                         row.HeaderCell.Value = placement?.ToString() ?? "-";
                     }
 

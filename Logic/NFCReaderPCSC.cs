@@ -244,11 +244,6 @@ namespace turisticky_zavod.Logic
                 .GetString(buffer.Take(16).TakeWhile(b => b != 0x00).ToArray());
         }
 
-        public string ReadFirstBlock()
-        {
-            return "";
-        }
-
         private bool UpdateBlock(ICardReader reader, int block, byte[] data)
         {
             if (data.Length != 16)

@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
@@ -130,18 +131,13 @@ namespace turisticky_zavod.Data
             }
         }
 
-        [NotMapped]
-        [JsonIgnore]
-        public int? Placement
+        public int? GetPlacement(LocalView<Runner> runners)
         {
-            get 
-            {
-                var runners = Database.Instance.Runner.Local.Where(x => x.FinalRunTime != null && !x.Disqualified)
-                                                            .OrderBy(x => x.FinalRunTime).ToList();
-                var placement = runners.FindIndex(x => x.ID == this.ID);
+            var runnersFiltered = runners.Where(x => x.FinalRunTime != null && !x.Disqualified)
+                                         .OrderBy(x => x.FinalRunTime).ToList();
+            var placement = runnersFiltered.FindIndex(x => x.ID == this.ID);
 
-                return placement > -1 ? placement + 1 : null;
-            }
+            return placement > -1 ? placement + 1 : null;
         }
     }
 }

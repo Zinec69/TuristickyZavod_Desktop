@@ -235,6 +235,7 @@
             // 
             comboBox_type.DropDownStyle = ComboBoxStyle.DropDownList;
             comboBox_type.FormattingEnabled = true;
+            errorProvider_category.SetIconAlignment(comboBox_type, ErrorIconAlignment.MiddleLeft);
             comboBox_type.Items.AddRange(new object[] { "Klasický", "Dvojice", "Štafety" });
             comboBox_type.Location = new Point(536, 44);
             comboBox_type.Name = "comboBox_type";
@@ -357,6 +358,7 @@
             // 
             // textBox_name_checkpoint
             // 
+            errorProvider_checkpoint.SetIconAlignment(textBox_name_checkpoint, ErrorIconAlignment.MiddleLeft);
             errorProvider_category.SetIconAlignment(textBox_name_checkpoint, ErrorIconAlignment.MiddleLeft);
             textBox_name_checkpoint.Location = new Point(23, 44);
             textBox_name_checkpoint.Margin = new Padding(3, 3, 16, 3);
@@ -504,7 +506,7 @@
             MinimumSize = new Size(1300, 530);
             Name = "AgeCategoriesEditor";
             StartPosition = FormStartPosition.CenterScreen;
-            Text = "Nastavení věkových kategorií";
+            Text = "Nastavení věkových kategorií a stanovišť";
             Load += AgeCategoriesEditor_Load;
             ((System.ComponentModel.ISupportInitialize)dataGridView_categories).EndInit();
             ((System.ComponentModel.ISupportInitialize)ageCategoryBindingSource).EndInit();

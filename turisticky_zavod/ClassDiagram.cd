@@ -1,0 +1,53 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="turisticky_zavod.Forms.JsonPicker" Collapsed="true">
+    <Position X="2.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AABgAEECECAAAAABAACAAAACIAgAABAAACgAAgAyAAg=</HashCode>
+      <FileName>Data import\JsonPicker.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="turisticky_zavod.Forms.NFCScanning" Collapsed="true">
+    <Position X="2.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gAAAiIAAACgAAABACACAAgACAAgEAAgAABAAAgAAAAE=</HashCode>
+      <FileName>Data import\NFCScanning.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="turisticky_zavod.Forms.AgeCategoriesEditor" Collapsed="true">
+    <Position X="0.5" Y="1.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>JmARBBSgKDKIArL7AoiEwgICBgwEEgpSCEA4aihAAIU=</HashCode>
+      <FileName>Edit\AgeCategoriesEditor.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="turisticky_zavod.Forms.LogWindow" Collapsed="true">
+    <Position X="0.5" Y="2.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAEAAAAAACAAQAAAAACAAAACAAAAAAAAAAAAAAIAAAA=</HashCode>
+      <FileName>LogWindow.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="turisticky_zavod.Forms.MainWindow" Collapsed="true">
+    <Position X="0.5" Y="0.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>TfZmEmiWQXAiIvNiMxP0n1yy6EqXkXqx/DW+Q8ReTQs=</HashCode>
+      <FileName>MainWindow.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="turisticky_zavod.Forms.Program" Collapsed="true">
+    <Position X="4.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAA=</HashCode>
+      <FileName>Program.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Forms.About" Collapsed="true">
+    <Position X="2.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAEAAAACAAABAAABCAAAACAAAAAABAAAAAAAAAAAA=</HashCode>
+      <FileName>About.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
