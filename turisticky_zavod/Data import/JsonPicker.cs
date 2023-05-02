@@ -15,7 +15,7 @@ namespace turisticky_zavod.Forms
             dataGridView1.DataSource = new BindingList<Runner>(Runners);
         }
 
-        private void button_save_Click(object sender, EventArgs e)
+        private void Button_Save_Click(object sender, EventArgs e)
         {
             int count = Runners.Count;
             for (int i = count - 1; i >= 0; i--)
@@ -37,7 +37,7 @@ namespace turisticky_zavod.Forms
             Close();
         }
 
-        private void dataGridView1_RowsAdded(object sender, DataGridViewRowsAddedEventArgs e)
+        private void DataGridView1_RowsAdded(object sender, DataGridViewRowsAddedEventArgs e)
         {
             foreach (DataGridViewRow row in dataGridView1.Rows)
             {

@@ -22,6 +22,12 @@ namespace turisticky_zavod.Data
 
                     if (line != null)
                     {
+                        if (line.Length <= 1)
+                            throw new CsvException("Data csv souboru nejsou oddělena středníkem");
+
+                        if (line.Length < 10)
+                            throw new CsvException("Soubor csv není v požadovaném formátu");
+
                         var startNumber = line[0].Trim();
                         var runner = new Runner()
                         {

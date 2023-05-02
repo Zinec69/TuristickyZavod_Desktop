@@ -220,6 +220,7 @@ namespace turisticky_zavod.Data
             optionsBuilder
                 .UseSqlite(@$"Data Source={Directory.GetCurrentDirectory()}\tz.db")
                 .EnableSensitiveDataLogging()
+                .UseLazyLoadingProxies()
                 .ConfigureWarnings(b => b.Ignore());
         }
 

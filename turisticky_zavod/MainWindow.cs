@@ -24,7 +24,7 @@ namespace turisticky_zavod.Forms
 
             InitDatabase();
         }
-
+        
         private void MainWindow_FormClosing(object sender, FormClosingEventArgs e)
         {
             if (HandleClosing())
@@ -125,12 +125,12 @@ namespace turisticky_zavod.Forms
                     }
                 }
 
-                dataGridView_runners.DataSource = null;
-                dataGridView_runners_results.DataSource = null;
-
                 toolStripStatusLabel1.Text = "Naèítání ze souboru";
                 toolStripProgressBar1.Value = 40;
                 toolStripProgressBar1.Visible = true;
+
+                dataGridView_runners.DataSource = null;
+                dataGridView_runners_results.DataSource = null;
 
                 new Thread(new ThreadStart(async () =>
                 {
@@ -298,7 +298,36 @@ namespace turisticky_zavod.Forms
 
                     try
                     {
-                        Database.LoadFromJson(filePath);
+                        toolStripStatusLabel1.Text = "Naèítání ze souboru";
+                        toolStripProgressBar1.Value = 40;
+                        toolStripProgressBar1.Visible = true;
+
+                        dataGridView_runners.DataSource = null;
+                        dataGridView_runners_results.DataSource = null;
+
+                        new Thread(new ThreadStart(() =>
+                        {
+                            Database.LoadFromJson(filePath);
+
+                            Invoke(() =>
+                            {
+                                dataGridView_runners.DataSource = database.Runner.Local.ToBindingList();
+                                dataGridView_runners_results.DataSource = database.Runner.Local.ToBindingList();
+
+                                toolStripStatusLabel1.Text = "Soubor úspìšnì naèten";
+                                toolStripProgressBar1.Value = 100;
+                            });
+
+                            Thread.Sleep(1000);
+
+                            Invoke(() =>
+                            {
+                                toolStripStatusLabel1.Text = string.Empty;
+                                toolStripProgressBar1.Visible = false;
+                                toolStripProgressBar1.Value = 0;
+                            });
+                        }
+                        )).Start();
 
                         await transaction.CommitAsync();
                     }
@@ -861,9 +890,6 @@ namespace turisticky_zavod.Forms
                 }
                 else
                 {
-                    var checkpointInfos = (List<CheckpointRunnerInfo>)dataGridView_runnerCheckpoints.DataSource;
-                    var runner = (Runner)dataGridView_runners_results.CurrentRow.DataBoundItem;
-
                     checkpointInfo.Disqualified = !checkpointInfo.Disqualified;
                     database.CheckpointRunnerInfo.Update(checkpointInfo);
 

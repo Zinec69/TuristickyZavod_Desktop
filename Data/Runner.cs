@@ -30,7 +30,7 @@ namespace turisticky_zavod.Data
         [JsonIgnore]
         public virtual Partner? Partner { get; set; }
 
-        public List<CheckpointRunnerInfo> CheckpointInfo { get; set; } = new();
+        public virtual List<CheckpointRunnerInfo> CheckpointInfo { get; set; } = new();
 
         public int? AgeCategoryID { get; set; }
 

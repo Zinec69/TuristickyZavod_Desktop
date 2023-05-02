@@ -71,7 +71,7 @@
             dataGridView1.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dataGridView1.Size = new Size(780, 311);
             dataGridView1.TabIndex = 0;
-            dataGridView1.RowsAdded += dataGridView1_RowsAdded;
+            dataGridView1.RowsAdded += DataGridView1_RowsAdded;
             // 
             // StartNumber
             // 
@@ -151,7 +151,7 @@
             button_save.TabIndex = 1;
             button_save.Text = "Uložit";
             button_save.UseVisualStyleBackColor = true;
-            button_save.Click += button_save_Click;
+            button_save.Click += Button_Save_Click;
             // 
             // groupBox1
             // 

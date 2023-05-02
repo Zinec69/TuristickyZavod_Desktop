@@ -41,9 +41,9 @@
             // statusStrip1
             // 
             statusStrip1.Items.AddRange(new ToolStripItem[] { toolStripStatusLabel });
-            statusStrip1.Location = new Point(0, 219);
+            statusStrip1.Location = new Point(0, 229);
             statusStrip1.Name = "statusStrip1";
-            statusStrip1.Size = new Size(284, 22);
+            statusStrip1.Size = new Size(299, 22);
             statusStrip1.TabIndex = 0;
             statusStrip1.Text = "statusStrip1";
             // 
@@ -74,7 +74,7 @@
             pictureBox_nfcIcon.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             pictureBox_nfcIcon.Location = new Point(96, 75);
             pictureBox_nfcIcon.Name = "pictureBox_nfcIcon";
-            pictureBox_nfcIcon.Size = new Size(90, 90);
+            pictureBox_nfcIcon.Size = new Size(105, 100);
             pictureBox_nfcIcon.SizeMode = PictureBoxSizeMode.Zoom;
             pictureBox_nfcIcon.TabIndex = 5;
             pictureBox_nfcIcon.TabStop = false;
@@ -83,7 +83,7 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(284, 241);
+            ClientSize = new Size(299, 251);
             Controls.Add(pictureBox_nfcIcon);
             Controls.Add(readerStatusTextVar);
             Controls.Add(readerStatusText);
@@ -91,7 +91,7 @@
             Icon = (Icon)resources.GetObject("$this.Icon");
             MaximizeBox = false;
             MinimizeBox = false;
-            MinimumSize = new Size(300, 280);
+            MinimumSize = new Size(315, 290);
             Name = "NFCScanning";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Načítání dat z NFC čipů";
