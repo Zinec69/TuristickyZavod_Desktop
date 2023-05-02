@@ -54,7 +54,7 @@ namespace turisticky_zavod.Forms
                     //database.Database.EnsureDeleted();
                     database.Database.EnsureCreated();
 
-                    Invoke(async () =>
+                    var res = BeginInvoke(async () =>
                     {
                         await database.CheckpointRunnerInfo.LoadAsync();
                         toolStripProgressBar1.Value += 20;
@@ -75,15 +75,14 @@ namespace turisticky_zavod.Forms
                         await database.Log.LoadAsync();
 
                         logWindow = new LogWindow();
-
-                        dataGridView_runners.DataSource = database.Runner.Local.ToBindingList();
                         comboBox_team.DataSource = database.Team.Local.ToBindingList();
                         comboBox_ageCategory.DataSource = database.AgeCategory.Local.ToBindingList();
-
-                        dataGridView_runners_results.DataSource = database.Runner.Local.ToBindingList();
-                        comboBox_filter_team.DataSource = database.Team.Local.ToBindingList();
-                        comboBox_filter_category.DataSource = database.AgeCategory.Local.ToBindingList();
                     });
+
+                    while (!res.IsCompleted) { };
+
+                    dataGridView_runners.BeginInvoke(() =>
+                        dataGridView_runners.DataSource = database.Runner.Local.ToBindingList());
 
                     timer.Stop();
                     Log($"Database loaded in {timer.ElapsedMilliseconds}ms", "Database");
@@ -137,11 +136,10 @@ namespace turisticky_zavod.Forms
                     await database.Runner.AddRangeAsync(runners);
                     await database.SaveChangesAsync();
 
+                    dataGridView_runners.BeginInvoke(() => dataGridView_runners.DataSource = database.Runner.Local.ToBindingList());
+
                     Invoke(() =>
                     {
-                        dataGridView_runners.DataSource = database.Runner.Local.ToBindingList();
-                        dataGridView_runners_results.DataSource = database.Runner.Local.ToBindingList();
-
                         toolStripStatusLabel1.Text = "Soubor úspìšnì naèten";
                         toolStripProgressBar1.Value = 100;
                     });
@@ -312,7 +310,6 @@ namespace turisticky_zavod.Forms
                             Invoke(() =>
                             {
                                 dataGridView_runners.DataSource = database.Runner.Local.ToBindingList();
-                                dataGridView_runners_results.DataSource = database.Runner.Local.ToBindingList();
 
                                 toolStripStatusLabel1.Text = "Soubor úspìšnì naèten";
                                 toolStripProgressBar1.Value = 100;
@@ -1247,6 +1244,15 @@ namespace turisticky_zavod.Forms
 
                 Size = size;
                 MinimumSize = size;
+
+                new Thread(new ThreadStart(() =>
+                {
+                    Thread.Sleep(10);
+                    dataGridView_runners_results.BeginInvoke(() => dataGridView_runners_results.DataSource = database.Runner.Local.ToBindingList());
+                    comboBox_filter_team.DataSource = database.Team.Local.ToBindingList();
+                    comboBox_filter_category.DataSource = database.AgeCategory.Local.ToBindingList();
+                }
+                )).Start();
             }
         }
 
