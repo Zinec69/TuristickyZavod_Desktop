@@ -372,3 +372,6 @@ FodyWeavers.xsd
 **/*.local
 **/*.git
 **/*.DS_Store
+/WinUI3
+/WinUI3.Core
+/tz.db
