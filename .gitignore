@@ -372,3 +372,10 @@ FodyWeavers.xsd
 **/*.local
 **/*.git
 **/*.DS_Store
+/WPF_Test/WPF_Test.csproj
+/WPF_Test
+/WinUI3
+/WinUI3.Core
+/tz.db
+/tz.db-shm
+/tz.db-wal
