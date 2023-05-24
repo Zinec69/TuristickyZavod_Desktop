@@ -1,0 +1,24 @@
+﻿<Page
+    x:Class="WinUI3.Views.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid x:Name="ContentArea">
+
+        <StackPanel Spacing="7" Grid.Row="0">
+            <StackPanel x:Name="TextArea" Background="#155D6A7A" CornerRadius="10" Padding="15,10,5,10" Spacing="5">
+                <TextBlock Text="Vítejte ve vyhodnocovací aplikaci turistických závodů" FontSize="22" FontWeight="Medium"/>
+                <TextBlock Text="Začněte tím, že načtete data ze souboru:" FontSize="16" Margin="2,0,0,0"/>
+
+                <StackPanel Orientation="Horizontal" Margin="2,7,0,3" Spacing="7">
+                    <Button Content="Načíst soubor CSV" />
+                    <Button Content="Načíst soubor JSON" />
+                </StackPanel>
+            </StackPanel>
+        </StackPanel>
+        
+    </Grid>
+</Page>
