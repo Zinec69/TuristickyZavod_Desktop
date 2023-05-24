@@ -1,4 +1,4 @@
-# WinForms app for competition runs in Czech republic
+# Desktop app for competition runs in Czech republic
 
 This app's purpose is to load runners' data from \*.csv and \*.json files and NFC tags, let the user interact with it if necessary and export the data to an Excel spreadsheet
 
