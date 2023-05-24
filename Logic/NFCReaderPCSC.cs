@@ -1,5 +1,6 @@
 ﻿using PCSC;
 using PCSC.Monitoring;
+using System.Collections.ObjectModel;
 using System.Text;
 using turisticky_zavod.Data;
 using Usb.Events;
@@ -137,7 +138,7 @@ namespace turisticky_zavod.Logic
             if (runner_split.Length < 6)
                 throw new NFCException("Data na čipu jsou nekompletní nebo ve špatném formátu");
 
-            var checkpointInfos = new List<CheckpointRunnerInfo>();
+            var checkpointInfos = new ObservableCollection<CheckpointRunnerInfo>();
             if (runner_split.Length > 6)
             {
                 for (int j = 6; j < runner_split.Length; j += 7)

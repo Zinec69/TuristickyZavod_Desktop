@@ -1,13 +1,35 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.ComponentModel;
+using System.Text.Json.Serialization;
 
-namespace turisticky_zavod.Data
+namespace turisticky_zavod.Data;
+
+[JsonSerializable(typeof(Team))]
+public class Team : INotifyPropertyChanged
 {
-    [JsonSerializable(typeof(Team))]
-    public class Team
+    private int id;
+    public int ID
     {
-        public int ID {  get; set; }
-        public string Name { get; set; }
-
-        public override string ToString() => Name ?? string.Empty;
+        get => id;
+        set
+        {
+            id = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ID)));
+        }
     }
+
+    private string name;
+    public string Name
+    {
+        get => name;
+        set
+        {
+            name = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Name)));
+        }
+    }
+
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    public override string ToString() => Name ?? string.Empty;
 }

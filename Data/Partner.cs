@@ -1,7 +1,10 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.ComponentModel;
+using System.Text.Json.Serialization;
 
-namespace turisticky_zavod.Data
+namespace turisticky_zavod.Data;
+
+[JsonSerializable(typeof(Partner))]
+public class Partner : BaseRunner, INotifyPropertyChanged
 {
-    [JsonSerializable(typeof(Partner))]
-    public class Partner : BaseRunner { }
+
 }

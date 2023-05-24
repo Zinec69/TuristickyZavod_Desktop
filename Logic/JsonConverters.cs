@@ -1,7 +1,8 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
+using turisticky_zavod.Data;
 
-namespace turisticky_zavod.Data
+namespace turisticky_zavod.Logic
 {
     internal class RefereeJsonConverter : JsonConverter<Referee>
     {

@@ -1,10 +1,10 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.ComponentModel;
+using System.Text.Json.Serialization;
 
-namespace turisticky_zavod.Data
+namespace turisticky_zavod.Data;
+
+[JsonSerializable(typeof(Referee))]
+public class Referee : Person, INotifyPropertyChanged
 {
-    [JsonSerializable(typeof(Referee))]
-    public class Referee : Person
-    {
-        public int ID { get; set; }
-    }
+
 }

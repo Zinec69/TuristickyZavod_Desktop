@@ -1,4 +1,5 @@
-﻿using turisticky_zavod.Data;
+﻿using turisticky_zavod.Logic;
+using turisticky_zavod.Data;
 
 namespace turisticky_zavod.Forms
 {
@@ -36,9 +37,9 @@ namespace turisticky_zavod.Forms
                 var ageMax = textBox_ageMax.Text;
                 var type = comboBox_type.SelectedIndex switch
                 {
-                    0 => CategoryType.DEFAULT,
-                    1 => CategoryType.DUOS,
-                    2 => CategoryType.RELAY
+                    0 => AgeCategoryType.DEFAULT,
+                    1 => AgeCategoryType.DUOS,
+                    2 => AgeCategoryType.RELAY
                 };
                 var gender = comboBox_gender.SelectedIndex switch
                 {

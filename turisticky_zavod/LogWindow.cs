@@ -1,4 +1,4 @@
-﻿using turisticky_zavod.Data;
+﻿using turisticky_zavod.Logic;
 
 namespace turisticky_zavod.Forms
 {

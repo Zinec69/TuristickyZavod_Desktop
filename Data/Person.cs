@@ -1,65 +1,81 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
-namespace turisticky_zavod.Data
+namespace turisticky_zavod.Data;
+
+[NotMapped]
+public abstract class Person : INotifyPropertyChanged
 {
-    [NotMapped]
-    public abstract class Person
+    private int id;
+    public int ID
     {
-        private string firstName;
-
-        [JsonIgnore]
-        public string FirstName
+        get => id;
+        set
         {
-            get
-            {
-                return firstName;
-            }
-            set
-            {
-                firstName = value;
-                if (!string.IsNullOrEmpty(lastName))
-                {
-                    name = $"{FirstName} {LastName}";
-                }
-            }
-        }
-
-        private string lastName;
-
-        [JsonIgnore]
-        public string LastName
-        {
-            get
-            {
-                return lastName;
-            }
-            set
-            {
-                lastName = value;
-                if (!string.IsNullOrEmpty(firstName))
-                {
-                    name = $"{FirstName} {LastName}";
-                }
-            }
-        }
-
-        private string name;
-
-        [NotMapped]
-        public string Name
-        {
-            get
-            {
-                return string.IsNullOrEmpty(name) ? $"{FirstName} {LastName}" : name;
-            }
-            set
-            {
-                name = value;
-                var lastSpaceIndex = name.LastIndexOf(' ');
-                FirstName = lastSpaceIndex >= 0 ? name[..lastSpaceIndex] : name;
-                LastName = lastSpaceIndex >= 0 ? name[(lastSpaceIndex + 1)..] : name;
-            }
+            id = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ID)));
         }
     }
+
+
+    private string firstName;
+
+    [JsonIgnore]
+    public string FirstName
+    {
+        get => firstName;
+        set
+        {
+            firstName = value.Trim();
+            if (!string.IsNullOrEmpty(lastName))
+            {
+                name = $"{FirstName} {LastName}";
+            }
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(FirstName)));
+        }
+    }
+
+
+    private string lastName;
+
+    [JsonIgnore]
+    public string LastName
+    {
+        get => lastName;
+        set
+        {
+            lastName = value.Trim();
+            if (!string.IsNullOrEmpty(firstName))
+            {
+                name = $"{FirstName} {LastName}";
+            }
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(LastName)));
+        }
+    }
+
+
+    private string name;
+
+    [NotMapped]
+    public string Name
+    {
+        get => string.IsNullOrEmpty(name)
+                ? (string.IsNullOrEmpty(FirstName) && string.IsNullOrEmpty(LastName))
+                    ? string.Empty
+                    : $"{FirstName} {LastName}"
+                : name;
+        set
+        {
+            name = value.Trim();
+            var lastSpaceIndex = name.LastIndexOf(' ');
+            FirstName = lastSpaceIndex >= 0 ? name[..lastSpaceIndex] : name;
+            LastName = lastSpaceIndex >= 0 ? name[(lastSpaceIndex + 1)..] : name;
+
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Name)));
+        }
+    }
+
+
+    public event PropertyChangedEventHandler? PropertyChanged;
 }

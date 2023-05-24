@@ -1,10 +1,8 @@
-﻿
-namespace turisticky_zavod.Data
+﻿namespace turisticky_zavod.Data;
+
+public enum Gender
 {
-    public enum Gender
-    {
-        MALE,
-        FEMALE,
-        IRRELEVANT
-    }
+    MALE,
+    FEMALE,
+    IRRELEVANT
 }

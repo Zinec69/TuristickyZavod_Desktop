@@ -136,7 +136,9 @@ namespace turisticky_zavod.Forms
                     await database.Runner.AddRangeAsync(runners);
                     await database.SaveChangesAsync();
 
-                    dataGridView_runners.BeginInvoke(() => dataGridView_runners.DataSource = database.Runner.Local.ToBindingList());
+                    dataGridView_runners.BeginInvoke(() =>
+                        dataGridView_runners.DataSource = database.Runner.Local.ToBindingList()
+                    );
 
                     Invoke(() =>
                     {
@@ -1151,7 +1153,7 @@ namespace turisticky_zavod.Forms
         {
             comboBox_ageCategory.SelectedItem = Data.AgeCategory.TryGetByBirthdate(dateTimePicker_birthdate.Value, database.AgeCategory.Local,
                 comboBox_gender.SelectedIndex == 0 ? Gender.MALE : Gender.FEMALE, out AgeCategory? category,
-                string.IsNullOrEmpty(textBox_name_partner.Text) ? CategoryType.DEFAULT : CategoryType.DUOS,
+                string.IsNullOrEmpty(textBox_name_partner.Text) ? AgeCategoryType.DEFAULT : AgeCategoryType.DUOS,
                 dateTimePicker_birthdate_partner.Value) ? category : null;
         }
 

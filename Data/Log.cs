@@ -1,26 +1,57 @@
-﻿
-namespace turisticky_zavod.Data
+﻿using System.ComponentModel;
+
+namespace turisticky_zavod.Data;
+
+public class Log : INotifyPropertyChanged
 {
-    public class Log
+    private int id;
+    public int ID
     {
-        public int ID { get; set; }
-
-        private string message;
-        public string Message
+        get => id;
+        set
         {
-            get => message;
-            set
-            { 
-                message = value;
-                Timestamp = DateTime.Now;
-            }
+            id = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ID)));
         }
-
-        public string Type { get; set; }
-
-        public DateTime Timestamp { get; private set; }
-
-        public override string ToString()
-            => $"{Timestamp:HH:mm:ss} [{Type.ToUpper()}] {Message}";
     }
+
+    private string message;
+    public string Message
+    {
+        get => message;
+        set
+        {
+            message = value;
+            Timestamp = DateTime.Now;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Message)));
+        }
+    }
+
+    private string type;
+    public string Type
+    {
+        get => type;
+        set
+        {
+            type = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Type)));
+        }
+    }
+
+    private DateTime timestamp;
+    public DateTime Timestamp
+    {
+        get => timestamp;
+        private set
+        {
+            timestamp = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Timestamp)));
+        }
+    }
+
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    public override string ToString()
+        => $"{timestamp:HH:mm:ss} [{type.ToUpper()}] {message}";
 }

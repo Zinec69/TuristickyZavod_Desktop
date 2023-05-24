@@ -1,8 +1,9 @@
 ﻿using ClosedXML.Excel;
 using System.Text;
 using System.Text.Json;
+using turisticky_zavod.Data;
 
-namespace turisticky_zavod.Data
+namespace turisticky_zavod.Logic
 {
     public static class FileHelper
     {
@@ -74,7 +75,7 @@ namespace turisticky_zavod.Data
                         runner.AgeCategory = runner.Birthdate.HasValue
                             ? (runner.Partner == null
                                     ? (AgeCategory.TryGetByBirthdate(runner.Birthdate.Value, allCategories, runner.Gender, out AgeCategory? category) ? category : null)
-                                    : (AgeCategory.TryGetByBirthdate(runner.Birthdate.Value, allCategories, runner.Gender, out AgeCategory? category2, CategoryType.DUOS,
+                                    : (AgeCategory.TryGetByBirthdate(runner.Birthdate.Value, allCategories, runner.Gender, out AgeCategory? category2, AgeCategoryType.DUOS,
                                             runner.Partner!.Birthdate.HasValue ? runner.Partner?.Birthdate.Value : null) ? category2 : null))
                             : null;
 
@@ -162,7 +163,7 @@ namespace turisticky_zavod.Data
 
                 if (runner.Disqualified)
                 {
-                    var disqualificationCheckpoint = runner.CheckpointInfo.Find(x => x.Disqualified);
+                    var disqualificationCheckpoint = runner.CheckpointInfo.Single(x => x.Disqualified);
                     worksheet.Cell($"{cellColumn}{cellRow}").Value = $"Diskvalifikován/a na stanovišti {disqualificationCheckpoint!.Checkpoint.Name}";
                     worksheet.Range($"B{cellRow}:{(char)(cellColumn - 1)}{cellRow}").Style.Fill.BackgroundColor = XLColor.FromArgb(237, 204, 203);
                 }
@@ -239,7 +240,7 @@ namespace turisticky_zavod.Data
 
                     if (runner.Disqualified)
                     {
-                        var disqualificationCheckpoint = runner.CheckpointInfo.Find(x => x.Disqualified);
+                        var disqualificationCheckpoint = runner.CheckpointInfo.Single(x => x.Disqualified);
                         sheet.Cell($"{cellColumn}{cellRow}").Value = $"Diskvalifikován/a na stanovišti {disqualificationCheckpoint!.Checkpoint.Name}";
                         sheet.Range($"B{cellRow}:{(char)(cellColumn - 1)}{cellRow}").Style.Fill.BackgroundColor = XLColor.FromArgb(237, 204, 203);
                     }

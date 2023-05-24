@@ -1,12 +1,31 @@
-﻿
-namespace turisticky_zavod.Data
+﻿using System.ComponentModel;
+
+namespace turisticky_zavod.Data;
+
+public abstract class BaseRunner : Person, INotifyPropertyChanged
 {
-    public abstract class BaseRunner : Person
+    private DateTime? birthdate;
+    public DateTime? Birthdate
     {
-        public int ID { get; set; }
-
-        public DateTime? Birthdate { get; set; }
-
-        public Gender Gender { get; set; }
+        get => birthdate;
+        set
+        {
+            birthdate = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Birthdate)));
+        }
     }
+
+    private Gender gender;
+    public Gender Gender
+    {
+        get => gender;
+        set
+        {
+            gender = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Gender)));
+        }
+    }
+
+
+    public new event PropertyChangedEventHandler? PropertyChanged;
 }
